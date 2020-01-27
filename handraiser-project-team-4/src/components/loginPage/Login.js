@@ -6,17 +6,19 @@ import axios from 'axios'
 export default function Login() {
     const [user, setUser] = useState({
         isNew: false,
-        userObj: {}
+        userObj: {},
+        loginSuccess: false
     })
     const responseGoogle = (response) => {
+        // console.log(response)
         axios({
             method: "get",
-            url: `/api/users?email=${response.profileObj.email}`,
+            url: `/api/users?user_id=${response.profileObj.googleId}`,
         })
         .then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             if (res.data.length === 0) {
-                setUser({
+                setUser({...user,
                     isNew: true,
                     userObj: {
                         user_id: response.profileObj.googleId,
@@ -26,6 +28,10 @@ export default function Login() {
                         lastname: response.profileObj.familyName
                     }
                 })
+            }
+            else{
+                localStorage.setItem('accessToken', response.profileObj.googleId);
+                setUser({ ...user, loginSuccess: true})
             }
         })
         .catch(err => {
@@ -39,6 +45,9 @@ export default function Login() {
             state: user
         }}
         />
+
+    if(localStorage.getItem(`accessToken`) || user.loginSuccess)
+        return <Redirect to="/cohort-list" />
 
     return (
         <div style={{ display: `flex`, justifyContent: `center`, alignItems: `center`, height: `100vh` }}>

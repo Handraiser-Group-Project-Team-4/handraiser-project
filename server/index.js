@@ -20,6 +20,8 @@ massive({
 
   app.get('/api/users', users.login)
   app.post('/api/users', users.create)
+  app.get('/api/users/:id', users.fetch)
+
 
 
   const PORT = 4000;
