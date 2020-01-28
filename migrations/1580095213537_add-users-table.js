@@ -8,10 +8,6 @@ exports.up = pgm => {
             type: 'text',
             primaryKey: true,
         },
-        // user_id: {
-        //     type: 'serial',
-        //     primaryKey: true,
-        // },
         firstname: {
             type: 'text',
             notNull: true,
@@ -32,15 +28,15 @@ exports.up = pgm => {
             type: 'text',
             notNull: true,
         },
-        user_key_id: {
-            type: 'integer',
-            notNull: false,
-            references: '"user_key"',
-        },
+        // user_key_id: {
+        //     type: 'integer',
+        //     notNull: false,
+        //     references: '"user_key"',
+        // },
         user_role_id: {
             type: 'integer',
             notNull: true,
-            references: '"user_role"',
+            references: 'user_role',
         },
     });
 };

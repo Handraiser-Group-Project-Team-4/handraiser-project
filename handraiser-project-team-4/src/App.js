@@ -3,16 +3,21 @@ import './App.css';
 
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import Login from './components/loginPage/Login'
-import FirstLogin from './components/loginPage/FirstLogin'
-import CohortList from './components/mainPage/CohortList'
+import StudentPage from './components/mainPage/StudentPage'
+import MentorPage from './components/mainPage/MentorPage'
+import AdminPage from './components/mainPage/AdminPage'
 
 function App() {
 	return (
     <BrowserRouter>
 		<Switch>
 			<Route exact path="/" component={Login} />
-			<Route exact path="/first-login" component={FirstLogin} />
-			<Route exact path="/cohort-list" component={CohortList} />
+			<Route exact path="/admin-page" component={AdminPage} />
+			<Route exact path="/mentor-page" component={MentorPage} />
+			<Route exact path="/student-page" component={StudentPage} />
+			{/* <Route exact path="/cohort" component={} /> */}
+			{/* <Route exact path="/cohort-mentor-page" component={} /> */}
+
 		</Switch>
 	</BrowserRouter>
   );
