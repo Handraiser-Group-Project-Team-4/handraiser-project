@@ -9,18 +9,18 @@ import AdminPage from './components/mainPage/AdminPage'
 
 function App() {
 	return (
-    <BrowserRouter>
-		<Switch>
-			<Route exact path="/" component={Login} />
-			<Route exact path="/admin-page" component={AdminPage} />
-			<Route exact path="/mentor-page" component={MentorPage} />
-			<Route exact path="/student-page" component={StudentPage} />
-			{/* <Route exact path="/cohort" component={} /> */}
-			{/* <Route exact path="/cohort-mentor-page" component={} /> */}
+		<BrowserRouter>
+			<Switch>
+				<Route exact path="/" component={Login} />
+				<Route exact path="/admin-page" component={AdminPage} />
+				<Route exact path="/mentor-page" component={MentorPage} />
+				<Route exact path="/student-page" component={StudentPage} />
+				{/* <Route exact path="/cohort" component={} /> */}
+				{/* <Route exact path="/cohort-mentor-page" component={} /> */}
 
-		</Switch>
-	</BrowserRouter>
-  );
+			</Switch>
+		</BrowserRouter>
+	);
 }
 
 export default App;
