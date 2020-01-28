@@ -3,9 +3,9 @@
 exports.shorthands = undefined;
 
 exports.up = pgm => {
-    pgm.createTable('user_info', {
-        user_info_id: {
-            type: 'serial',
+    pgm.createTable('users', {
+        user_id: {
+            type: 'text',
             primaryKey: true,
         },
         firstname: {
@@ -24,14 +24,20 @@ exports.up = pgm => {
             type: 'text',
             notNull: true,
         },
-        user_key: {
-            type: 'text',
-            notNull: true,
-        },
         user_status: {
             type: 'text',
             notNull: true,
-        }
+        },
+        // user_key_id: {
+        //     type: 'integer',
+        //     notNull: false,
+        //     references: '"user_key"',
+        // },
+        user_role_id: {
+            type: 'integer',
+            notNull: true,
+            references: 'user_role',
+        },
     });
 };
 
