@@ -8,7 +8,14 @@ module.exports = {
     
         db.query(`SELECT * FROM users WHERE user_id = '${user_id}'`)
         .then(user => {
-            const token = jwt.sign({ user_id }, secret);
+            let user_role_id;
+
+            if (user.length > 0){
+                user_role_id = user[0].user_role_id;
+                db.query(`UPDATE users SET user_status='active' WHERE user_id='${user_id}'`)
+            }
+
+            const token = jwt.sign({ user_id, user_role_id}, secret);
             res.status(200).json({ ...user, token });
         })
         .catch(err => {
@@ -21,51 +28,35 @@ module.exports = {
         const db = req.app.get('db')
         const {user_id, firstname, lastname, email, avatar,} = req.body
 
-        if (!req.headers.authorization) 
-            return res.status(401).end();
-
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            jwt.verify(token, secret); 
-
-            db.query(`INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id)
-                    VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', 'active', 3)    
-            `)
-            .then(user => {
-                res.status(201).json(user)
-            })
-            .catch(err => {
-                console.log(err)
-                res.status(500).end();
-            })
-        } catch (err) {
-            console.error(err);
-            res.status(401).end();
-        }
+        db.query(`INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id)
+                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', 'active', 3)    
+        `)
+        .then(user => {
+            res.status(201).json(user)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).end();
+        })
     },
 
     fetch: (req, res) => {
         const db = req.app.get('db')
-        const {user_id} = req.params.id
 
-        if (!req.headers.authorization) 
-            return res.status(401).end();
+        db.users.find(req.params.id)
+        .then(user => {
+            // console.log(user)
+            res.status(200).json(user)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).end();
+        })
+    },
 
-        try {
-            const token = req.headers.authorization.split(' ')[1];
-            jwt.verify(token, secret); 
+    logout: (req, res) => {
+        const db = req.app.get('db')
 
-            db.users.find(user_id)
-            .then(user => {
-                res.status(200).json(user)
-            })
-            .catch(err => {
-                console.log(err)
-                res.status(500).end();
-            })
-        } catch (err) {
-            console.error(err);
-            res.status(401).end();
-        }
+        db.query(`UPDATE users SET user_status='inactive' WHERE user_id='${req.params.id}'`)
     }
 }

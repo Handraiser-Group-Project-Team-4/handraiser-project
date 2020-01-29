@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
+import jwtToken from '../tools/jwtToken'
 
 export default function MainpageTemplate({children}) {
+    const userObj = jwtToken();
     const [user, setUser] = useState()
+
     useEffect(() => {
         axios({
             method: 'get',
-            url: `/api/users/${localStorage.getItem(`id`)}`,
+            url: `/api/users/${userObj.user_id}`,
             headers: {
-                Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }
         })
         .then(res => {
             // console.log(res.data)
-            setUser(...res.data)
+            setUser(res.data)
         })
         .catch(err => {
             console.log(err)
@@ -23,9 +26,26 @@ export default function MainpageTemplate({children}) {
         return () => { };
     }, [])
 
-    if (!localStorage.getItem(`id`))
+    const handleLogout = () => {
+        axios({
+            method:`patch`,
+            url:`/api/logout/${userObj.user_id}`,
+            headers: {
+                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+            }
+        })
+        .then(res => {
+            console.log(res)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+        sessionStorage.clear()
+    }
+
+    if (!userObj)
         return <Redirect to="/" />
-        
+
     return (
         <div style={{backgroundColor: `lightgrey`}}>
             <header style={{background:`grey`, color:`white`, padding:`20px`, display:`flex`, justifyContent:`space-between`}}>
@@ -35,7 +55,7 @@ export default function MainpageTemplate({children}) {
                     <div style={{display:`flex`, alignItems:`center`}}>
                         {user.firstname} {user.lastname}
                         <img src={user.avatar} alt="profile_pic" width="50" style={{borderRadius:`50%`, margin:`0 20px`}}/>
-                        <a href="#home" onClick={() => localStorage.clear()}>Log out</a>
+                        <Link to="/" onClick={handleLogout}>Log out</Link>
                         {/* <h2>{user.firstname} {user.lastname}</h2> */}
                         {/* <p>{user.email}</p> */}
                     </div>

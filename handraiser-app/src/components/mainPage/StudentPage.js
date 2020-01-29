@@ -1,9 +1,19 @@
 import React from 'react'
+import { Redirect } from 'react-router-dom'
+import jwtToken from '../tools/jwtToken'
 
 import MainpageTemplate from '../tools/MainpageTemplate'
-import CohortList from '../tools/CohortList'
+import CohortList from '../cohort/CohortList'
 
 export default function StudentPage({ location }) {
+    const userObj = jwtToken();
+
+    if(userObj.user_role_id === 1)
+        return <Redirect to="/admin-page" />
+
+    else if(userObj.user_role_id === 2)
+        return <Redirect to="/mentor-page" />
+
     return (
         <MainpageTemplate>
             <div style={{ display: `flex`, flexDirection: `column`, justifyContent: `center`, alignItems: `center`, height: `100vh` }}>
