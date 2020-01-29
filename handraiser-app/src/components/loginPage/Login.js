@@ -10,14 +10,15 @@ export default function Login() {
         role: null
     })
     const responseGoogle = (response) => {
-        console.log(response)
+        // console.log(response)
         axios({
             method: "get",
             url: `/api/users?user_id=${response.profileObj.googleId}`,
         })
         .then(res => {
-            // console.log(res.data)
-            if (res.data.length === 0) {
+            localStorage.setItem('accessToken', res.data.token);
+
+            if (res.data[0] === undefined) {
                 axios({
                     method: `post`,
                     url: `/api/users`,
@@ -27,19 +28,20 @@ export default function Login() {
                         email: response.profileObj.email,
                         firstname: response.profileObj.givenName,
                         lastname: response.profileObj.familyName
+                    },
+                    headers: {
+                        Authorization: 'Bearer ' + localStorage.getItem('accessToken')
                     }
                 })
                 .then(res => {
                     // console.log(res)
                     localStorage.setItem('id', response.profileObj.googleId);
-                    localStorage.setItem('accessToken', response.accessToken);
                     setUser({ ...user, loginSuccess: true, isNew: true})
                 })
                 .catch(err => console.log(err))
             }
             else {
                 localStorage.setItem('id', response.profileObj.googleId);
-                localStorage.setItem('accessToken', response.accessToken);
                 setUser({ ...user, loginSuccess: true, role: res.data[0].user_role_id})
             }
         })
@@ -54,7 +56,7 @@ export default function Login() {
     else if ((localStorage.getItem(`id`) || user.loginSuccess) && user.role === 2)
         return <Redirect to='/mentor-page' />
 
-    else if ((localStorage.getItem(`id`) || user.loginSuccess))
+    else if (localStorage.getItem(`id`) || user.loginSuccess)
         return <Redirect to={{
             pathname: '/student-page',
             state: user

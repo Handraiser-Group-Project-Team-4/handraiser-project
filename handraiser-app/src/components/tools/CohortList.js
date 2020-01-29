@@ -47,7 +47,7 @@ export default function CohortList({mentor}) {
                 if(res.data.length === 0)
                     setIsKey({...isKey, open: true, classroomObj: x})
                 else{
-                    history.push(`/cohort`);
+                    history.push(`/cohort/${x.class_id}`);
                 }
             })
             .catch(err => {
@@ -55,7 +55,7 @@ export default function CohortList({mentor}) {
             })
         }
         else
-            history.push(`/cohort-mentor-page`);
+            history.push(`/cohort/${x.class_id}`);
     }
 
     const handleSubmitKey = (isKey) => {
@@ -77,7 +77,7 @@ export default function CohortList({mentor}) {
         .then(res => {
             // console.log(res)
             alert("Congrats you enter the correct Key!")
-            history.push(`/cohort`);
+            history.push(`/cohort/${class_id}`);
         })
         .catch(err => {
             console.log(err)

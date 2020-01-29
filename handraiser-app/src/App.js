@@ -6,6 +6,7 @@ import Login from './components/loginPage/Login'
 import StudentPage from './components/mainPage/StudentPage'
 import MentorPage from './components/mainPage/MentorPage'
 import AdminPage from './components/mainPage/AdminPage'
+import CohortPage from './components/mainPage/CohortPage'
 
 function App() {
 	return (
@@ -15,8 +16,7 @@ function App() {
 				<Route exact path="/admin-page" component={AdminPage} />
 				<Route exact path="/mentor-page" component={MentorPage} />
 				<Route exact path="/student-page" component={StudentPage} />
-				{/* <Route exact path="/cohort" component={} /> */}
-				{/* <Route exact path="/cohort-mentor-page" component={} /> */}
+				<Route exact path="/cohort/:id" component={CohortPage} />
 
 			</Switch>
 		</BrowserRouter>
