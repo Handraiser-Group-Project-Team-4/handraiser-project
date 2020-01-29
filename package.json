@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:start": "docker-compose up -d db",
+    "db:stop": "docker-compose down",
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "nodemon server/index.js",
     "client": "npm start --prefix handraiser-app",
