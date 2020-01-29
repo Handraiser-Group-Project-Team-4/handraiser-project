@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
+import jwtToken from '../tools/jwtToken'
 
 export default function CohortList({mentor}) {
+    const userObj = jwtToken();
     const history = useHistory()
     const [cohorts, setCohorts] = useState([])
     const [isKey, setIsKey] = useState({
@@ -17,7 +19,7 @@ export default function CohortList({mentor}) {
             method: `get`,
             url: '/api/cohorts',
             headers: {
-                Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }
         })
         .then(res => {
@@ -34,28 +36,24 @@ export default function CohortList({mentor}) {
 
     const handleCohort = (x) => {
         // console.log(`clicked`, x)
-        if(!mentor){
-            axios({
-                method:`get`,
-                url:`/api/cohort-check/${x.class_id}?user_id=${localStorage.getItem('id')}`,
-                headers: {
-                    Authorization: 'Bearer ' + localStorage.getItem('accessToken')
-                }
-            })
-            .then(res => {
-                // console.log(res)
-                if(res.data.length === 0)
-                    setIsKey({...isKey, open: true, classroomObj: x})
-                else{
-                    history.push(`/cohort/${x.class_id}`);
-                }
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        }
-        else
-            history.push(`/cohort/${x.class_id}`);
+        axios({
+            method:`get`,
+            url:`/api/cohort-check/${x.class_id}?user_id=${userObj.user_id}`,
+            headers: {
+                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+            }
+        })
+        .then(res => {
+            // console.log(res)
+            if(res.data.length === 0)
+                setIsKey({...isKey, open: true, classroomObj: x})
+            else{
+                history.push(`/cohort/${x.class_id}`);
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
     }
 
     const handleSubmitKey = (isKey) => {
@@ -67,11 +65,11 @@ export default function CohortList({mentor}) {
             url:`/api/submit-key`,
             data: {
                 class_id,
-                user_id: localStorage.getItem(`id`),
+                user_id: userObj.user_id,
                 input_key
             },
             headers: {
-                Authorization: 'Bearer ' + localStorage.getItem('accessToken')
+                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }
         })
         .then(res => {
