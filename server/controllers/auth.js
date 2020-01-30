@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const secret = require('../../secret')
 
 module.exports = {
     header: (req, res, next) => {
@@ -8,7 +7,7 @@ module.exports = {
 
         try {
             const token = req.headers.authorization.split(' ')[1];
-            jwt.verify(token, secret); 
+            jwt.verify(token, process.env.SECRET_KEY); 
 
             next();
 

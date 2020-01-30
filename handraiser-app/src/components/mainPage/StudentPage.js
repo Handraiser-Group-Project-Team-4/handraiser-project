@@ -8,11 +8,15 @@ import CohortList from '../cohort/CohortList'
 export default function StudentPage({ location }) {
     const userObj = jwtToken();
 
-    if(userObj.user_role_id === 1)
-        return <Redirect to="/admin-page" />
+    if(userObj){
+        if(userObj.user_role_id === 1)
+            return <Redirect to="/admin-page" />
 
-    else if(userObj.user_role_id === 2)
-        return <Redirect to="/mentor-page" />
+        else if(userObj.user_role_id === 2)
+            return <Redirect to="/mentor-page" />
+    }
+    else
+        return <Redirect to="/" />
 
     return (
         <MainpageTemplate>

@@ -10,7 +10,7 @@ export default function MainpageTemplate({children}) {
     useEffect(() => {
         axios({
             method: 'get',
-            url: `/api/users/${userObj.user_id}`,
+            url: `/api/users/${(userObj)&&userObj.user_id}`,
             headers: {
                 Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }

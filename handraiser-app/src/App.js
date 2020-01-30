@@ -8,7 +8,6 @@ import AdminPage from "./components/mainPage/AdminPage";
 import CohortPage from "./components/cohort/CohortPage";
 import NotFound from './components/tools/NotFound'
 
-
 export default function App() {
   return (
     <BrowserRouter>
