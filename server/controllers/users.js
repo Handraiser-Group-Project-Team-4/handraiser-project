@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const secret = require('../../secret')
 
 module.exports = {
     login: (req, res) => {
@@ -12,10 +11,10 @@ module.exports = {
 
             if (user.length > 0){
                 user_role_id = user[0].user_role_id;
-                db.query(`UPDATE users SET user_status='active' WHERE user_id='${user_id}'`)
+                db.query(`UPDATE users SET user_status=true WHERE user_id='${user_id}'`)
             }
 
-            const token = jwt.sign({ user_id, user_role_id}, secret);
+            const token = jwt.sign({ user_id, user_role_id}, process.env.SECRET_KEY);
             res.status(200).json({ ...user, token });
         })
         .catch(err => {
@@ -28,8 +27,8 @@ module.exports = {
         const db = req.app.get('db')
         const {user_id, firstname, lastname, email, avatar,} = req.body
 
-        db.query(`INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id)
-                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', 'active', 3)    
+        db.query(`INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id, dark_mode)
+                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, 3, false)    
         `)
         .then(user => {
             res.status(201).json(user)
@@ -57,6 +56,6 @@ module.exports = {
     logout: (req, res) => {
         const db = req.app.get('db')
 
-        db.query(`UPDATE users SET user_status='inactive' WHERE user_id='${req.params.id}'`)
+        db.query(`UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`)
     }
 }

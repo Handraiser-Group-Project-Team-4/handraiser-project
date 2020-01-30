@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const massive = require('massive');
 const cors = require('cors')
@@ -6,11 +7,11 @@ const users = require('./controllers/users')
 const cohorts = require('./controllers/cohorts')
 
 massive({
-  host: 'localhost',
-  port: 5435,
-  database: 'handraiser',
-  user: 'postgres',
-  password: 'handraiser',
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
 }).then(db => {
   const app = express();
 
@@ -34,9 +35,7 @@ massive({
   app.get('/api/cohort-check/:id', cohorts.checkUser)
   app.post('/api/submit-key/', cohorts.submitKey)
 
-
-
-  const PORT = 4000;
+  const PORT = process.env.PORT || 4000;
   app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
   });

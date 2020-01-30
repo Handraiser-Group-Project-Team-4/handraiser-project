@@ -8,6 +8,7 @@ import jwtToken from '../tools/jwtToken'
 export default function LoginBtn() {
     const userObj = jwtToken();
     const [user, setUser] = useState({
+        isNew: false,
         loginSuccess: false,
         role: null
     })
@@ -37,13 +38,11 @@ export default function LoginBtn() {
                 })
                 .then(res => {
                     // console.log(res)
-                    // localStorage.setItem('id', response.profileObj.googleId);
-                    setUser({ ...user, loginSuccess: true})
+                    setUser({ ...user, loginSuccess: true, isNew: true})
                 })
                 .catch(err => console.log(err))
             }
             else {
-                // localStorage.setItem('id', response.profileObj.googleId);
                 setUser({ ...user, loginSuccess: true, role: res.data[0].user_role_id})
             }
         })
@@ -52,7 +51,7 @@ export default function LoginBtn() {
         })
     }
     if ((userObj || user.loginSuccess) && user.role === 1)
-    return <Redirect to='/admin-page' />
+        return <Redirect to='/admin-page' />
         
     else if ((userObj|| user.loginSuccess) && user.role === 2)
         return <Redirect to='/mentor-page' />
@@ -65,7 +64,7 @@ export default function LoginBtn() {
 
     return (
         <GoogleLogin
-            clientId="583886288270-pclb0onu831kl9a3n1onuqbnhs5sk8k1.apps.googleusercontent.com"
+            clientId={process.env.REACT_APP_CLIENT_ID}
             buttonText="Login with Google"
             onSuccess={responseGoogle}
             onFailure={(response) => console.log(response)}
@@ -85,6 +84,7 @@ export default function LoginBtn() {
                         border: "none",
                         display:"flex",
                         alignItems:"center",
+                        cursor:`pointer`,
                         boxShadow: "0px 3px 5px -1px rgba(0,0,0,0.2), 0px 6px 10px 0px rgba(0,0,0,0.14), 0px 1px 18px 0px rgba(0,0,0,0.12)"
                         }}
                 >        
