@@ -8,18 +8,19 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import classroom from "../../images/classroom.png";
 import handraise from "../../images/handraise.png";
-import googleIcon from "../../images/google-icon.svg";
 import bg from "../../images/bg.jpg";
-import Fab from "@material-ui/core/Fab";
+// import googleIcon from "../../images/google-icon.svg";
+// import Fab from "@material-ui/core/Fab";
 import Hidden from "@material-ui/core/Hidden";
+import LoginBtn from './LoginBtn'
 
-export default function Login() {
+export default function LoginPage() {
   const classes = useStyles();
   return (
     <div className={classes.gradient}>
       <CssBaseline />
       <Container fixed>
-        <Box boxShadow={3} className={classes.loginBox}>
+        <Box boxshadow={3} className={classes.loginBox}>
           <Grid container spacing={0} style={{ height: "100%" }}>
             <Hidden only={["xs", "sm"]}>
               <Grid
@@ -43,7 +44,7 @@ export default function Login() {
               className={classes.loginBoxGridTwo}
             >
               <CardMedia
-                boxShadow={3}
+                boxshadow={3}
                 className={classes.loginBoxGridTwoCardMedia}
                 image={bg}
               >
@@ -63,7 +64,7 @@ export default function Login() {
                 >
                   You can access the Handraiser with your google account
                 </Typography>
-                <Fab
+                {/* <Fab
                   variant="outlined"
                   color="primary"
                   aria-label="add"
@@ -85,7 +86,8 @@ export default function Login() {
                     }}
                   />
                   GET STARTED
-                </Fab>
+                </Fab> */}
+                <LoginBtn />
               </CardMedia>
             </Grid>
           </Grid>

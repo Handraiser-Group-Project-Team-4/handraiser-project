@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import axios from "axios";
-
+import jwtToken from "../tools/jwtToken";
 export default function MainpageTemplate({ children }) {
+  const userObj = jwtToken();
   const [user, setUser] = useState();
   useEffect(() => {
     axios({
       method: "get",
-      url: `/api/users/${localStorage.getItem(`id`)}`,
+      url: `/api/users/${userObj && userObj.user_id}`,
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken")
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
     })
       .then(res => {
@@ -19,12 +20,25 @@ export default function MainpageTemplate({ children }) {
       .catch(err => {
         console.log(err);
       });
-
     return () => {};
   }, []);
-
-  if (!localStorage.getItem(`id`)) return <Redirect to="/" />;
-
+  const handleLogout = () => {
+    axios({
+      method: `patch`,
+      url: `/api/logout/${userObj.user_id}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    sessionStorage.clear();
+  };
+  if (!userObj) return <Redirect to="/" />;
   return (
     <div style={{ backgroundColor: `lightgrey` }}>
       <header
@@ -37,7 +51,6 @@ export default function MainpageTemplate({ children }) {
         }}
       >
         <h3>This is a header</h3>
-
         {user && (
           <div style={{ display: `flex`, alignItems: `center` }}>
             {user.firstname} {user.lastname}
@@ -47,17 +60,15 @@ export default function MainpageTemplate({ children }) {
               width="50"
               style={{ borderRadius: `50%`, margin: `0 20px` }}
             />
-            <a href="#home" onClick={() => localStorage.clear()}>
+            <Link to="/" onClick={handleLogout}>
               Log out
-            </a>
+            </Link>
             {/* <h2>{user.firstname} {user.lastname}</h2> */}
             {/* <p>{user.email}</p> */}
           </div>
         )}
       </header>
-
       {children}
-
       <footer
         style={{
           background: `grey`,

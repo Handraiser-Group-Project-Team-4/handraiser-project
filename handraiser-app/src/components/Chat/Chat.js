@@ -1,62 +1,62 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-
+import jwtToken from "../tools/jwtToken";
 let socket;
 const Chat = () => {
-  // const [username, setUsername] = useState("");
-  // const [room, setRoom] = useState("");
-  const [chatDetails, setChatDetails] = useState({});
+  const userObj = jwtToken();
+  // const [chatDetails, setChatDetails] = useState({
+  //     name:"",
+  //     room:"",
+  //     avater:"",
+  // });
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
+  const ENDPOINT = "localhost:4000";
   useEffect(() => {
     axios({
       method: "get",
-      url: `/api/users/${localStorage.getItem(`id`)}`,
+      url: `/api/users/${userObj.user_id}?chat=true`,
       headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken")
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
     })
       .then(res => {
-        setChatDetails({
-          name: res.data.firstname + " " + res.data.lastname,
-          room: "Websocket"
-        });
+        // console.log(res.data)
+        // setChatDetails({
+        //     name: res.data.firstname + " " + res.data.lastname,
+        //     room: `'${res.data.concern_id}'`,
+        //     avatar: res.data.avatar
+        // })
+        setUsername(res.data.firstname + " " + res.data.lastname);
+        setRoom(`WebSocket`);
       })
       .catch(err => {
         console.log(err);
       });
   }, []);
-
   useEffect(() => {
-    socket = io("localhost:4000");
-    socket.emit(
-      "join",
-      { name: chatDetails.name, room: chatDetails.room },
-      error => {}
-    );
-  }, [chatDetails]);
-
+    socket = io(ENDPOINT);
+    socket.emit("join", { username, room }, error => {});
+  }, [ENDPOINT, username, room]);
   useEffect(() => {
     socket.on("message", message => {
       setMessages([...messages, message]);
     });
-
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [messages]);
-
+  }, []);
   const sendMessage = event => {
     event.preventDefault();
-
     if (message) {
       socket.emit("sendMessage", message, () => setMessage(""));
     }
   };
-  // console.log(message, messages);
+  console.log(message, messages);
   return (
     <div
       style={{
@@ -69,11 +69,14 @@ const Chat = () => {
       }}
     >
       <h1>Chat</h1>
-      <p>{"Name: " + chatDetails.name}</p>
-      <p style={{ paddingBottom: "80px" }}>{"Room: " + chatDetails.room}</p>
+      <p>{"Name: " + username}</p>
+      <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
       {messages.map((message, i) => (
         <div key={i}>
-          {message.user + " " + message.text + " " + message.time_sent}
+          <div>{message.user + " " + message.text}</div>
+          <p style={{ opacity: `0.5`, fontSize: `10px`, margin: `0` }}>
+            {message.time_sent}
+          </p>
         </div>
       ))}
       <input
@@ -87,5 +90,4 @@ const Chat = () => {
     </div>
   );
 };
-
 export default Chat;
