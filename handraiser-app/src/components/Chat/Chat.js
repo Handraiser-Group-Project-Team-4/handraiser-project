@@ -4,12 +4,11 @@ import axios from "axios";
 
 let socket;
 const Chat = () => {
-  const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("");
+  // const [username, setUsername] = useState("");
+  // const [room, setRoom] = useState("");
+  const [chatDetails, setChatDetails] = useState({});
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
-  const ENDPOINT = "localhost:4000";
 
   useEffect(() => {
     axios({
@@ -20,8 +19,10 @@ const Chat = () => {
       }
     })
       .then(res => {
-        setUsername(res.data.firstname + " " + res.data.lastname);
-        setRoom("WebSocket");
+        setChatDetails({
+          name: res.data.firstname + " " + res.data.lastname,
+          room: "Websocket"
+        });
       })
       .catch(err => {
         console.log(err);
@@ -29,11 +30,13 @@ const Chat = () => {
   }, []);
 
   useEffect(() => {
-    const name = username;
-
-    socket = io(ENDPOINT);
-    socket.emit("join", { name, room }, error => {});
-  }, [ENDPOINT, username, room]);
+    socket = io("localhost:4000");
+    socket.emit(
+      "join",
+      { name: chatDetails.name, room: chatDetails.room },
+      error => {}
+    );
+  }, [chatDetails]);
 
   useEffect(() => {
     socket.on("message", message => {
@@ -53,7 +56,7 @@ const Chat = () => {
       socket.emit("sendMessage", message, () => setMessage(""));
     }
   };
-  console.log(message, messages);
+  // console.log(message, messages);
   return (
     <div
       style={{
@@ -66,8 +69,8 @@ const Chat = () => {
       }}
     >
       <h1>Chat</h1>
-      <p>{"Name: " + username}</p>
-      <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
+      <p>{"Name: " + chatDetails.name}</p>
+      <p style={{ paddingBottom: "80px" }}>{"Room: " + chatDetails.room}</p>
       {messages.map((message, i) => (
         <div key={i}>
           {message.user + " " + message.text + " " + message.time_sent}

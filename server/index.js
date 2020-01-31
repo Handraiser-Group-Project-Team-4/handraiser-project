@@ -56,7 +56,11 @@ massive({
     console.log("a user connected");
 
     socket.on("join", ({ name, room }, callback) => {
-      const user = { id: socket.id, name, room };
+      const user = {
+        id: socket.id,
+        name,
+        room
+      };
       users.push(user);
 
       socket.broadcast.to(user.room).emit("message", {
@@ -71,7 +75,7 @@ massive({
 
     socket.on("sendMessage", (message, callback) => {
       const user = users.find(user => user.id === socket.id);
-
+      console.log(user);
       io.to(user.room).emit("message", {
         user: user.name,
         text: message,
