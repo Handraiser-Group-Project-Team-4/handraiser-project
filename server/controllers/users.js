@@ -41,16 +41,25 @@ module.exports = {
 
     fetch: (req, res) => {
         const db = req.app.get('db')
+        const {chat} = req.query;
 
-        db.users.find(req.params.id)
-        .then(user => {
-            // console.log(user)
-            res.status(200).json(user)
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).end();
-        })
+        if(chat){
+            db.query(`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1 `)
+            .then(concern => {
+                res.status(200).json(...concern)
+            })
+        }
+        else{
+            db.users.find(req.params.id)
+            .then(user => {
+                // console.log(user)
+                res.status(200).json(user)
+            })
+            .catch(err => {
+                console.log(err)
+                res.status(500).end();
+            })
+        }
     },
 
     logout: (req, res) => {

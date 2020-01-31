@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/Handraiser-Group-Project-Team-4/handraiser-project#readme",
   "dependencies": {
-    "argon2": "^0.24.0",
     "concurrently": "^5.0.2",
     "config": "^3.2.5",
     "cors": "^2.8.5",
@@ -32,7 +31,8 @@
     "jsonwebtoken": "^8.5.1",
     "massive": "^6.1.4",
     "node-pg-migrate": "^4.2.2",
-    "pg": "^7.17.1"
+    "pg": "^7.17.1",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"

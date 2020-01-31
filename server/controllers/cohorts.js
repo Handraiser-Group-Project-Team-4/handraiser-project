@@ -26,13 +26,13 @@ module.exports = {
 
     submitKey: (req, res) => {
         const db = req.app.get('db')
-        const {class_id, user_id, input_key} = req.body
-        
+        const {class_id, user_id, date_joined, input_key} = req.body
 
         db.query(`SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`)
         .then(classroom => {
             if(classroom.length !== 0){
-                db.query(`INSERT INTO classroom_students (class_id, user_id) VALUES (${class_id}, ${user_id})`)
+                db.classroom_students.insert({class_id, user_id, date_joined})
+                // db.query(`INSERT INTO classroom_students (class_id, user_id, date_joined) VALUES (${class_id}, '${user_id}, '${date_joined}')`)
                 .then(classroom_students => res.status(201).json(classroom_students) )
             }
             else
@@ -59,7 +59,8 @@ module.exports = {
             db.query(`INSERT INTO classroom (class_key, class_id) VALUES('${key}', ${classroom_details.class_id})`)
             .then(classroom => {
                 res.status(201).json({key})
-                db.query(`INSERT INTO classroom_students(class_id, user_id) VALUES(${classroom_details.class_id}, ${user_id})`)
+                db.query(`INSERT INTO classroom_students(class_id, user_id, date_joined) 
+                        VALUES(${classroom_details.class_id}, '${user_id}', '${class_created}')`)
                 .then(res => console.log(res))
                 .catch(err => req.status(500).end())
             })
