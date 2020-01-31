@@ -45,13 +45,25 @@ massive({
   //CHATS
   io.on("connection", socket => {
     const users = [];
+    const new_date = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(new Date());
+
     console.log("a user connected");
 
     socket.on("join", ({ name, room }, callback) => {
       const user = { id: socket.id, name, room };
       users.push(user);
 
-      socket.broadcast.to(user.room).emit("message", { user: "", text: `` });
+      socket.broadcast.to(user.room).emit("message", {
+        user: "admin",
+        text: `hello`,
+        time_sent: new_date
+      });
       socket.join(user.room);
 
       callback();
@@ -59,8 +71,12 @@ massive({
 
     socket.on("sendMessage", (message, callback) => {
       const user = users.find(user => user.id === socket.id);
-      console.log(user);
-      io.to(user.room).emit("message", { user: user.name, text: message });
+
+      io.to(user.room).emit("message", {
+        user: user.name,
+        text: message,
+        time_sent: new_date
+      });
 
       callback();
     });

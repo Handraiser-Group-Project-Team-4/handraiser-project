@@ -69,7 +69,9 @@ const Chat = () => {
       <p>{"Name: " + username}</p>
       <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
       {messages.map((message, i) => (
-        <div key={i}>{message.user + ": " + message.text}</div>
+        <div key={i}>
+          {message.user + " " + message.text + " " + message.time_sent}
+        </div>
       ))}
       <input
         style={{ marginTop: "50px", padding: "30px" }}
