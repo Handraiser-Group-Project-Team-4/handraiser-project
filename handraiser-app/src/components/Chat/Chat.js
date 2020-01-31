@@ -8,13 +8,13 @@ const Chat = () => {
     // const [chatDetails, setChatDetails] = useState({
     //     name:"",
     //     room:"",
-    //     avater:"",
+    //     avatar:"",
     // });
     const [username, setUsername] = useState("");
     const [room, setRoom] = useState("");
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    // const ENDPOINT = "localhost:4000";
+    const ENDPOINT = "localhost:4000";
 
 
     useEffect(() => {
@@ -33,7 +33,7 @@ const Chat = () => {
                 //     avatar: res.data.avatar
                 // })
                 setUsername(res.data.firstname + " " + res.data.lastname);
-                setRoom(`'${res.data.concern_id}'`);
+                setRoom(res.data.concern_id);
             })
             .catch(err => {
                 console.log(err);
@@ -41,12 +41,13 @@ const Chat = () => {
     }, []);
 
     useEffect(() => {
-        socket = io(process.env.WEBSOCKET_HOST);
+        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
         socket.emit("join", { username, room }, error => { });
     }, [username, room]);
 
     useEffect(() => {
         socket.on("message", message => {
+            console.log(message)
             setMessages([...messages, message]);
         });
         return () => {

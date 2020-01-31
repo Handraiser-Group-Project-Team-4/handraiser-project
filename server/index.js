@@ -42,15 +42,8 @@ massive({
 
     //CHATS
     io.on("connection", socket => {
-        const users = [];
-
-        const new_date = new Intl.DateTimeFormat("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit"
-          }).format(new Date());
+        const users = []
+        let messages=[];
 
         console.log("a user connected");
 
@@ -61,31 +54,43 @@ massive({
                 room: room
             };
 
-            console.log(user)
+            // console.log(user)
             users.push(user);
 
-            // db.query(`SELECT * FROM concern WHERE concern_id = ${room}`)
-            // .then(res => {
-                // console.log(res)
-                socket.broadcast
-                    .to(user.room)
-                    .emit("message", { 
-                        user: "", 
-                        text: ``, 
-                        time_sent: `${new_date}` 
-                    });
-            // })
+            if (user.room)
+                db.query(`SELECT * FROM messages WHERE concern_id=${user.room}`)
+                .then(res => {
+                    console.log(res)
+                    messages = res 
+                })
+                .catch(err => console.log(err))
 
-            socket.join(user.room);
+            socket.broadcast
+            .to(`${user.room}`)
+            .emit("message", { 
+                user: "This is chat", 
+                text: `from db`, 
+                time_sent: `Jan 31, 2020, 01:55 PM` 
+            });
+
+            socket.join(`${user.room}`);
 
             callback();
 
         });
 
         socket.on("sendMessage", (message, callback) => {
+            const new_date = new Intl.DateTimeFormat("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            }).format(new Date());
+    
             const user = users.find(user => user.id === socket.id);
 
-            io.to(user.room).emit("message", { 
+            io.to(`${user.room}`).emit("message", { 
                 user: user.name, 
                 text: message,  
                 time_sent: new_date 

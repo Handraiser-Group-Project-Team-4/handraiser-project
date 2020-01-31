@@ -141,7 +141,7 @@ exports.up = pgm => {
         concern_id: {
             type: 'integer',
             notNull: true,
-            references: 'classroom_details',
+            references: 'concern',
         },
         message: {
             type: 'text',
