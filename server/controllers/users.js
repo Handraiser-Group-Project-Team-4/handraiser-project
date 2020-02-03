@@ -1,61 +1,141 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 module.exports = {
-    login: (req, res) => {
-        const db = req.app.get('db')
-        const {user_id} = req.query
-    
-        db.query(`SELECT * FROM users WHERE user_id = '${user_id}'`)
-        .then(user => {
-            let user_role_id;
+  login: (req, res) => {
+    const db = req.app.get("db");
+    const { user_id } = req.query;
 
-            if (user.length > 0){
-                user_role_id = user[0].user_role_id;
-                db.query(`UPDATE users SET user_status=true WHERE user_id='${user_id}'`)
-            }
+    db.query(`SELECT * FROM users WHERE user_id = '${user_id}'`)
+      .then(user => {
+        let user_role_id;
 
-            const token = jwt.sign({ user_id, user_role_id}, process.env.SECRET_KEY);
-            res.status(200).json({ ...user, token });
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).end();
-        })
-    },
+        if (user.length > 0) {
+          user_role_id = user[0].user_role_id;
+          db.query(
+            `UPDATE users SET user_status=true WHERE user_id='${user_id}'`
+          );
+        }
 
-    create: (req, res) => {
-        const db = req.app.get('db')
-        const {user_id, firstname, lastname, email, avatar,} = req.body
+        const token = jwt.sign(
+          { user_id, user_role_id },
+          process.env.SECRET_KEY
+        );
+        res.status(200).json({ ...user, token });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).end();
+      });
+  },
 
-        db.query(`INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id, dark_mode)
-                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, 3, false)    
-        `)
-        .then(user => {
-            res.status(201).json(user)
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).end();
-        })
-    },
+  create: (req, res) => {
+    const db = req.app.get("db");
+    const { user_id, firstname, lastname, email, avatar } = req.body;
 
-    fetch: (req, res) => {
-        const db = req.app.get('db')
+    db.query(
+      `INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, reason_disapproved, user_role_id, user_approval_status, dark_mode)
+                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, null, 3, 3, false)    
+        `
+    )
+      .then(user => {
+        res.status(201).json(user);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).end();
+      });
+  },
 
-        db.users.find(req.params.id)
-        .then(user => {
-            // console.log(user)
-            res.status(200).json(user)
-        })
-        .catch(err => {
-            console.log(err)
-            res.status(500).end();
-        })
-    },
+  fetch: (req, res) => {
+    const db = req.app.get("db");
 
-    logout: (req, res) => {
-        const db = req.app.get('db')
+    db.users
+      .find(req.params.id)
+      .then(user => {
+        // console.log(user)
+        res.status(200).json(user);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).end();
+      });
+  },
 
-        db.query(`UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`)
-    }
-}
+  logout: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`
+    );
+  },
+
+  pending: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(`select * from users where user_approval_status = 2`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
+  approved: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(`select * from users where user_approval_status = 1`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+  disapproved: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(`select * from users where user_approval_status = 3`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+  movingToApprove: (req, res) => {
+    const db = req.app.get("db");
+    const { user_approval_status } = req.body;
+    db.users
+      .update(
+        {
+          user_id: req.params.id
+        },
+        {
+          user_approval_status: user_approval_status,
+          user_role_id: 2
+        }
+      )
+      .then(post => res.status(201).send(post))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
+  },
+  movingToDisapprove: (req, res) => {
+    const db = req.app.get("db");
+    const { user_approval_status, reason_disapproved } = req.body;
+    db.users
+      .update(
+        {
+          user_id: req.params.id
+        },
+        {
+          user_approval_status: user_approval_status,
+          reason_disapproved: reason_disapproved 
+        }
+      )
+      .then(post => res.status(201).send(post))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
+  }
+};

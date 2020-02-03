@@ -3,7 +3,8 @@ import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
 import jwtToken from '../tools/jwtToken'
 
-export default function MainpageTemplate({children}) {
+
+export default function MainpageTemplate() {
     const userObj = jwtToken();
     const [user, setUser] = useState()
 
@@ -62,9 +63,9 @@ export default function MainpageTemplate({children}) {
                 }
             </header>
 
-                {children}
+             
 
-            <footer style={{background:`grey`, color:`white`, padding:`20px`, textAlign:`center`}}>This is a footer</footer>
+            {/* <footer style={{background:`grey`, color:`white`, padding:`20px`, textAlign:`center`}}>This is a footer</footer> */}
         </div>
     )
 }
