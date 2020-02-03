@@ -41,7 +41,9 @@ massive({
 
 	// CONCERN
 	app.get('/api/concern/:id', concern.list);
-	app.patch('/api/concern/:id', concern.action);
+	app.post('/api/concern/', concern.create);
+	app.patch('/api/concern/:id', concern.update);
+	app.delete('/api/concern/:id', concern.delete);
 
 	const PORT = 4000;
 

@@ -11,7 +11,7 @@ import Data from './Data';
 export default function NeedHelp(props) {
 	const classes = useStyles();
 
-	const { data, setData } = Data(props.id, 'onprocess', props.socket);
+	const { data } = Data(props.id, props.socket);
 
 	return (
 		<Paper className={classes.paper}>
@@ -28,9 +28,7 @@ export default function NeedHelp(props) {
 								id={student.concern_id}
 								student_id={student.student_id}
 								status={student.concern_status}
-								data={data}
-								setData={setData}
-								index={index}
+								text={student.concern_title}
 							/>
 						);
 					} else return null;

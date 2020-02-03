@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Axios from 'axios';
 import jwtToken from '../tools/jwtToken';
 
+import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import Divider from '@material-ui/core/Divider';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -10,10 +11,13 @@ import Avatar from '@material-ui/core/Avatar';
 import HelpIcon from '@material-ui/icons/Help';
 import ChatIcon from '@material-ui/icons/Chat';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import DeleteIcon from '@material-ui/icons/Delete';
+import Typography from '@material-ui/core/Typography';
 
 export default function Students(props) {
+	const classes = useStyles();
 	const userObj = jwtToken();
-	const { id, status, student_id, data, setData, index } = props;
+	const { id, status, student_id, text } = props;
 	const [student, setStudent] = useState([]);
 
 	useEffect(() => {
@@ -30,55 +34,57 @@ export default function Students(props) {
 			.catch(err => console.log(err));
 	}, [student_id]);
 
-	const hanleAction = concern_status => {
-		let mentor_id = concern_status === 'onprocess' ? userObj.user_id : null;
+	const handleUpdate = value => {
+		let mentor_id = value === 'onprocess' ? userObj.user_id : null;
 		Axios({
 			method: 'patch',
 			url: `/api/concern/${id}`,
-			data: { concern_status, mentor_id },
+			data: { concern_status: value, mentor_id },
 			headers: {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 			}
 		})
-			.then(res => {
-				let arr = [];
-				data.filter((student, n) => {
-					let {
-						concern_id,
-						mentor_id,
-						student_id,
-						class_id,
-						concern_title,
-						concern_status
-					} = student;
-					if (index === n) {
-						concern_status = concern_status;
-					}
-					return arr.push({
-						concern_id,
-						mentor_id,
-						student_id,
-						class_id,
-						concern_title,
-						concern_status
-					});
-				});
-				setData(arr);
-			})
+			.then(res => {})
 			.catch(err => console.log(err));
 	};
 
+	const handleDelete = () => {
+		Axios({
+			method: 'delete',
+			url: `/api/concern/${id}`,
+			headers: {
+				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+			}
+		})
+			.then(res => {})
+			.catch(err => console.log(err));
+	};
+	if (!student) {
+		return null;
+	}
 	return (
 		<>
 			<ListItem alignItems="flex-start">
 				<ListItemAvatar>
 					<Avatar alt={student.firstname} src={student.avatar} />
 				</ListItemAvatar>
-				<ListItemText primary={`${student.firstname} ${student.lastname}`} />
+				<ListItemText
+					primary={`${student.firstname} ${student.lastname}`}
+					secondary={
+						<React.Fragment>
+							{`Problem: ${text}`}
+							<Typography
+								component="span"
+								variant="body2"
+								className={classes.inline}
+							></Typography>
+						</React.Fragment>
+					}
+				/>
 				{status === 'pending' && userObj.user_role_id === 2 ? (
 					<HelpIcon
 						onClick={() => {
-							hanleAction('onprocess');
+							handleUpdate('onprocess');
 						}}
 					/>
 				) : status === 'onprocess' && userObj.user_role_id === 2 ? (
@@ -87,13 +93,28 @@ export default function Students(props) {
 						<RemoveCircleIcon
 							style={{ marginLeft: 10 }}
 							onClick={() => {
-								hanleAction('pending');
+								handleUpdate('pending');
 							}}
 						/>
 					</>
+				) : status === 'pending' &&
+				  userObj.user_role_id === 3 &&
+				  userObj.user_id === student.user_id ? (
+					<DeleteIcon
+						onClick={() => {
+							handleDelete();
+						}}
+					/>
 				) : null}
 			</ListItem>
 			<Divider variant="inset" component="li" />
 		</>
 	);
 }
+
+const useStyles = makeStyles(theme => ({
+	inline: {
+		display: 'inline',
+		color: '#000'
+	}
+}));
