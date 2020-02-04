@@ -4,11 +4,18 @@ module.exports = {
   list: (req, res) => {
     const db = req.app.get("db");
 
-    db.classroom_details
-      .find()
-      .then(classroom => res.status(200).json(classroom))
+    db.query(
+      `select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
+    classroom_details.class_created, 
+    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
+    classroom.class_key
+    from classroom_details
+    inner join classroom
+    on classroom_details.class_id = classroom.class_id`
+    )
+      .then(get => res.status(200).json(get))
       .catch(err => {
-        console.log(err);
+        console.error(err);
         res.status(500).end();
       });
   },
@@ -90,6 +97,7 @@ module.exports = {
         res.status(500).end();
       });
   },
+  
   //Zion
   make: (req, res) => {
     const db = req.app.get("db");
@@ -120,25 +128,6 @@ module.exports = {
         }
       )
       .then(post => res.status(201).json(post))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-
-  lista: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
-    classroom_details.class_created, 
-    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
-    classroom.class_key
-    from classroom_details
-    inner join classroom
-    on classroom_details.class_id = classroom.class_id`
-    )
-      .then(get => res.status(200).json(get))
       .catch(err => {
         console.error(err);
         res.status(500).end();

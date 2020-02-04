@@ -21,7 +21,7 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/toapprove/${handleId.user_id}`,
+      url: `/api/toapprove/${handleId.user_id}`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     },
@@ -44,8 +44,8 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
       fullWidth={false}
       maxWidth="xs"
     >
-        <DialogTitle id="alert-dialog-title"></DialogTitle>
-            Are you sure you want to assign {handleId.firstname} {handleId.lastname} as a mentor?
+        <DialogTitle id="alert-dialog-title"> Are you sure you want to assign {handleId.firstname} {handleId.lastname} as a mentor?</DialogTitle>
+           
         <DialogContent>
           
         </DialogContent>

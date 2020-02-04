@@ -17,7 +17,7 @@ const Chat = () => {
     const [oldChat, setOldChat] = useState([]);
     const [currentChat, setCurrentChat] = useState([]);
     const [message, setMessage] = useState("");
-    const ENDPOINT = "localhost:4000";
+    const ENDPOINT = "localhost:3001";
   
     useEffect(() => {
         axios({

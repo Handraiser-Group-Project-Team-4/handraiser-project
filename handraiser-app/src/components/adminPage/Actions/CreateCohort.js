@@ -48,7 +48,7 @@ export default function AlertDialog({ open, handleClose, renderCohorts }) {
 
     axios({
       method: "post",
-      url: "http://localhost:4000/api/class",
+      url: "/api/class",
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     },

@@ -25,7 +25,7 @@ export default function AlertDialog({ open, handleClose, renderCohorts, row }) {
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/class/${row.classroom_id}`,
+      url: `/api/class/${row.classroom_id}`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     },

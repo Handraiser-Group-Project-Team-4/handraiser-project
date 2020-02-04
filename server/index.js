@@ -34,23 +34,25 @@ massive({
     app.patch('/api/logout/:id', users.logout)
     app.post('/api/users', users.create)
     app.get('/api/users/:id', users.fetch)
-    app.get('/api/pending', users.pending)
-    app.get('/api/approved', users.approved)
-    app.get('/api/disapproved', users.disapproved)
-    app.patch('/api/toapprove/:id', users.movingToApprove)
-    app.patch('/api/todisapprove/:id', users.movingToDisapprove)
-  
-    // COHORTS
-    app.post('/api/class', cohorts.make)
-    app.get('/api/class', cohorts.lista)
-    app.patch('/api/class/:id', cohorts.changeKey)
-  
-  
-    
+
+    // COHORTS 
     app.get('/api/cohorts', cohorts.list)
     app.post('/api/cohorts', cohorts.create)
     app.get('/api/cohort-check/:id', cohorts.checkUser)
     app.post('/api/submit-key/', cohorts.submitKey)
+
+
+    // ADMIN - USERS
+    app.patch('/api/pending/:id', users.request)
+
+    app.get('/api/user_approval_fetch', users.user_approval_fetch)
+    app.patch('/api/toapprove/:id', users.movingToApprove)
+    app.patch('/api/todisapprove/:id', users.movingToDisapprove)
+
+    // ADMIN - COHORTS
+    app.post('/api/class', cohorts.make)
+    app.patch('/api/class/:id', cohorts.changeKey)
+  
 
     //CHATS
     io.on("connection", socket => {
@@ -124,7 +126,7 @@ massive({
         });
     });
 
-    const PORT = process.env.PORT || 4000;
+    const PORT = process.env.PORT || 3001;
 
     server.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`);

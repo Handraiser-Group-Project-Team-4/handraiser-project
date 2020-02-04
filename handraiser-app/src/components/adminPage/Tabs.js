@@ -72,18 +72,18 @@ export default function ScrollableTabsButtonAuto() {
         >
           <Tab label="Approval" {...a11yProps(0)} />
           <Tab label="Create Cohort" {...a11yProps(1)} />
-          
+
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <Approval/>
-       
+        <Approval />
+
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Cohort/>
-      
+        <Cohort />
+
       </TabPanel>
-      
+
     </div>
   );
 }

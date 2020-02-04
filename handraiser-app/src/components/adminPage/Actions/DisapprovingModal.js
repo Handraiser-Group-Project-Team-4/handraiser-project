@@ -25,7 +25,7 @@ export default function AlertDialog({
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/todisapprove/${data.user_id}`,
+      url: `/api/todisapprove/${data.user_id}`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     },

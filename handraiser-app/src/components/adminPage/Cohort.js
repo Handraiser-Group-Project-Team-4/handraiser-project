@@ -67,7 +67,7 @@ export default function StickyHeadTable() {
   const renderCohorts = () => {
     axios({
       method: "get",
-      url: `http://localhost:4000/api/class`,
+      url: `/api/cohorts`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     }
