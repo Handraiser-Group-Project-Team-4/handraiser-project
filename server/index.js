@@ -70,13 +70,24 @@ massive({
 
     app.get("/api/users", users.login);
     app.use(auth.header)
-
+  
     // USERS
     app.patch('/api/logout/:id', users.logout)
     app.post('/api/users', users.create)
     app.get('/api/users/:id', users.fetch)
-
+    app.get('/api/pending', users.pending)
+    app.get('/api/approved', users.approved)
+    app.get('/api/disapproved', users.disapproved)
+    app.patch('/api/toapprove/:id', users.movingToApprove)
+    app.patch('/api/todisapprove/:id', users.movingToDisapprove)
+  
     // COHORTS
+    app.post('/api/class', cohorts.make)
+    app.get('/api/class', cohorts.lista)
+    app.patch('/api/class/:id', cohorts.changeKey)
+  
+  
+    
     app.get('/api/cohorts', cohorts.list)
     app.post('/api/cohorts', cohorts.create)
     app.get('/api/cohort-check/:id', cohorts.checkUser)
@@ -140,6 +151,7 @@ massive({
                     //         db.query(`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(conversation)}', ${user.room}) `)
                     // })
                     // .catch(err => console.log(err))   
+
 
                     db.query(`SELECT message from messages WHERE message = '${JSON.stringify(conversation)}'`)
                     .then(res => {
