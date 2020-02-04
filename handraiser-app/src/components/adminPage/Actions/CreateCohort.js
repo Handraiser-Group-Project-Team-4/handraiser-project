@@ -13,7 +13,7 @@ export default function AlertDialog({ open, handleClose, renderCohorts }) {
   const [body, setBody] = useState({
     data: {
       class_title: "",
-      class_description: "",
+      class_description: ""
     }
   });
 
@@ -48,15 +48,15 @@ export default function AlertDialog({ open, handleClose, renderCohorts }) {
 
     axios({
       method: "post",
-      url: "http://localhost:4000/api/class",
+      url: "/api/class",
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    },
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      },
       data: body.data
     })
       .then(() => {
-        handleClose()
-        renderCohorts()     
+        handleClose();
+        renderCohorts();
       })
       .catch(err => console.log(err));
   };
@@ -90,7 +90,6 @@ export default function AlertDialog({ open, handleClose, renderCohorts }) {
                 onChange={handleInputs}
               />
             </Grid>
-
           </Grid>
         </DialogContent>
         <DialogActions>

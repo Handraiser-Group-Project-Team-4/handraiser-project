@@ -15,7 +15,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import InputAdornment from "@material-ui/core/InputAdornment";
 
 const columns = [
-  { id: "photo", label: "Photo", minWidth: 170 },  
+  { id: "photo", label: "Photo", minWidth: 170 },
   { id: "name", label: "Name", minWidth: 170 },
   { id: "email", label: "Email", minWidth: 100 },
   { id: "reason", label: "Reason", minWidth: 100 }
@@ -44,7 +44,7 @@ export default function StickyHeadTable() {
   const renderDisapproved = () => {
     axios({
       method: "get",
-      url: `http://localhost:4000/api/disapproved`,
+      url: `/api/disapproved`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
@@ -79,65 +79,72 @@ export default function StickyHeadTable() {
 
   return (
     <Paper className={classes.root}>
-    <TextField
-      label="Search Name"
-      onChange={e => handleSearch(e)}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon />
-          </InputAdornment>
-        )
-      }}
-    />
+      <TextField
+        label="Search Name"
+        onChange={e => handleSearch(e)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          )
+        }}
+      />
 
-    <TableContainer className={classes.container}>
-      <Table stickyHeader aria-label="sticky table">
-        <TableHead>
-          <TableRow>
-            {columns.map(column => (
-              <TableCell
-                key={column.id}
-                align={column.align}
-                style={{ minWidth: column.minWidth }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {temp
-            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map(row => {
-              return (
-                <TableRow
-                  hover
-                  role="checkbox"
-                  tabIndex={-1}
-                  key={row.user_id}
+      <TableContainer className={classes.container}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              {columns.map(column => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  style={{ minWidth: column.minWidth }}
                 >
-                 <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80"/></TableCell>
-                  <TableCell>
-                    {row.firstname}, {row.lastname}
-                  </TableCell>
-                  <TableCell>{row.email}</TableCell>
-                  <TableCell>{row.reason_disapproved}</TableCell>
-                </TableRow>
-              );
-            })}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <TablePagination
-      rowsPerPageOptions={[10, 25, 100]}
-      component="div"
-      count={disapproved.length}
-      rowsPerPage={rowsPerPage}
-      page={page}
-      onChangePage={handleChangePage}
-      onChangeRowsPerPage={handleChangeRowsPerPage}
-    />
-  </Paper>
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {temp
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map(row => {
+                return (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={row.user_id}
+                  >
+                    <TableCell>
+                      <img
+                        src={row.avatar}
+                        alt="Smiley face"
+                        height="80"
+                        width="80"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {row.firstname}, {row.lastname}
+                    </TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.reason_disapproved}</TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={disapproved.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
+    </Paper>
   );
 }

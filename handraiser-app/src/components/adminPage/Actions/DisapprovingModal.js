@@ -25,10 +25,10 @@ export default function AlertDialog({
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/todisapprove/${data.user_id}`,
+      url: `/api/todisapprove/${data.user_id}`,
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    },
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      },
       data: body.data
     })
       .then(() => {
@@ -38,7 +38,7 @@ export default function AlertDialog({
       .catch(err => console.log(err));
   };
 
-  const handleReason = (e) => {
+  const handleReason = e => {
     setBody({
       data: {
         ...body.data,
@@ -46,7 +46,7 @@ export default function AlertDialog({
         user_approval_status_id: 3
       }
     });
-    console.log(body)
+    console.log(body);
   };
 
   return (
@@ -59,30 +59,30 @@ export default function AlertDialog({
       maxWidth="xs"
     >
       <form onSubmit={submitUserData}>
-      <DialogTitle id="alert-dialog-title">
-        Are you sure you want to disapprove {data.firstname} {data.lastname} as
-        a mentor?
-      </DialogTitle>
+        <DialogTitle id="alert-dialog-title">
+          Are you sure you want to disapprove {data.firstname} {data.lastname}{" "}
+          as a mentor?
+        </DialogTitle>
 
-      <DialogContent>
-        <TextField
-          id="outlined-multiline-static"
-          label="Reason"
-          multiline
-          name="reason_disapproved"
-          rows="4"
-          onChange={handleReason}
-          variant="outlined"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Disagree
-        </Button>
-        <Button type="submit" color="primary" autoFocus>
+        <DialogContent>
+          <TextField
+            id="outlined-multiline-static"
+            label="Reason"
+            multiline
+            name="reason_disapproved"
+            rows="4"
+            onChange={handleReason}
+            variant="outlined"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Disagree
+          </Button>
+          <Button type="submit" color="primary" autoFocus>
             Agree
           </Button>
-      </DialogActions>
+        </DialogActions>
       </form>
     </Dialog>
   );

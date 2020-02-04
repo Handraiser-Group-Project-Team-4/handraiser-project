@@ -7,24 +7,26 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
-
-export default function AlertDialog({ handleId, open, handleClose, renderPending }) {
-  const body  = {
+export default function AlertDialog({
+  handleId,
+  open,
+  handleClose,
+  renderPending
+}) {
+  const body = {
     data: {
-        user_approval_status_id: 1
-    }}
-  ;
-
-
+      user_approval_status_id: 1
+    }
+  };
   const submitUserData = e => {
     e.preventDefault();
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/toapprove/${handleId.user_id}`,
+      url: `/api/toapprove/${handleId.user_id}`,
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    },
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      },
       data: body.data
     })
       .then(() => {
@@ -33,7 +35,6 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
       })
       .catch(err => console.log(err));
   };
-
 
   return (
     <Dialog
@@ -44,20 +45,18 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
       fullWidth={false}
       maxWidth="xs"
     >
-        <DialogTitle id="alert-dialog-title"></DialogTitle>
-            Are you sure you want to assign {handleId.firstname} {handleId.lastname} as a mentor?
-        <DialogContent>
-          
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Disagree
-          </Button>
-          <Button onClick={e => submitUserData(e)} color="primary" autoFocus>
-            Agree
-          </Button>
-        </DialogActions>
-
+      <DialogTitle id="alert-dialog-title"></DialogTitle>
+      Are you sure you want to assign {handleId.firstname} {handleId.lastname}{" "}
+      as a mentor?
+      <DialogContent></DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="primary">
+          Disagree
+        </Button>
+        <Button onClick={e => submitUserData(e)} color="primary" autoFocus>
+          Agree
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

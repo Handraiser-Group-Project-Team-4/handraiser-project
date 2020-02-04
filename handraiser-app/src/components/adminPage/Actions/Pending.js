@@ -44,8 +44,8 @@ export default function StickyHeadTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [approving, setApproving] = useState(false);
   const [disapproving, setDisapproving] = useState(false);
-  const [handleId, setHandleId] = useState('')
-  const [data, setData] = useState('')
+  const [handleId, setHandleId] = useState("");
+  const [data, setData] = useState("");
   const [pending, setPending] = useState([]);
   const [temp, setTemp] = useState([]);
 
@@ -59,9 +59,9 @@ export default function StickyHeadTable() {
   };
 
   const disApprovingfunc = row => {
-    setData(row)
-    setDisapproving(true)
-  }
+    setData(row);
+    setDisapproving(true);
+  };
 
   const closeDisApprovingfunc = () => {
     setDisapproving(false);
@@ -75,7 +75,7 @@ export default function StickyHeadTable() {
   const renderPending = () => {
     axios({
       method: "get",
-      url: `http://localhost:4000/api/pending`,
+      url: `/api/pending`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
@@ -167,7 +167,14 @@ export default function StickyHeadTable() {
                       tabIndex={-1}
                       key={row.user_id}
                     >
-                      <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80"/></TableCell>
+                      <TableCell>
+                        <img
+                          src={row.avatar}
+                          alt="Smiley face"
+                          height="80"
+                          width="80"
+                        />
+                      </TableCell>
                       <TableCell>
                         {row.firstname}, {row.lastname}
                       </TableCell>

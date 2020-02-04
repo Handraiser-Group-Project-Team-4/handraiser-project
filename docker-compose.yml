@@ -1,11 +1,11 @@
-version: '3'
+version: "3"
 services:
   db: # this is the service name
     image: postgres # this is the Docker image we want for this service
     environment: # We can set shell environment variables that will be passed to process
       POSTGRES_PASSWORD: handraiser
     ports:
-      - 5432:5432 # this binds ports from the container to the host system (your computer)
+      - 5435:5432 # this binds ports from the container to the host system (your computer)
     volumes:
       - handraiser:/var/lib/postgresql/data # binds a folder in the container to a specified volume
 volumes:

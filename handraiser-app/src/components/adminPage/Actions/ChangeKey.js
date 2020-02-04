@@ -18,17 +18,17 @@ export default function AlertDialog({ open, handleClose, renderCohorts, row }) {
     }
   });
 
-//   console.log(row)
+  //   console.log(row)
 
   const submitUserData = e => {
     e.preventDefault();
 
     axios({
       method: "patch",
-      url: `http://localhost:4000/api/class/${row.classroom_id}`,
+      url: `/api/class/${row.classroom_id}`,
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    },
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      },
       data: body.data
     })
       .then(() => {
@@ -39,7 +39,6 @@ export default function AlertDialog({ open, handleClose, renderCohorts, row }) {
   };
 
   const generateKey = () => {
-
     var result = "";
     var characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -47,18 +46,16 @@ export default function AlertDialog({ open, handleClose, renderCohorts, row }) {
     for (var i = 0; i < 10; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    
 
     setBody({
-        data:{
-            class_id: row.class_id,
-            class_key: result
-        }
-    })
+      data: {
+        class_id: row.class_id,
+        class_key: result
+      }
+    });
 
-    console.log(body)
-
-  }
+    console.log(body);
+  };
 
   return (
     <Dialog
@@ -71,7 +68,7 @@ export default function AlertDialog({ open, handleClose, renderCohorts, row }) {
     >
       <form onSubmit={e => submitUserData(e)}>
         <DialogTitle id="alert-dialog-title">Change key</DialogTitle>
-        id: { row.classroom_id}
+        id: {row.classroom_id}
         <DialogContent>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>

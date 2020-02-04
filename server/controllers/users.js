@@ -33,13 +33,8 @@ module.exports = {
     const { user_id, firstname, lastname, email, avatar } = req.body;
 
     db.query(
-<<<<<<< HEAD
-      `INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, user_role_id, dark_mode)
-                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, 3, false)    
-=======
       `INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, reason_disapproved, user_role_id, user_approval_status_id, dark_mode)
                 VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, null, 3, 4, false)    
->>>>>>> 07075fff3faf79fc9b7e818dad98f074ca8637db
         `
     )
       .then(user => {
@@ -52,15 +47,25 @@ module.exports = {
   },
 
   fetch: (req, res) => {
-<<<<<<< HEAD
     const db = req.app.get("db");
     const { chat } = req.query;
-
     if (chat) {
+      let users = {};
       db.query(
-        `SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1 `
+        `SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 3`
       ).then(concern => {
-        res.status(200).json(...concern);
+        users.concern = concern[0];
+        // res.status(200).json(...concern)
+        db.query(
+          `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`
+        ).then(messages => {
+          let temp = [];
+          messages.map(x => {
+            temp.push(x.message);
+          });
+          users.messages = temp;
+          res.status(200).json(users);
+        });
       });
     } else {
       db.users
@@ -68,89 +73,17 @@ module.exports = {
         .then(user => {
           // console.log(user)
           res.status(200).json(user);
-=======
-    const db = req.app.get('db')
-    const {chat} = req.query;
-    if(chat){
-        let users={}
-        db.query(`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1`)
-        .then(concern => {
-            users.concern = concern[0];
-            // res.status(200).json(...concern)
-            db.query(`SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`)
-            .then(messages => {
-                let temp=[]
-                messages.map(x => {
-                    temp.push(x.message);
-                })
-                users.messages = temp
-                res.status(200).json(users)
-            })
-        })
-    }
-    else{
-        db.users.find(req.params.id)
-        .then(user => {
-            // console.log(user)
-            res.status(200).json(user)
->>>>>>> 07075fff3faf79fc9b7e818dad98f074ca8637db
         })
         .catch(err => {
-<<<<<<< HEAD
           console.log(err);
           res.status(500).end();
         });
     }
   },
-=======
-            console.log(err)
-            res.status(500).end();
-        })
-    }
-},
 
   logout: (req, res) => {
     const db = req.app.get("db");
 
-<<<<<<< HEAD
-        if(chat){
-            let users={}
-            db.query(`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1`)
-            .then(concern => {
-                users.concern = concern[0];
-                // res.status(200).json(...concern)
-                db.query(`SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`)
-                .then(messages => {
-                    let temp=[]
-                    messages.map(x => {
-                        temp.push(x.message);
-                    })
-                    users.messages = temp
-                    res.status(200).json(users)
-                })
-            })
-        }
-        else{
-            db.users.find(req.params.id)
-            .then(user => {
-                // console.log(user)
-                res.status(200).json(user)
-            })
-            .catch(err => {
-                console.log(err)
-                res.status(500).end();
-            })
-        }
-    },
->>>>>>> d9ec2994bab0e0ec2c74aba939cde8ed08b08e51
-
-  logout: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`
-    );
-=======
     db.query(
       `UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`
     );
@@ -216,7 +149,7 @@ module.exports = {
         },
         {
           user_approval_status_id: user_approval_status_id,
-          reason_disapproved: reason_disapproved 
+          reason_disapproved: reason_disapproved
         }
       )
       .then(post => res.status(201).send(post))
@@ -224,6 +157,5 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
->>>>>>> 07075fff3faf79fc9b7e818dad98f074ca8637db
   }
 };

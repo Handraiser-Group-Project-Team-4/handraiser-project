@@ -24,7 +24,6 @@ import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
 import SearchIcon from "@material-ui/icons/Search";
 
-
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },
   { id: "description", label: "Description", minWidth: 170 },
@@ -46,7 +45,7 @@ export default function StickyHeadTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [cohort, setCohort] = useState([]);
-  const [temp, setTemp] = useState([]) 
+  const [temp, setTemp] = useState([]);
   const [handleValues, sethandleValues] = useState({});
   const [createCohort, setCreateCohort] = useState(false);
   const [editCohort, setEditCohort] = useState(false);
@@ -67,28 +66,28 @@ export default function StickyHeadTable() {
   const renderCohorts = () => {
     axios({
       method: "get",
-      url: `http://localhost:4000/api/class`,
+      url: `/api/class`,
       headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    }
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
       // data: body.data
     })
       .then(data => {
         console.log(data.data);
         setCohort(data.data);
-        setTemp(data.data)
+        setTemp(data.data);
       })
       .catch(err => console.log("object"));
   };
 
-  //SEARCH FUNCTION 
+  //SEARCH FUNCTION
   const handleSearch = e => {
     const filteredContacts = cohort.filter(
       el =>
         el.class_title.toLowerCase().indexOf(e.target.value.toLowerCase()) !==
-          -1 
+        -1
     );
-  
+
     setTemp(filteredContacts);
   };
 
@@ -122,26 +121,25 @@ export default function StickyHeadTable() {
 
       {editCohort && (
         <ChangeKey
-            row={handleValues}
-            open={editCohort}
-            handleClose={closeEditCohort}
-            renderCohorts={renderCohorts}
+          row={handleValues}
+          open={editCohort}
+          handleClose={closeEditCohort}
+          renderCohorts={renderCohorts}
         />
       )}
 
       <Paper className={classes.root}>
-     
-      <TextField
-                 label="Search Contact"
-                 onChange={e => handleSearch(e)}
-                 InputProps={{
-                   startAdornment: (
-                     <InputAdornment position="start">
-                       <SearchIcon />
-                     </InputAdornment>
-                   )
-                 }}
-               />
+        <TextField
+          label="Search Contact"
+          onChange={e => handleSearch(e)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            )
+          }}
+        />
 
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
