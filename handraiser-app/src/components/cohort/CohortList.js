@@ -60,12 +60,18 @@ export default function CohortList({mentor}) {
         const input_key = isKey.key;
         const class_id = isKey.classroomObj.class_id;
 
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
+        var yyyy = today.getFullYear();
+
         axios({
             method:"post",
             url:`/api/submit-key`,
             data: {
                 class_id,
                 user_id: userObj.user_id,
+                date_joined: `${mm+'/'+dd+'/'+yyyy}`,
                 input_key
             },
             headers: {

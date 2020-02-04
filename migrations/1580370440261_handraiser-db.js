@@ -133,6 +133,11 @@ exports.up = pgm => {
             type: 'serial',
             primaryKey: true,
         },
+        class_id: {
+            type: 'integer',
+            notNull: true,
+            references: 'classroom_details',
+        },
         mentor_id: {
             type: 'text',
             notNull: false,

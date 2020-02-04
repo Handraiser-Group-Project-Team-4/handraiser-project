@@ -28,26 +28,23 @@ module.exports = {
   },
 
   submitKey: (req, res) => {
-    const db = req.app.get("db");
-    const { class_id, user_id, input_key } = req.body;
-
-    db.query(
-      `SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`
-    )
-      .then(classroom => {
-        if (classroom.length !== 0) {
-          db.query(
-            `INSERT INTO classroom_students (class_id, user_id) VALUES (${class_id}, ${user_id})`
-          ).then(classroom_students =>
-            res.status(201).json(classroom_students)
-          );
-        } else res.status(400).end();
-      })
-      .catch(err => {
-        console.log(err);
+    const db = req.app.get('db')
+    const {class_id, user_id, date_joined, input_key} = req.body
+    db.query(`SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`)
+    .then(classroom => {
+        if(classroom.length !== 0){
+            db.classroom_students.insert({class_id, user_id, date_joined})
+            // db.query(`INSERT INTO classroom_students (class_id, user_id, date_joined) VALUES (${class_id}, '${user_id}, '${date_joined}')`)
+            .then(classroom_students => res.status(201).json(classroom_students) )
+        }
+        else
+            res.status(400).end();
+    })
+    .catch(err => {
+        console.log(err)
         res.status(500).end();
-      });
-  },
+    })
+},
 
   create: (req, res) => {
     // console.log(keyGenerator.keyGen())
@@ -59,7 +56,6 @@ module.exports = {
       class_status,
       user_id
     } = req.body;
-
     db.classroom_details
       .insert(
         { class_title, class_description, class_created, class_status },
@@ -75,14 +71,14 @@ module.exports = {
       )
       .then(classroom_details => {
         let key = keyGenerator.keyGen();
-
         db.query(
           `INSERT INTO classroom (class_key, class_id) VALUES('${key}', ${classroom_details.class_id})`
         )
           .then(classroom => {
             res.status(201).json({ key });
             db.query(
-              `INSERT INTO classroom_students(class_id, user_id) VALUES(${classroom_details.class_id}, ${user_id})`
+              `INSERT INTO classroom_students(class_id, user_id, date_joined) 
+                    VALUES(${classroom_details.class_id}, '${user_id}', '${class_created}')`
             )
               .then(res => console.log(res))
               .catch(err => req.status(500).end());
@@ -151,10 +147,7 @@ module.exports = {
 
   changeKey: (req, res) => {
     const db = req.app.get("db");
-    const {
-      class_id,
-      class_key,
-    } = req.body;
+    const { class_id, class_key } = req.body;
     db.classroom
       .update(
         {
@@ -163,7 +156,6 @@ module.exports = {
         {
           class_id: class_id,
           class_key: class_key
-         
         }
       )
       .then(post => res.status(201).send(post))
