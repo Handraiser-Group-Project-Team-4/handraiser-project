@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom'
 import jwtToken from '../tools/jwtToken'
 
 import MainpageTemplate from '../tools/MainpageTemplate'
+import Tabs from '../adminPage/Tabs'
 
 export default function AdminPage() {
     const userObj = jwtToken();
@@ -17,8 +18,11 @@ export default function AdminPage() {
         return <Redirect to="/" />
 
     return (
+        <>
         <MainpageTemplate>
-            
+          
         </MainpageTemplate>
+        <Tabs/>
+        </>
     )
 }
