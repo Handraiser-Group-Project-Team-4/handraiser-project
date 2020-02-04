@@ -133,6 +133,7 @@ exports.up = pgm => {
         notNull: true
       }
     }),
+<<<<<<< HEAD
     pgm.createTable("messages", {
       message_id: {
         type: "serial",
@@ -154,6 +155,57 @@ exports.up = pgm => {
   pgm.sql(
     `INSERT INTO classroom (class_key, class_id) VALUES ('qwerty_key for class#2', 1)`
   );
+=======
+    pgm.createTable('concern', {
+        concern_id: {
+            type: 'serial',
+            primaryKey: true,
+        },
+        class_id: {
+            type: 'integer',
+            notNull: true,
+            references: 'classroom_details',
+        },
+        mentor_id: {
+            type: 'text',
+            notNull: false,
+            references: 'users',
+        },
+        student_id: {
+            type: 'text',
+            notNull: true,
+            references: 'users',
+        },
+        concern_title: {
+            type: 'text',
+            notNull: true,
+        },
+        concern_status: {
+            type: 'text',
+            notNull: true,
+        },
+    }),
+    pgm.createTable('messages', {
+        message_id: {
+            type: 'serial',
+            primaryKey: true,
+        },
+        concern_id: {
+            type: 'integer',
+            notNull: true,
+            references: 'concern',
+        },
+        message: {
+            type: 'jsonb',
+            notNull: true,
+        },
+    }),
+    pgm.sql(`INSERT INTO user_role (user_role) VALUES ('admin')`)
+    pgm.sql(`INSERT INTO user_role (user_role) VALUES ('mentor')`)
+    pgm.sql(`INSERT INTO user_role (user_role) VALUES ('student')`)
+    pgm.sql(`INSERT INTO users (user_id, user_role_id, firstname, lastname, email, avatar, user_status, dark_mode) 
+    VALUES ('100867400409639305310', 1, 'Vince Gerard', 'Ludovice', 'vince.ludovice@boom.camp', 'https://lh3.googleusercontent.com/a-/AAuE7mDWCzeeRDfkjldWIhUYCxVQimKeabceug_WIpYo=s96-c', false, false)`)
+>>>>>>> d9ec2994bab0e0ec2c74aba939cde8ed08b08e51
 
   pgm.sql(`INSERT INTO user_role (user_role) VALUES ('admin')`);
   pgm.sql(`INSERT INTO user_role (user_role) VALUES ('mentor')`);
