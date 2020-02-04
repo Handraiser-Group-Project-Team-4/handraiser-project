@@ -33,8 +33,8 @@ module.exports = {
     const { user_id, firstname, lastname, email, avatar } = req.body;
 
     db.query(
-      `INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, reason_disapproved, user_role_id, user_approval_status, dark_mode)
-                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, null, 3, 3, false)    
+      `INSERT INTO users (user_id, firstname, lastname, email, avatar, user_status, reason_disapproved, user_role_id, user_approval_status_id, dark_mode)
+                VALUES ('${user_id}', '${firstname}', '${lastname}', '${email}', '${avatar}', true, null, 3, 4, false)    
         `
     )
       .then(user => {
@@ -72,7 +72,7 @@ module.exports = {
   pending: (req, res) => {
     const db = req.app.get("db");
 
-    db.query(`select * from users where user_approval_status = 2`)
+    db.query(`select * from users where user_approval_status_id = 2`)
       .then(get => res.status(200).json(get))
       .catch(err => {
         console.error(err);
@@ -83,7 +83,7 @@ module.exports = {
   approved: (req, res) => {
     const db = req.app.get("db");
 
-    db.query(`select * from users where user_approval_status = 1`)
+    db.query(`select * from users where user_approval_status_id = 1`)
       .then(get => res.status(200).json(get))
       .catch(err => {
         console.error(err);
@@ -93,7 +93,7 @@ module.exports = {
   disapproved: (req, res) => {
     const db = req.app.get("db");
 
-    db.query(`select * from users where user_approval_status = 3`)
+    db.query(`select * from users where user_approval_status_id = 3`)
       .then(get => res.status(200).json(get))
       .catch(err => {
         console.error(err);
@@ -102,14 +102,14 @@ module.exports = {
   },
   movingToApprove: (req, res) => {
     const db = req.app.get("db");
-    const { user_approval_status } = req.body;
+    const { user_approval_status_id } = req.body;
     db.users
       .update(
         {
           user_id: req.params.id
         },
         {
-          user_approval_status: user_approval_status,
+          user_approval_status_id: user_approval_status,
           user_role_id: 2
         }
       )
@@ -121,14 +121,14 @@ module.exports = {
   },
   movingToDisapprove: (req, res) => {
     const db = req.app.get("db");
-    const { user_approval_status, reason_disapproved } = req.body;
+    const { user_approval_status_id, reason_disapproved } = req.body;
     db.users
       .update(
         {
           user_id: req.params.id
         },
         {
-          user_approval_status: user_approval_status,
+          user_approval_status_id: user_approval_status_id,
           reason_disapproved: reason_disapproved 
         }
       )

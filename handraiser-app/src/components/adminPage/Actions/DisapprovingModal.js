@@ -16,7 +16,7 @@ export default function AlertDialog({
 }) {
   const [body, setBody] = useState({
     data: {
-      user_approval_status: 3
+      user_approval_status_id: 3
     }
   });
 
@@ -43,7 +43,7 @@ export default function AlertDialog({
       data: {
         ...body.data,
         [e.target.name]: e.target.value,
-        user_approval_status: 3
+        user_approval_status_id: 3
       }
     });
     console.log(body)

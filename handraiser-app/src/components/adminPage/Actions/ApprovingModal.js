@@ -11,7 +11,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 export default function AlertDialog({ handleId, open, handleClose, renderPending }) {
   const body  = {
     data: {
-        user_approval_status: 1
+        user_approval_status_id: 1
     }}
   ;
 
