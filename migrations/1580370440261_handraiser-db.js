@@ -114,6 +114,11 @@ exports.up = pgm => {
             type: 'serial',
             primaryKey: true,
         },
+        class_id: {
+            type: 'integer',
+            notNull: true,
+            references: 'classroom_details',
+        },
         mentor_id: {
             type: 'text',
             notNull: false,
@@ -141,14 +146,10 @@ exports.up = pgm => {
         concern_id: {
             type: 'integer',
             notNull: true,
-            references: 'classroom_details',
+            references: 'concern',
         },
         message: {
-            type: 'text',
-            notNull: true,
-        },
-        message_time_stamp: {
-            type: 'text',
+            type: 'jsonb',
             notNull: true,
         },
     }),
