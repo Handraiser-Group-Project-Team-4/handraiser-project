@@ -8,13 +8,14 @@ const Chat = () => {
   // const [chatDetails, setChatDetails] = useState({
   //     name:"",
   //     room:"",
-  //     avater:"",
+  //     avatar:"",
   // });
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const ENDPOINT = "localhost:4000";
+
   useEffect(() => {
     axios({
       method: "get",
@@ -31,25 +32,29 @@ const Chat = () => {
         //     avatar: res.data.avatar
         // })
         setUsername(res.data.firstname + " " + res.data.lastname);
-        setRoom(`WebSocket`);
+        setRoom(res.data.concern_id);
       })
       .catch(err => {
         console.log(err);
       });
   }, []);
+
   useEffect(() => {
-    socket = io(ENDPOINT);
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
     socket.emit("join", { username, room }, error => {});
-  }, [ENDPOINT, username, room]);
+  }, [username, room]);
+
   useEffect(() => {
     socket.on("message", message => {
+      console.log(message);
       setMessages([...messages, message]);
     });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, []);
+  }, [messages]);
+
   const sendMessage = event => {
     event.preventDefault();
     if (message) {
