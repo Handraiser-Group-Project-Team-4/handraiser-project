@@ -29,18 +29,18 @@ module.exports = {
 
 	submitKey: (req, res) => {
 		const db = req.app.get('db');
-		const { class_id, user_id, input_key, date_joined } = req.body;
-
+		const { class_id, user_id, date_joined, input_key } = req.body;
 		db.query(
 			`SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`
 		)
 			.then(classroom => {
 				if (classroom.length !== 0) {
-					db.query(
-						`INSERT INTO classroom_students (class_id, user_id,date_joined) VALUES (${class_id}, ${user_id},'${date_joined}')`
-					).then(classroom_students =>
-						res.status(201).json(classroom_students)
-					);
+					db.classroom_students
+						.insert({ class_id, user_id, date_joined })
+						// db.query(`INSERT INTO classroom_students (class_id, user_id, date_joined) VALUES (${class_id}, '${user_id}, '${date_joined}')`)
+						.then(classroom_students =>
+							res.status(201).json(classroom_students)
+						);
 				} else res.status(400).end();
 			})
 			.catch(err => {
@@ -59,7 +59,6 @@ module.exports = {
 			class_status,
 			user_id
 		} = req.body;
-
 		db.classroom_details
 			.insert(
 				{ class_title, class_description, class_created, class_status },
@@ -75,14 +74,14 @@ module.exports = {
 			)
 			.then(classroom_details => {
 				let key = keyGenerator.keyGen();
-
 				db.query(
 					`INSERT INTO classroom (class_key, class_id) VALUES('${key}', ${classroom_details.class_id})`
 				)
 					.then(classroom => {
 						res.status(201).json({ key });
 						db.query(
-							`INSERT INTO classroom_students(class_id, user_id) VALUES(${classroom_details.class_id}, ${user_id})`
+							`INSERT INTO classroom_students(class_id, user_id, date_joined) 
+                    VALUES(${classroom_details.class_id}, '${user_id}', '${class_created}')`
 						)
 							.then(res => console.log(res))
 							.catch(err => req.status(500).end());
@@ -91,6 +90,80 @@ module.exports = {
 			})
 			.catch(err => {
 				console.log(err);
+				res.status(500).end();
+			});
+	},
+	//Zion
+	make: (req, res) => {
+		const db = req.app.get('db');
+		const {
+			class_title,
+			class_description,
+			class_created,
+			class_status,
+			class_id,
+			class_key
+		} = req.body;
+		db.classroom_details
+			.save(
+				{
+					class_title,
+					class_description,
+					class_created,
+					class_status,
+					classroom: [
+						{
+							class_id,
+							class_key
+						}
+					]
+				},
+				{
+					deepInsert: true
+				}
+			)
+			.then(post => res.status(201).json(post))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
+
+	lista: (req, res) => {
+		const db = req.app.get('db');
+
+		db.query(
+			`select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
+    classroom_details.class_created, 
+    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
+    classroom.class_key
+    from classroom_details
+    inner join classroom
+    on classroom_details.class_id = classroom.class_id`
+		)
+			.then(get => res.status(200).json(get))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
+
+	changeKey: (req, res) => {
+		const db = req.app.get('db');
+		const { class_id, class_key } = req.body;
+		db.classroom
+			.update(
+				{
+					classroom_id: req.params.id
+				},
+				{
+					class_id: class_id,
+					class_key: class_key
+				}
+			)
+			.then(post => res.status(201).send(post))
+			.catch(err => {
+				console.err(err);
 				res.status(500).end();
 			});
 	}

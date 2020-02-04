@@ -10,7 +10,7 @@ export default function MainpageTemplate({ children }) {
 	useEffect(() => {
 		axios({
 			method: 'get',
-			url: `/api/users/${userObj.user_id}`,
+			url: `/api/users/${userObj && userObj.user_id}`,
 			headers: {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 			}
@@ -24,7 +24,7 @@ export default function MainpageTemplate({ children }) {
 			});
 
 		return () => {};
-	}, [userObj.user_id]);
+	}, []);
 
 	const handleLogout = () => {
 		axios({
@@ -78,16 +78,7 @@ export default function MainpageTemplate({ children }) {
 
 			{children}
 
-			<footer
-				style={{
-					background: `grey`,
-					color: `white`,
-					padding: `20px`,
-					textAlign: `center`
-				}}
-			>
-				This is a footer
-			</footer>
+			{/* <footer style={{background:`grey`, color:`white`, padding:`20px`, textAlign:`center`}}>This is a footer</footer> */}
 		</div>
 	);
 }

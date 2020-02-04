@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   db: # this is the service name
     image: postgres # this is the Docker image we want for this service

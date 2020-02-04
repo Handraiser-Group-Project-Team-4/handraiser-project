@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Help from './Help';
 import Data from './Data';
+import Chat from '../Chat/Chat';
 
 export default function CohortPage(props) {
 	const classes = useStyles();
@@ -32,7 +33,7 @@ export default function CohortPage(props) {
 							<BeingHelp handleData={handleData} />
 						</Grid>
 						<Grid item xs={6} lg={9}>
-							<ChatRoom />
+							<Chat />
 						</Grid>
 					</Grid>
 				</div>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import jwtToken from '../tools/jwtToken';
-
 export default function CohortList({ mentor }) {
 	const userObj = jwtToken();
 	const history = useHistory();
@@ -13,7 +12,6 @@ export default function CohortList({ mentor }) {
 		classroomObj: {},
 		error: false
 	});
-
 	useEffect(() => {
 		axios({
 			method: `get`,
@@ -29,10 +27,8 @@ export default function CohortList({ mentor }) {
 			.catch(err => {
 				console.log(err);
 			});
-
 		return () => {};
 	}, []);
-
 	const handleCohort = x => {
 		// console.log(`clicked`, x)
 		axios({
@@ -54,24 +50,21 @@ export default function CohortList({ mentor }) {
 				console.log(err);
 			});
 	};
-
 	const handleSubmitKey = isKey => {
+		const input_key = isKey.key;
+		const class_id = isKey.classroomObj.class_id;
 		var today = new Date();
 		var dd = String(today.getDate()).padStart(2, '0');
 		var mm = String(today.getMonth() + 1).padStart(2, '0');
 		var yyyy = today.getFullYear();
-
-		const input_key = isKey.key;
-		const class_id = isKey.classroomObj.class_id;
-
 		axios({
 			method: 'post',
 			url: `/api/submit-key`,
 			data: {
 				class_id,
 				user_id: userObj.user_id,
-				input_key,
-				date_joined: `${mm + '/' + dd + '/' + yyyy}`
+				date_joined: `${mm + '/' + dd + '/' + yyyy}`,
+				input_key
 			},
 			headers: {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
@@ -87,7 +80,6 @@ export default function CohortList({ mentor }) {
 				setIsKey({ ...isKey, error: true });
 			});
 	};
-
 	return (
 		<>
 			{isKey.open && (

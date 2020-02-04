@@ -13,6 +13,16 @@ exports.up = pgm => {
 			notNull: true
 		}
 	}),
+		pgm.createTable('approval', {
+			approval_id: {
+				type: 'serial',
+				primaryKey: true
+			},
+			approval_status: {
+				type: 'text',
+				notNull: true
+			}
+		}),
 		pgm.createTable('users', {
 			user_id: {
 				type: 'text',
@@ -22,6 +32,11 @@ exports.up = pgm => {
 				type: 'integer',
 				notNull: true,
 				references: 'user_role'
+			},
+			user_approval_status_id: {
+				type: 'integer',
+				notNull: true,
+				references: 'approval'
 			},
 			firstname: {
 				type: 'text',
@@ -46,6 +61,10 @@ exports.up = pgm => {
 			dark_mode: {
 				type: 'boolean',
 				notNull: true
+			},
+			reason_disapproved: {
+				type: 'text',
+				notNull: false
 			}
 		}),
 		pgm.createTable('classroom_details', {
@@ -114,6 +133,11 @@ exports.up = pgm => {
 				type: 'serial',
 				primaryKey: true
 			},
+			class_id: {
+				type: 'integer',
+				notNull: true,
+				references: 'classroom_details'
+			},
 			mentor_id: {
 				type: 'text',
 				notNull: false,
@@ -123,11 +147,6 @@ exports.up = pgm => {
 				type: 'text',
 				notNull: true,
 				references: 'users'
-			},
-			class_id: {
-				type: 'integer',
-				notNull: true,
-				references: 'classroom_details'
 			},
 			concern_title: {
 				type: 'text',
@@ -146,17 +165,22 @@ exports.up = pgm => {
 			concern_id: {
 				type: 'integer',
 				notNull: true,
-				references: 'classroom_details'
+				references: 'concern'
 			},
 			message: {
-				type: 'text',
-				notNull: true
-			},
-			message_time_stamp: {
-				type: 'text',
+				type: 'jsonb',
 				notNull: true
 			}
-		});
+		}),
+		pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Approved')`);
+	pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Pending')`);
+	pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Disapproved')`);
+	pgm.sql(`INSERT INTO approval (approval_status) VALUES ('NoReqSent')`);
+	pgm.sql(`INSERT INTO user_role (user_role) VALUES ('admin')`);
+	pgm.sql(`INSERT INTO user_role (user_role) VALUES ('mentor')`);
+	pgm.sql(`INSERT INTO user_role (user_role) VALUES ('student')`);
+	pgm.sql(`INSERT INTO users (user_id, user_approval_status_id, user_role_id, firstname, lastname, email, avatar, user_status, dark_mode, reason_disapproved) 
+    VALUES ('100867400409639305310', 4, 1, 'Vince Gerard', 'Ludovice', 'vince.ludovice@boom.camp', 'https://lh3.googleusercontent.com/a-/AAuE7mDWCzeeRDfkjldWIhUYCxVQimKeabceug_WIpYo=s96-c', false, false, null)`);
 };
 
 exports.down = pgm => {};
