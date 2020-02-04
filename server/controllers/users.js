@@ -44,9 +44,20 @@ module.exports = {
         const {chat} = req.query;
 
         if(chat){
-            db.query(`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1 `)
+            let users={}
+            db.query(`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1`)
             .then(concern => {
-                res.status(200).json(...concern)
+                users.concern = concern[0];
+                // res.status(200).json(...concern)
+                db.query(`SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`)
+                .then(messages => {
+                    let temp=[]
+                    messages.map(x => {
+                        temp.push(x.message);
+                    })
+                    users.messages = temp
+                    res.status(200).json(users)
+                })
             })
         }
         else{

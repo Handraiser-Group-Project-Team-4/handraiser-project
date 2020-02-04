@@ -2,21 +2,23 @@ import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import jwtToken from '../tools/jwtToken'
+
 let socket;
 const Chat = () => {
+    const username=`noe`, room="1";
     const userObj = jwtToken();
     // const [chatDetails, setChatDetails] = useState({
     //     name:"",
     //     room:"",
     //     avatar:"",
     // });
-    const [username, setUsername] = useState("");
-    const [room, setRoom] = useState("");
+    // const [username, setUsername] = useState("");
+    // const [room, setRoom] = useState("");
+    const [oldChat, setOldChat] = useState([]);
+    const [currentChat, setCurrentChat] = useState([]);
     const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
     const ENDPOINT = "localhost:4000";
-
-
+  
     useEffect(() => {
         axios({
             method: "get",
@@ -32,8 +34,11 @@ const Chat = () => {
                 //     room: `'${res.data.concern_id}'`,
                 //     avatar: res.data.avatar
                 // })
-                setUsername(res.data.firstname + " " + res.data.lastname);
-                setRoom(res.data.concern_id);
+
+                // setUsername(res.data.users_concern.firstname + " " + res.data.users_concern.lastname);
+                // setRoom(res.data.users_concern.concern_id);
+
+                setOldChat(res.data.messages);
             })
             .catch(err => {
                 console.log(err);
@@ -42,28 +47,30 @@ const Chat = () => {
 
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-        socket.emit("join", { username, room }, error => { });
-    }, [username, room]);
+        socket.emit("join", { username, room, userObj}, error => { });
+    }, [ENDPOINT]);
 
     useEffect(() => {
         socket.on("message", message => {
-            console.log(message)
-            setMessages([...messages, message]);
+            // console.log(message)
+            setCurrentChat([...currentChat, message]);
         });
+        socket.emit("saveChat", currentChat);
+
         return () => {
             socket.emit("disconnect");
             socket.off();
         };
-    }, [messages]);
+    }, [currentChat]);
 
     const sendMessage = event => {
         event.preventDefault();
         if (message) {
-            socket.emit("sendMessage", message, () => setMessage(""));
+            socket.emit("sendMessage", {message}, () => setMessage(""));
         }
     };
 
-    console.log(message, messages);
+    // console.log(message, currentChat);
     return (
         <div
             style={{
@@ -78,7 +85,13 @@ const Chat = () => {
             <h1>Chat</h1>
             <p>{"Name: " + username}</p>
             <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
-            {messages.map((message, i) => (
+            {oldChat.map((message, i) => (
+                <div key={i}>
+                    <div>{message.user + " " + message.text}</div>
+                    <p style={{opacity:`0.5`, fontSize:`10px`, margin:`0`}}>{message.time_sent}</p>
+                </div>
+            ))}
+            {currentChat.map((message, i) => (
                 <div key={i}>
                     <div>{message.user + " " + message.text}</div>
                     <p style={{opacity:`0.5`, fontSize:`10px`, margin:`0`}}>{message.time_sent}</p>
