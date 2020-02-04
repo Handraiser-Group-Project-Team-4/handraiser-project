@@ -6,13 +6,11 @@ import Paper from '@material-ui/core/Paper';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
-import Data from './Data';
 
 export default function NeedHelp(props) {
 	const classes = useStyles();
 
-	const { data } = Data(props.id, props.socket);
-
+	const { handleData } = props;
 	return (
 		<Paper className={classes.paper}>
 			<Typography variant="h5" style={{ padding: 10 }}>
@@ -20,15 +18,17 @@ export default function NeedHelp(props) {
 			</Typography>
 			<Divider />
 			<List className={classes.list}>
-				{data.map((student, index) => {
-					if (student.concern_status === 'onprocess') {
+				{handleData.data.map((concern, index) => {
+					if (concern.concern_status === 'onprocess') {
 						return (
 							<Students
 								key={index}
-								id={student.concern_id}
-								student_id={student.student_id}
-								status={student.concern_status}
-								text={student.concern_title}
+								id={concern.concern_id}
+								student_id={concern.student_id}
+								status={concern.concern_status}
+								text={concern.concern_title}
+								index={index}
+								handleData={handleData}
 							/>
 						);
 					} else return null;

@@ -1,14 +1,24 @@
 module.exports = {
 	create: (req, res) => {
 		const db = req.app.get('db');
-		const { class_id, student_id, concern_title, concern_status } = req.body;
-		db.query(
-			`INSERT INTO concern ( class_id,mentor_id, student_id, concern_title, concern_status)
-					VALUES (${class_id}, null , '${student_id}', '${concern_title}', '${concern_status}')
-			`
-		)
+		const {
+			class_id,
+			mentor_id,
+			student_id,
+			concern_title,
+			concern_status
+		} = req.body;
+
+		db.concern
+			.insert({
+				class_id,
+				mentor_id,
+				student_id,
+				concern_title,
+				concern_status
+			})
 			.then(concern => {
-				res.status(201).json(req.body);
+				res.status(201).json(concern);
 			})
 			.catch(err => {
 				console.log(err);

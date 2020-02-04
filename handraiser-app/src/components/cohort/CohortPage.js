@@ -1,19 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import MainpageTemplate from '../tools/MainpageTemplate';
 import { Link } from 'react-router-dom';
 import NeedHelp from './NeedHelp';
 import BeingHelp from './BeingHelp';
 import ChatRoom from './ChatRoom';
-import io from 'socket.io-client';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Help from './Help';
+import Data from './Data';
 
 export default function CohortPage(props) {
 	const classes = useStyles();
-	const ENDPOINT = 'localhost:4000';
-	let socket = io(ENDPOINT);
+	const { id } = props.match.params;
+	const { handleData } = Data(id);
 
 	return (
 		<MainpageTemplate>
@@ -27,9 +27,9 @@ export default function CohortPage(props) {
 				<div className={classes.root}>
 					<Grid container spacing={3}>
 						<Grid item xs={6} lg={3}>
-							<Help id={props.match.params.id} socket={socket} />
-							<NeedHelp id={props.match.params.id} socket={socket} />
-							<BeingHelp id={props.match.params.id} socket={socket} />
+							<Help handleData={handleData} id={id} />
+							<NeedHelp handleData={handleData} />
+							<BeingHelp handleData={handleData} />
 						</Grid>
 						<Grid item xs={6} lg={9}>
 							<ChatRoom />

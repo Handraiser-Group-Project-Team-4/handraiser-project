@@ -1,43 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Axios from 'axios';
 import jwtToken from '../tools/jwtToken';
 
-export default function Data(id, socket) {
-	const userObj = jwtToken();
+export default function Data(id) {
 	const [data, setData] = useState([]);
 	const [isTrue, setIsTrue] = useState(false);
-
+	const userObj = jwtToken();
 	useEffect(() => {
-		Axios({
-			method: 'get',
-			url: `/api/concern/${id}`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				setData(res.data);
-
-				let val = false;
-				res.data.map(student => {
-					if (student.student_id === userObj.user_id) {
-						val = true;
-					}
-					return val;
-				});
-				setIsTrue(val);
-
-				socket.emit('join', res.data);
-				socket.on('out', data => {
-					setData(data);
-				});
+		if (id) {
+			Axios({
+				method: 'get',
+				url: `/api/concern/${id}`,
+				headers: {
+					Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+				}
 			})
-			.catch(err => console.log(err));
-		return () => {
-			socket.emit('disconnect');
-			socket.off();
-		};
-	}, [data, id, socket, isTrue, userObj.user_id]);
+				.then(res => {
+					setData(res.data);
+					let isNull = false;
+					res.data.map(student => {
+						if (userObj.user_id === student.student_id) {
+							isNull = true;
+						}
+						return isNull;
+					});
+					setIsTrue(isNull);
+				})
+				.catch(err => console.log(err));
+		}
+	}, [id, isTrue, userObj.user_id]);
 
-	return { data, setData, isTrue, setIsTrue };
+	const handleData = useMemo(() => ({ data, setData }), [data, setData]);
+
+	return { handleData, isTrue, setIsTrue };
 }

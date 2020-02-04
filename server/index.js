@@ -45,22 +45,23 @@ massive({
 	app.patch('/api/concern/:id', concern.update);
 	app.delete('/api/concern/:id', concern.delete);
 
-	const PORT = 4000;
+	const PORT = 3001;
 
 	server.listen(PORT, () => {
 		console.log(`Server listening on port ${PORT}`);
 	});
 
 	io.on('connection', function(socket) {
-		console.log('User connected ' + socket.id);
+		console.log('User connected ');
 
-		socket.on('join', data => {
-			socket.to(data).emit('out', data);
-			socket.join(data);
+		socket.on('join', (id, data) => {
+			console.log(id);
+			socket.to(id).emit('out', data);
+			socket.join(id);
 		});
 
 		socket.on('disconnect', function() {
-			console.log('User disconnected ' + socket.id);
+			console.log('User disconnected ');
 		});
 	});
 });

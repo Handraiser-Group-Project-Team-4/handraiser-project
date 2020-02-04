@@ -17,8 +17,9 @@ import Typography from '@material-ui/core/Typography';
 export default function Students(props) {
 	const classes = useStyles();
 	const userObj = jwtToken();
-	const { id, status, student_id, text } = props;
+	const { id, status, student_id, index, text, handleData } = props;
 	const [student, setStudent] = useState([]);
+	const { data, setData } = handleData;
 
 	useEffect(() => {
 		Axios({
@@ -44,7 +45,16 @@ export default function Students(props) {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 			}
 		})
-			.then(res => {})
+			.then(res => {
+				let arr = [];
+				data.filter((student, n) => {
+					if (index === n) {
+						student.concern_status = value;
+					}
+					return arr.push(student);
+				});
+				setData(arr);
+			})
 			.catch(err => console.log(err));
 	};
 
@@ -56,12 +66,18 @@ export default function Students(props) {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 			}
 		})
-			.then(res => {})
+			.then(res => {
+				let arr = [];
+				data.filter((student, n) => {
+					if (index !== n) {
+						return arr.push(data[n]);
+					}
+					return arr;
+				});
+				setData(arr);
+			})
 			.catch(err => console.log(err));
 	};
-	if (!student) {
-		return null;
-	}
 	return (
 		<>
 			<ListItem alignItems="flex-start">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import jwtToken from '../tools/jwtToken';
 import Axios from 'axios';
 import Data from './Data';
@@ -6,7 +6,25 @@ import Data from './Data';
 export default function Help(props) {
 	const userObj = jwtToken();
 	const [value, setValue] = useState('');
-	const { isTrue, setIsTrue } = Data(props.id, props.socket);
+	const [user, setUser] = useState();
+	const { isTrue, setIsTrue } = Data(props.id);
+	const { data, setData } = props.handleData;
+
+	useEffect(() => {
+		Axios({
+			method: 'get',
+			url: `/api/users/${userObj.user_id}`,
+			headers: {
+				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+			}
+		})
+			.then(res => {
+				setUser(res.data);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	});
 
 	const handleClick = () => {
 		Axios({
@@ -14,6 +32,7 @@ export default function Help(props) {
 			url: `/api/concern`,
 			data: {
 				class_id: props.id,
+				mentor_id: null,
 				student_id: userObj.user_id,
 				concern_title: value,
 				concern_status: 'pending'
@@ -23,6 +42,7 @@ export default function Help(props) {
 			}
 		})
 			.then(res => {
+				setData([...data, res.data]);
 				setValue('');
 				setIsTrue(true);
 			})
@@ -31,8 +51,8 @@ export default function Help(props) {
 
 	return (
 		<>
-			{userObj ? (
-				userObj.user_role_id === 3 ? (
+			{user ? (
+				user.user_role_id === 3 ? (
 					<>
 						<button
 							onClick={() => {
