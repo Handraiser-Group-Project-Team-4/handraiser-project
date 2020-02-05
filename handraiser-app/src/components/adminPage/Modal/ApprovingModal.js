@@ -33,8 +33,7 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
       })
       .catch(err => console.log(err));
   };
-
-
+  
   return (
     <Dialog
       open={open}
