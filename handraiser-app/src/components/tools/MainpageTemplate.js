@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 
 export default function MainpageTemplate({children}) {
@@ -25,7 +25,7 @@ export default function MainpageTemplate({children}) {
         })
 
         return () => { };
-    }, [])
+    }, [userObj])
 
     const handleLogout = () => {
         axios({

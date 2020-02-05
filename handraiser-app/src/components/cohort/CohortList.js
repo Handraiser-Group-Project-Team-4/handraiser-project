@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 export default function CohortList({mentor}) {
     const userObj = jwtToken();
