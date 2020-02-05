@@ -64,7 +64,7 @@ const Chat = () => {
 		setExpanded(!expanded);
 	};
 	const username = `noe`,
-		room = '1';
+		room = '40';
 	const userObj = jwtToken();
 	// const [chatDetails, setChatDetails] = useState({
 	//     name:"",

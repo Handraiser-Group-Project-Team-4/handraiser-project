@@ -13,6 +13,7 @@ import Grid from '@material-ui/core/Grid';
 
 export const UserContext = createContext(null);
 
+let socket;
 export default function CohortPage(props) {
 	const classes = useStyles();
 	const userObj = jwtToken();

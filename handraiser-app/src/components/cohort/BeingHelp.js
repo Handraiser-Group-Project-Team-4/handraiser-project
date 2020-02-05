@@ -20,15 +20,22 @@ export default function NeedHelp(props) {
 			<Divider />
 			<List className={classes.list}>
 				{data.map((concern, index) => {
-					if (concern.concern_status === 'onprocess') {
+					const {
+						concern_status,
+						concern_id,
+						student_id,
+						concern_title
+					} = concern;
+
+					if (concern_status === 'onprocess') {
 						return (
 							<Students
 								key={index}
-								id={concern.concern_id}
-								student_id={concern.student_id}
-								status={concern.concern_status}
-								text={concern.concern_title}
 								index={index}
+								id={concern_id}
+								student_id={student_id}
+								status={concern_status}
+								text={concern_title}
 							/>
 						);
 					} else return null;

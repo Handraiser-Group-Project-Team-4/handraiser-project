@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Axios from 'axios';
-import jwtToken from '../tools/jwtToken';
 import { UserContext } from './CohortPage';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,11 +16,10 @@ import Typography from '@material-ui/core/Typography';
 
 export default function Students(props) {
 	const classes = useStyles();
-	const userObj = jwtToken();
-	const { id, status, student_id, index, text } = props;
+	const { id, index, status, student_id, text } = props;
 	const [student, setStudent] = useState([]);
 
-	const { data, setData } = useContext(UserContext);
+	const { data, setData, user } = useContext(UserContext);
 
 	useEffect(() => {
 		Axios({
@@ -38,7 +36,7 @@ export default function Students(props) {
 	}, [student_id]);
 
 	const handleUpdate = value => {
-		let mentor_id = value === 'onprocess' ? userObj.user_id : null;
+		let mentor_id = value === 'onprocess' ? user.user_id : null;
 		Axios({
 			method: 'patch',
 			url: `/api/concern/${id}`,
@@ -56,6 +54,7 @@ export default function Students(props) {
 					return arr.push(student);
 				});
 				setData(arr);
+				// socket.emit('set-concern', res.data);
 			})
 			.catch(err => console.log(err));
 	};
@@ -80,6 +79,9 @@ export default function Students(props) {
 			})
 			.catch(err => console.log(err));
 	};
+	if (!user) {
+		return null;
+	}
 	return (
 		<>
 			<ListItem alignItems="flex-start">
@@ -99,13 +101,13 @@ export default function Students(props) {
 						</React.Fragment>
 					}
 				/>
-				{status === 'pending' && userObj.user_role_id === 2 ? (
+				{status === 'pending' && user.user_role_id === 2 ? (
 					<HelpIcon
 						onClick={() => {
 							handleUpdate('onprocess');
 						}}
 					/>
-				) : status === 'onprocess' && userObj.user_role_id === 2 ? (
+				) : status === 'onprocess' && user.user_role_id === 2 ? (
 					<>
 						<CheckCircleIcon style={{ marginLeft: 10 }} />
 
@@ -117,8 +119,8 @@ export default function Students(props) {
 						/>
 					</>
 				) : status === 'pending' &&
-				  userObj.user_role_id === 3 &&
-				  userObj.user_id === student.user_id ? (
+				  user.user_role_id === 3 &&
+				  user.user_id === student.user_id ? (
 					<DeleteIcon
 						onClick={() => {
 							handleDelete();

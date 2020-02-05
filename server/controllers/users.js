@@ -52,7 +52,7 @@ module.exports = {
 		if (chat) {
 			let users = {};
 			db.query(
-				`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 1`
+				`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 40`
 			).then(concern => {
 				users.concern = concern[0];
 				// res.status(200).json(...concern)

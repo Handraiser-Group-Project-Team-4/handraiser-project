@@ -43,29 +43,31 @@ export default function Help() {
 			.catch(err => console.log(err));
 	};
 
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<>
-			{user ? (
-				user.user_role_id === 3 ? (
-					<>
-						<button
-							onClick={() => {
-								handleClick();
-							}}
-							disabled={isTrue}
-						>
-							Help
-						</button>
-						<input
-							value={value}
-							type="text"
-							onChange={e => {
-								setValue(e.target.value);
-							}}
-							disabled={isTrue}
-						/>
-					</>
-				) : null
+			{user.user_role_id === 3 ? (
+				<>
+					<button
+						onClick={() => {
+							handleClick();
+						}}
+						disabled={isTrue}
+					>
+						Need help
+					</button>
+					<input
+						value={value}
+						type="text"
+						onChange={e => {
+							setValue(e.target.value);
+						}}
+						disabled={isTrue}
+					/>
+				</>
 			) : null}
 		</>
 	);
