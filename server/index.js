@@ -43,8 +43,11 @@ massive({
 
 
     // ADMIN - USERS
+    app.patch('/api/assigning/:id', users.assign)
     app.patch('/api/pending/:id', users.request)
-
+    app.get('/api/allusers', users.fetchall)
+    app.get('/api/asc', users.usersAsc)
+    app.get('/api/desc', users.usersDesc)
     app.get('/api/user_approval_fetch', users.user_approval_fetch)
     app.patch('/api/toapprove/:id', users.movingToApprove)
     app.patch('/api/todisapprove/:id', users.movingToDisapprove)

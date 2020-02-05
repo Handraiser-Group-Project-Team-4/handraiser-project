@@ -94,10 +94,9 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                         key={row.user_id}
                                     >
                                         <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
-                                        <TableCell>
-                                            {row.firstname}, {row.lastname}
-                                        </TableCell>
+                                        <TableCell>{row.firstname}, {row.lastname}</TableCell>
                                         <TableCell>{row.email}</TableCell>
+                                        
                                         {(type==='disapproved')&&<TableCell>{row.reason_disapproved}</TableCell>}
 
                                         {(type==='pending')&&

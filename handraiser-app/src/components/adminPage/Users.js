@@ -11,26 +11,17 @@ import TableHead from "@material-ui/core/TableHead";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableRow from "@material-ui/core/TableRow";
 import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import TextField from "@material-ui/core/TextField";
 
 // Components
-import CreateCohort from "./Actions/CreateCohort";
-import ChangeKey from "./Actions/ChangeKey";
+import Assign from "./Assign"
 
 // Material Icons
 import EditIcon from "@material-ui/icons/Edit";
-import AddIcon from "@material-ui/icons/Add";
 import SearchIcon from "@material-ui/icons/Search";
+import FilterListIcon from '@material-ui/icons/FilterList';
 
-
-const columns = [
-  { id: "title", label: "Title", minWidth: 170 },
-  { id: "description", label: "Description", minWidth: 170 },
-  { id: "key", label: "Key", minWidth: 170 },
-  { id: "action", label: "Acttion", minWidth: 170 }
-];
 
 const useStyles = makeStyles({
   root: {
@@ -45,29 +36,35 @@ export default function StickyHeadTable() {
   const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [cohort, setCohort] = useState([]);
+  const [users, setUsers] = useState([]);
   const [temp, setTemp] = useState([]) 
-  const [handleValues, sethandleValues] = useState({});
-  const [createCohort, setCreateCohort] = useState(false);
-  const [editCohort, setEditCohort] = useState(false);
+  const [sorter, setSorter] = useState(false);
+  const [assignModal, setAssignModal] = useState(false)
+  const [assignObj, setAssignObj] = useState({})
 
-  const handleClickOpen = () => {
-    setCreateCohort(true);
-  };
+  const openAssignModal = (row, role) => {
+    setAssignModal(true);
+    setAssignObj({
+      id: row.user_id,
+      firstname: row.firstname,
+      lastname: row.lastname,
+      role: role
+    })
+  }
 
-  const handleClose = () => {
-    setCreateCohort(false);
-  };
+  const closeAssignModal = () => {
+    setAssignModal(false);
+  }
 
   useEffect(() => {
-    renderCohorts();
+    renderUsers();
   }, []);
 
-  // GET THE COHORT VALUES
-  const renderCohorts = () => {
+  // GET THE Users VALUES
+  const renderUsers = () => {
     axios({
       method: "get",
-      url: `/api/cohorts`,
+      url: `/api/allusers`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     }
@@ -75,30 +72,66 @@ export default function StickyHeadTable() {
     })
       .then(data => {
         console.log(data.data);
-        setCohort(data.data);
+        setUsers(data.data);
         setTemp(data.data)
       })
-      .catch(err => console.log("object"));
+      .catch(err => console.log("err"));
   };
+
+  
 
   //SEARCH FUNCTION 
   const handleSearch = e => {
-    const filteredContacts = cohort.filter(
+    const filteredContacts = users.filter(
       el =>
-        el.class_title.toLowerCase().indexOf(e.target.value.toLowerCase()) !==
-          -1 
+        el.firstname.toLowerCase().indexOf(e.target.value.toLowerCase()) !==
+          -1 ||
+          el.lastname.toLowerCase().indexOf(e.target.value.toLowerCase()) !==
+          -1   
     );
   
     setTemp(filteredContacts);
   };
 
-  const changeKey = row => {
-    sethandleValues(row);
-    setEditCohort(true);
+  const ascDesc = () => {
+    if (sorter) {
+      setSorter(false);
+    } else {
+      setSorter(true);
+    }
+    filterRole();
   };
 
-  const closeEditCohort = () => {
-    setEditCohort(false);
+  const filterRole = () => {
+
+
+    if (sorter) {
+      axios({
+        method: "get",
+        url: `/api/asc`,
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+      }
+     
+      })
+        .then(data => {
+          setTemp(data.data);
+        })
+        .catch(err => console.log("err"));
+    } else {
+      axios({
+        method: "get",
+        url: `/api/desc`,
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+      }
+      
+      })
+        .then(data => {
+          setTemp(data.data);
+        })
+        .catch(err => console.log("err"));
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -112,20 +145,12 @@ export default function StickyHeadTable() {
 
   return (
     <React.Fragment>
-      {createCohort && (
-        <CreateCohort
-          open={createCohort}
-          handleClose={handleClose}
-          renderCohorts={renderCohorts}
-        />
-      )}
-
-      {editCohort && (
-        <ChangeKey
-            row={handleValues}
-            open={editCohort}
-            handleClose={closeEditCohort}
-            renderCohorts={renderCohorts}
+      {assignModal && (
+        <Assign
+        open ={assignModal}
+        renderUsers={renderUsers}
+        assignObj={assignObj}
+        handleClose={closeAssignModal}
         />
       )}
 
@@ -147,15 +172,11 @@ export default function StickyHeadTable() {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                {columns.map(column => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
+                <TableCell key="avatar" style={{ minWidth: "170" }} > </TableCell>
+                <TableCell key="name" style={{ minWidth: "170" }} > Name</TableCell>
+                <TableCell key="email" style={{ minWidth: "170" }} > Email</TableCell>
+                <TableCell key="role" style={{ minWidth: "170" }} > <FilterListIcon onClick = {ascDesc}/> Role</TableCell>
+                <TableCell key="action" style={{ minWidth: "170" }} align="center" > Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -167,22 +188,40 @@ export default function StickyHeadTable() {
                       hover
                       role="checkbox"
                       tabIndex={-1}
-                      key={row.class_id}
+                      key={row.user_id}
                     >
-                      <TableCell>{row.class_title}</TableCell>
-                      <TableCell>{row.class_description}</TableCell>
-                      <TableCell>{row.class_key}</TableCell>
+                      <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
+                      <TableCell>{row.lastname}, {row.firstname}</TableCell>
+                      <TableCell>{row.email}</TableCell>
                       <TableCell>
-                        <Button
+                        {(row.user_role_id===2 )? "Mentor" : "Student"} 
+                      </TableCell>
+                      <TableCell align="center">
+                      {(row.user_role_id===2 )? <Button
                           variant="contained"
                           color="primary"
                           size="small"
                           className={classes.button}
                           startIcon={<EditIcon />}
-                          onClick={e => changeKey(row)}
+                          onClick={e => openAssignModal(row, 3)}
                         >
-                          Change Key
+                          Assign as Student
+                        </Button> 
+                        
+                        : <Button
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                          className={classes.button}
+                          startIcon={<EditIcon />}
+                          onClick={e => openAssignModal(row, 2)}
+                        >
+                          Assign as Mentor
                         </Button>
+                        
+                        } 
+                        
+                        
                       </TableCell>
                     </TableRow>
                   );
@@ -193,17 +232,13 @@ export default function StickyHeadTable() {
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
-          count={cohort.length}
+          count={users.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-
-      <Fab color="primary" aria-label="add" onClick={handleClickOpen}>
-        <AddIcon />
-      </Fab>
     </React.Fragment>
   );
 }

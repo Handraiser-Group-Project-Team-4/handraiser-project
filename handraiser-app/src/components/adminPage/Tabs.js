@@ -10,6 +10,7 @@ import Box from '@material-ui/core/Box';
 // Components
 import Approval from './Approval';
 import Cohort from './Cohort'
+import Users from './Users'
 
 
 function TabPanel(props) {
@@ -72,6 +73,7 @@ export default function ScrollableTabsButtonAuto() {
         >
           <Tab label="Approval" {...a11yProps(0)} />
           <Tab label="Create Cohort" {...a11yProps(1)} />
+          <Tab label="Users" {...a11yProps(2)} />
 
         </Tabs>
       </AppBar>
@@ -81,6 +83,10 @@ export default function ScrollableTabsButtonAuto() {
       </TabPanel>
       <TabPanel value={value} index={1}>
         <Cohort />
+
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <Users />
 
       </TabPanel>
 

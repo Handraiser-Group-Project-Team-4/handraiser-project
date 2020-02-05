@@ -8,32 +8,28 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
 
-export default function AlertDialog({ handleId, open, handleClose, renderPending }) {
-  const body  = {
-    data: {
-        user_approval_status_id: 1
-    }}
-  ;
+export default function AlertDialog({ open, handleClose, renderUsers, assignObj}) {
 
-
-  const submitUserData = e => {
-    e.preventDefault();
-
+  const submitUserData = () => {
     axios({
       method: "patch",
-      url: `/api/toapprove/${handleId.user_id}`,
+      url: `/api/assigning/${assignObj.id}`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
     },
-      data: body.data
+      data: {
+        user_role_id: assignObj.role,
+        user_approval_status_id: 4,
+        reason_disapproved: null
+      }
     })
       .then(() => {
-        handleClose();
-        renderPending();
+        renderUsers()
+        handleClose()
       })
-      .catch(err => console.log(err));
-  };
-  
+      .catch(err => console.log("err"));
+  }
+  console.log(assignObj)
   return (
     <Dialog
       open={open}
@@ -43,8 +39,11 @@ export default function AlertDialog({ handleId, open, handleClose, renderPending
       fullWidth={false}
       maxWidth="xs"
     >
-        <DialogTitle id="alert-dialog-title"> Are you sure you want to assign {handleId.firstname} {handleId.lastname} as a mentor?</DialogTitle>
-           
+        <DialogTitle id="alert-dialog-title"> 
+        {assignObj.role === 3
+        ? `Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a student?`
+        : `Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a mentor?`    
+        }</DialogTitle>
         <DialogContent>
           
         </DialogContent>

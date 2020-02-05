@@ -79,6 +79,42 @@ module.exports = {
         }
     },
 
+    fetchall: (req, res) => {
+        const db = req.app.get("db");
+
+        db.query(`select * from users where user_role_id = 2 or user_role_id = 3;`)
+        .then(get => res.status(200).json(get))
+            .catch(err => {
+                console.error(err);
+                res.status(500).end();
+            });
+        
+    },
+
+    usersAsc: (req, res) => {
+        const db = req.app.get("db");
+
+        db.query(`select * from users where user_role_id = 2 or user_role_id = 3 order by user_role_id asc`)
+        .then(get => res.status(200).json(get))
+            .catch(err => {
+                console.error(err);
+                res.status(500).end();
+            });
+        
+    },
+
+    usersDesc: (req, res) => {
+        const db = req.app.get("db");
+
+        db.query(`select * from users where user_role_id = 2 or user_role_id = 3 order by user_role_id desc`)
+        .then(get => res.status(200).json(get))
+            .catch(err => {
+                console.error(err);
+                res.status(500).end();
+            });
+        
+    },
+
     logout: (req, res) => {
         const db = req.app.get("db");
 
@@ -106,6 +142,27 @@ module.exports = {
             .then(get => res.status(200).json(get))
             .catch(err => {
                 console.error(err);
+                res.status(500).end();
+            });
+    },
+
+    assign: (req, res) => {
+        const db = req.app.get("db");
+        const { user_role_id, user_approval_status_id, reason_disapproved } = req.body;
+        db.users
+            .update(
+                {
+                    user_id: req.params.id
+                },
+                {
+                    user_role_id: user_role_id,
+                    user_approval_status_id: user_approval_status_id,
+                    reason_disapproved: reason_disapproved
+                }
+            )
+            .then(post => res.status(201).send(post))
+            .catch(err => {
+                console.err(err);
                 res.status(500).end();
             });
     },
