@@ -20,14 +20,14 @@ import SearchIcon from "@material-ui/icons/Search";
 
 const useStyles = makeStyles({
     root: {
-      width: "100%"
+        width: "100%"
     },
     container: {
-      maxHeight: 740
+        maxHeight: 740
     }
-  });
+});
 
-export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc}) {
+export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn }) {
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -36,9 +36,12 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
     const handleSearch = e => {
         const filteredContacts = data.filter(
             el =>
-                el.firstname.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
-                ||
-                el.lastname.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+                (type !== 'cohort')?
+                    el.firstname.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+                    ||
+                    el.lastname.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1
+                :
+                    el.class_title.toLowerCase().indexOf(e.target.value.toLowerCase()) !== -1 
         );
 
         setTemp(filteredContacts);
@@ -91,37 +94,59 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                         hover
                                         role="checkbox"
                                         tabIndex={-1}
-                                        key={row.user_id}
+                                        key={(type !== 'cohort')?row.user_id:row.class_id}
                                     >
-                                        <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
-                                        <TableCell>{row.firstname}, {row.lastname}</TableCell>
-                                        <TableCell>{row.email}</TableCell>
-                                        
-                                        {(type==='disapproved')&&<TableCell>{row.reason_disapproved}</TableCell>}
+                                        {(type !== 'cohort') ?
+                                            <>
+                                                <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
+                                                <TableCell>
+                                                    {row.firstname}, {row.lastname}
+                                                </TableCell>
+                                                <TableCell>{row.email}</TableCell>
+                                                {(type === 'disapproved') && <TableCell>{row.reason_disapproved}</TableCell>}
 
-                                        {(type==='pending')&&
-                                            <TableCell>
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    size="small"
-                                                    className={classes.button}
-                                                    startIcon={<EditIcon />}
-                                                    onClick={e => approvingfunc(row)}
-                                                >
-                                                    Approve
-                                            </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    color="primary"
-                                                    size="small"
-                                                    className={classes.button}
-                                                    startIcon={<EditIcon />}
-                                                    onClick={e => disApprovingfunc(row)}
-                                                >
-                                                    Disapprove
-                                            </Button>
-                                            </TableCell>
+                                                {(type === 'pending') &&
+                                                    <TableCell>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            size="small"
+                                                            className={classes.button}
+                                                            startIcon={<EditIcon />}
+                                                            onClick={e => approvingfunc(row)}
+                                                        >
+                                                            Approve
+                                                </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            size="small"
+                                                            className={classes.button}
+                                                            startIcon={<EditIcon />}
+                                                            onClick={e => disApprovingfunc(row)}
+                                                        >
+                                                            Disapprove
+                                                </Button>
+                                                    </TableCell>}
+                                            </>
+                                            :
+                                            <>
+                                                <TableCell>{row.class_title}</TableCell>
+                                                <TableCell>{row.class_description}</TableCell>
+                                                <TableCell>{row.class_key}</TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        size="small"
+                                                        className={classes.button}
+                                                        startIcon={<EditIcon />}
+                                                        onClick={e => changeKeyFn(row)}
+                                                    >
+                                                        Change Key
+                                                    </Button>
+                                                </TableCell>
+                                            </>
                                         }
                                     </TableRow>
                                 );

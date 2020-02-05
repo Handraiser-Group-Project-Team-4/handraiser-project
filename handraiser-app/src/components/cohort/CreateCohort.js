@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import axios from 'axios'
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 export default function CreateCohort() {
     const userObj = jwtToken();

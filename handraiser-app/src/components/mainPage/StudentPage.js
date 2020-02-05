@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import { Redirect } from 'react-router-dom'
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 import MainpageTemplate from '../tools/MainpageTemplate'
 import CohortList from '../cohort/CohortList'
