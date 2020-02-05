@@ -1,29 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import jwtToken from '../tools/jwtToken';
+import React, { useState, useEffect, useContext } from 'react';
 import Axios from 'axios';
-import Data from './Data';
+import { UserContext } from './CohortPage';
 
-export default function Help(props) {
-	const userObj = jwtToken();
+export default function Help() {
 	const [value, setValue] = useState('');
-	const [user, setUser] = useState();
-	const { isTrue, setIsTrue } = Data(props.id);
-	const { data, setData } = props.handleData;
+	const [isTrue, setIsTrue] = useState(false);
+	const { id, data, setData, user } = useContext(UserContext);
 
 	useEffect(() => {
-		Axios({
-			method: 'get',
-			url: `/api/users/${userObj.user_id}`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				setUser(res.data);
-			})
-			.catch(err => {
-				console.log(err);
+		if (user) {
+			let isNull = false;
+			data.map(student => {
+				if (user.user_id === student.student_id) {
+					isNull = true;
+				}
+				return isNull;
 			});
+			setIsTrue(isNull);
+		}
 	});
 
 	const handleClick = () => {
@@ -31,9 +25,9 @@ export default function Help(props) {
 			method: 'post',
 			url: `/api/concern`,
 			data: {
-				class_id: props.id,
+				class_id: id,
 				mentor_id: null,
-				student_id: userObj.user_id,
+				student_id: user.user_id,
 				concern_title: value,
 				concern_status: 'pending'
 			},

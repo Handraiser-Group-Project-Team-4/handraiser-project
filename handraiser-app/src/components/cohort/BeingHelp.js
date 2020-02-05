@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Students from './Students';
+import { UserContext } from './CohortPage';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -9,8 +10,8 @@ import Typography from '@material-ui/core/Typography';
 
 export default function NeedHelp(props) {
 	const classes = useStyles();
+	const { data } = useContext(UserContext);
 
-	const { handleData } = props;
 	return (
 		<Paper className={classes.paper}>
 			<Typography variant="h5" style={{ padding: 10 }}>
@@ -18,7 +19,7 @@ export default function NeedHelp(props) {
 			</Typography>
 			<Divider />
 			<List className={classes.list}>
-				{handleData.data.map((concern, index) => {
+				{data.map((concern, index) => {
 					if (concern.concern_status === 'onprocess') {
 						return (
 							<Students
@@ -28,7 +29,6 @@ export default function NeedHelp(props) {
 								status={concern.concern_status}
 								text={concern.concern_title}
 								index={index}
-								handleData={handleData}
 							/>
 						);
 					} else return null;

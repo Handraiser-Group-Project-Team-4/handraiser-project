@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Axios from 'axios';
 import jwtToken from '../tools/jwtToken';
+import { UserContext } from './CohortPage';
 
 import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,7 +10,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import HelpIcon from '@material-ui/icons/Help';
-import ChatIcon from '@material-ui/icons/Chat';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
@@ -17,9 +18,10 @@ import Typography from '@material-ui/core/Typography';
 export default function Students(props) {
 	const classes = useStyles();
 	const userObj = jwtToken();
-	const { id, status, student_id, index, text, handleData } = props;
+	const { id, status, student_id, index, text } = props;
 	const [student, setStudent] = useState([]);
-	const { data, setData } = handleData;
+
+	const { data, setData } = useContext(UserContext);
 
 	useEffect(() => {
 		Axios({
@@ -105,7 +107,8 @@ export default function Students(props) {
 					/>
 				) : status === 'onprocess' && userObj.user_role_id === 2 ? (
 					<>
-						<ChatIcon style={{ marginLeft: 10 }} />
+						<CheckCircleIcon style={{ marginLeft: 10 }} />
+
 						<RemoveCircleIcon
 							style={{ marginLeft: 10 }}
 							onClick={() => {
