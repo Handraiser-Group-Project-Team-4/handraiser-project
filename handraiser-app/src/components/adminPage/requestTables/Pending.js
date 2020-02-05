@@ -6,8 +6,8 @@ import Paper from "@material-ui/core/Paper";
 import AdminTable from '../../tools/AdminTable'
 
 // Components
-import ApprovingModal from "../Actions/ApprovingModal";
-import DisapprovingModal from "../Actions/DisapprovingModal";
+import ApprovingModal from "../Modal/ApprovingModal";
+import DisapprovingModal from "../Modal/DisapprovingModal";
 
 const columns = [
   { id: "photo", label: "Photo", minWidth: 170 },
