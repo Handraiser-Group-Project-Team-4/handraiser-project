@@ -16,7 +16,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 // Material Icons
 import EditIcon from "@material-ui/icons/Edit";
 import SearchIcon from "@material-ui/icons/Search";
-
+import FilterListIcon from '@material-ui/icons/FilterList';
 
 const useStyles = makeStyles({
     root: {
@@ -27,7 +27,8 @@ const useStyles = makeStyles({
     }
 });
 
-export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn }) {
+export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn}) {
+    
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -46,7 +47,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
 
         setTemp(filteredContacts);
     };
-
+    
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -74,15 +75,24 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
-                            {columns.map(column => (
-                                <TableCell
-                                    key={column.id}
-                                    align={column.align}
-                                    style={{ minWidth: column.minWidth }}
-                                >
-                                    {column.label}
-                                </TableCell>
-                            ))}
+                            {(columns)?
+                                columns.map(column => (
+                                    <TableCell
+                                        key={column.id}
+                                        align={column.align}
+                                        style={{ minWidth: column.minWidth }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                )):
+                                <>
+                                <TableCell key="avatar" style={{ minWidth: "170" }} > </TableCell>
+                                <TableCell key="name" style={{ minWidth: "170" }} > Name</TableCell>
+                                <TableCell key="email" style={{ minWidth: "170" }} > Email</TableCell>
+                                <TableCell key="role" style={{ minWidth: "170" }} > <FilterListIcon onClick = {ascDescFn}/> Role</TableCell>
+                                <TableCell key="action" style={{ minWidth: "170" }} align="center" > Action</TableCell>
+                                </>
+                            }
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -96,7 +106,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                         tabIndex={-1}
                                         key={(type !== 'cohort')?row.user_id:row.class_id}
                                     >
-                                        {(type !== 'cohort') ?
+                                        {(type === 'pending' || type === 'approved' || type === 'disapproved') ?
                                             <>
                                                 <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
                                                 <TableCell>
@@ -128,8 +138,45 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                             Disapprove
                                                 </Button>
                                                     </TableCell>}
-                                            </>
-                                            :
+                                            </>:
+
+                                        (type === 'users') ?
+                                            <>
+                                                <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
+                                                <TableCell>{row.lastname}, {row.firstname}</TableCell>
+                                                <TableCell>{row.email}</TableCell>
+                                                <TableCell>
+                                                {(row.user_role_id===2 )? "Mentor" : "Student"} 
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                {(row.user_role_id===2 )? <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    size="small"
+                                                    className={classes.button}
+                                                    startIcon={<EditIcon />}
+                                                    onClick={e => openAssignModalFn(row, 3)}
+                                                >
+                                                    Assign as Student
+                                                </Button> 
+                                                
+                                                : <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    size="small"
+                                                    className={classes.button}
+                                                    startIcon={<EditIcon />}
+                                                    onClick={e => openAssignModalFn(row, 2)}
+                                                >
+                                                    Assign as Mentor
+                                                </Button>
+                                                } 
+                                                
+                                                
+                                                </TableCell>
+                                            </>:
+                                        
+                                        (type === 'cohort') ?
                                             <>
                                                 <TableCell>{row.class_title}</TableCell>
                                                 <TableCell>{row.class_description}</TableCell>
@@ -146,7 +193,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                         Change Key
                                                     </Button>
                                                 </TableCell>
-                                            </>
+                                            </>:null
                                         }
                                     </TableRow>
                                 );

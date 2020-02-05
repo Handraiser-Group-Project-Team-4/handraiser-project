@@ -83,21 +83,41 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         const URL = (type === 'approving')?`/api/toapprove/${data.user_id}`:
                     (type === 'disapproving')?`/api/todisapprove/${data.user_id}`:
                     (type === 'Create Cohort')?`/api/class`:
-                    (type === 'Change Key')?`/api/class/${data.classroom_id}`: null
+                    (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
+                    (type === 'users')?`/api/assigning/${data.id}`:null
 
-        axios({
-            method: METHOD,
-            url: URL,
-            headers: {
+        if(type === 'users')
+            axios({
+                method: METHOD,
+                url: URL,
+                headers: {
                 Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             },
-            data: body.data
-        }) 
-        .then(() => {
-            handleClose();
-            render();
-        })
-        .catch(err => console.log(err))
+                data: {
+                    user_role_id: data.role,
+                    user_approval_status_id: 4,
+                    reason_disapproved: null
+                }
+            })
+                .then(() => {
+                    render()
+                    handleClose()
+                })
+                .catch(err => console.log("err"))
+        else
+            axios({
+                method: METHOD,
+                url: URL,
+                headers: {
+                    Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+                },
+                data: body.data
+            }) 
+            .then(() => {
+                handleClose();
+                render();
+            })
+            .catch(err => console.log(err))
     };
 
     return (
