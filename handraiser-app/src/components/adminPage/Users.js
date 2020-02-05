@@ -103,9 +103,7 @@ export default function StickyHeadTable() {
   };
 
   const filterRole = () => {
-
-
-    if (sorter) {
+      if (sorter) {
       axios({
         method: "get",
         url: `/api/asc`,
@@ -117,7 +115,7 @@ export default function StickyHeadTable() {
         .then(data => {
           setTemp(data.data);
         })
-        .catch(err => console.log("err"));
+        .catch(() => console.log("err"));
     } else {
       axios({
         method: "get",
