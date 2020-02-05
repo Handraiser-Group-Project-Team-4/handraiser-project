@@ -18,6 +18,7 @@ import Divider from "@material-ui/core/Divider";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import Container from "@material-ui/core/Container";
+import ScrollableFeed from "react-scrollable-feed";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -188,64 +189,66 @@ const Chat = () => {
         <Divider />
         <CardContent className={classes.media}>
           <Box style={{ maxHeight: 500, overflow: "auto" }}>
-            {oldChat.map((message, i) => (
-              <div key={i}>
-                {message.user_id != userObj.user_id ? (
-                  <Box
-                    display="flex"
-                    justifyContent="flex-start"
-                    alignContent="flex-start"
-                    style={{ paddingBottom: "15px" }}
-                  >
-                    <Avatar className={classes.chatAvatar}>H</Avatar>
-                    <Container className={classes.chat}>
-                      {message.text}
-                    </Container>
-                  </Box>
-                ) : (
-                  <Box
-                    display="flex"
-                    justifyContent="flex-end"
-                    alignContent="flex-start"
-                    style={{ paddingBottom: "15px" }}
-                  >
-                    <Container className={classes.chat}>
-                      {message.text}
-                    </Container>
-                    <Avatar className={classes.chatLeftAvatar} />
-                  </Box>
-                )}
-              </div>
-            ))}
-            {currentChat.map((message, i) => (
-              <div key={i}>
-                {message.user_id != userObj.user_id ? (
-                  <Box
-                    display="flex"
-                    justifyContent="flex-start"
-                    alignContent="flex-start"
-                    style={{ paddingBottom: "15px" }}
-                  >
-                    <Avatar className={classes.chatAvatar}>H</Avatar>
-                    <Container className={classes.chat}>
-                      {message.text}
-                    </Container>
-                  </Box>
-                ) : (
-                  <Box
-                    display="flex"
-                    justifyContent="flex-end"
-                    alignContent="flex-start"
-                    style={{ paddingBottom: "15px" }}
-                  >
-                    <Container className={classes.chat}>
-                      {message.text}
-                    </Container>
-                    <Avatar className={classes.chatLeftAvatar} />
-                  </Box>
-                )}
-              </div>
-            ))}
+            <ScrollableFeed>
+              {oldChat.map((message, i) => (
+                <div key={i}>
+                  {message.user_id != userObj.user_id ? (
+                    <Box
+                      display="flex"
+                      justifyContent="flex-start"
+                      alignContent="flex-start"
+                      style={{ paddingBottom: "15px" }}
+                    >
+                      <Avatar className={classes.chatAvatar}>H</Avatar>
+                      <Container className={classes.chat}>
+                        {message.text}
+                      </Container>
+                    </Box>
+                  ) : (
+                    <Box
+                      display="flex"
+                      justifyContent="flex-end"
+                      alignContent="flex-start"
+                      style={{ paddingBottom: "15px" }}
+                    >
+                      <Container className={classes.chat}>
+                        {message.text}
+                      </Container>
+                      <Avatar className={classes.chatLeftAvatar} />
+                    </Box>
+                  )}
+                </div>
+              ))}
+              {currentChat.map((message, i) => (
+                <div key={i}>
+                  {message.user_id != userObj.user_id ? (
+                    <Box
+                      display="flex"
+                      justifyContent="flex-start"
+                      alignContent="flex-start"
+                      style={{ paddingBottom: "15px" }}
+                    >
+                      <Avatar className={classes.chatAvatar}>H</Avatar>
+                      <Container className={classes.chat}>
+                        {message.text}
+                      </Container>
+                    </Box>
+                  ) : (
+                    <Box
+                      display="flex"
+                      justifyContent="flex-end"
+                      alignContent="flex-start"
+                      style={{ paddingBottom: "15px" }}
+                    >
+                      <Container className={classes.chat}>
+                        {message.text}
+                      </Container>
+                      <Avatar className={classes.chatLeftAvatar} />
+                    </Box>
+                  )}
+                </div>
+              ))}
+            </ScrollableFeed>
           </Box>
         </CardContent>
         <CardActions disableSpacing>
