@@ -66,7 +66,7 @@ const Chat = () => {
     const sendMessage = event => {
         event.preventDefault();
         if (message) {
-            socket.emit("sendMessage", {message}, () => setMessage(""));
+            socket.emit("createCohort", {message}, () => setMessage(""));
         }
     };
 

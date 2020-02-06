@@ -1,20 +1,24 @@
 import React, { useState } from 'react'
 
 import { makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TextField,
+    Button,
+    InputAdornment
+} from "@material-ui/core"
 
 
 // Material Icons
+import BlockIcon from '@material-ui/icons/Block';
 import EditIcon from "@material-ui/icons/Edit";
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from '@material-ui/icons/FilterList';
 
@@ -27,7 +31,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn}) {
+export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn, closeCohortFn}) {
     
     const classes = useStyles();
     const [page, setPage] = useState(0);
@@ -80,7 +84,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                     <TableCell
                                         key={column.id}
                                         align={column.align}
-                                        style={{ minWidth: column.minWidth }}
+                                        style={{ minWidth: column.minWidth, textAlign: (column.id==='action')&&`center` }}
                                     >
                                         {column.label}
                                     </TableCell>
@@ -181,8 +185,8 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                 <TableCell>{row.class_title}</TableCell>
                                                 <TableCell>{row.class_description}</TableCell>
                                                 <TableCell>{row.class_key}</TableCell>
-                                                <TableCell>
-                                                    <Button
+                                                <TableCell style={{display:`flex`, alignItems:`center`, justifyContent:`space-around`}}>
+                                                    {/* <Button
                                                         variant="contained"
                                                         color="primary"
                                                         size="small"
@@ -191,7 +195,19 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                         onClick={e => changeKeyFn(row)}
                                                     >
                                                         Change Key
-                                                    </Button>
+                                                    </Button> */}
+                                                    <EditIcon 
+                                                        style={{color:`blue`, cursor:`pointer`}}
+                                                        onClick={e => changeKeyFn(row)}
+                                                    />
+                                                    <BlockIcon 
+                                                        style={{color:`orange`, cursor:`pointer`}}
+                                                        onClick={e => closeCohortFn(row)}
+                                                    />
+                                                    <DeleteOutlineIcon 
+                                                        style={{color:`red`, cursor:`pointer`}}
+
+                                                    />
                                                 </TableCell>
                                             </>:null
                                         }

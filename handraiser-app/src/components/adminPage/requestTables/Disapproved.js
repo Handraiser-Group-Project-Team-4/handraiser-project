@@ -27,7 +27,14 @@ export default function Disapproved() {
   const [disapproved, setDisapproved] = useState([]);
 
   useEffect(() => {
-    renderDisapproved();
+    let isCancelled = false;
+
+    if(!isCancelled)
+      renderDisapproved();
+    
+    return () => {
+      isCancelled = true
+    }
   }, []);
 
   const renderDisapproved = () => {

@@ -14,13 +14,25 @@ module.exports = {
                     db.query(
                         `UPDATE users SET user_status=true WHERE user_id='${user_id}'`
                     );
+
+                    const token = jwt.sign({ 
+                            user_id, 
+                            user_role_id, 
+                            user_approval_status_id: user[0].user_approval_status_id 
+                        },
+                        process.env.SECRET_KEY
+                    );
+                    res.status(200).json({ ...user, token });
+                }
+                else{
+                    const token = jwt.sign(
+                        {user_id}, process.env.SECRET_KEY
+                    );
+                    res.status(200).json({ token });
                 }
 
-                const token = jwt.sign(
-                    { user_id, user_role_id },
-                    process.env.SECRET_KEY
-                );
-                res.status(200).json({ ...user, token });
+
+               
             })
             .catch(err => {
                 console.log(err);
@@ -38,7 +50,12 @@ module.exports = {
         `
         )
             .then(user => {
-                res.status(201).json(user);
+                const token = jwt.sign(
+                    { user_id, user_role_id: 3, user_approval_status_id: 4},
+                    process.env.SECRET_KEY
+                );
+                res.status(201).json({ ...user, token });
+                // res.status(201).json(user);
             })
             .catch(err => {
                 console.log(err);
@@ -82,7 +99,7 @@ module.exports = {
     fetchall: (req, res) => {
         const db = req.app.get("db");
 
-        db.query(`select * from users where user_role_id = 2 or user_role_id = 3;`)
+        db.query(`select * from users where user_role_id = 2 or user_role_id = 3 order by lastname asc;`)
         .then(get => res.status(200).json(get))
             .catch(err => {
                 console.error(err);

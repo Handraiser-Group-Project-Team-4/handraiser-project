@@ -1,5 +1,6 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import axios from 'axios'
+import io from "socket.io-client";
 
 import keyGenerator from './assets/keyGenerator'
 import Button from "@material-ui/core/Button";
@@ -10,7 +11,9 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import EditIcon from "@material-ui/icons/Edit";
 
+let socket;
 export default function PopupModal({ title, data, open, handleClose, render, type }) {
+    const ENDPOINT = "localhost:3001";
     const [body, setBody] = useState({
         data: 
         (type === 'approving')?
@@ -35,6 +38,15 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 class_key: data.class_key
             }: null
     });
+
+    useEffect(() => {
+        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+
+        return () => {
+            socket.emit("disconnect");
+            socket.off();
+        };
+    }, [ENDPOINT]);
 
     const handleReason = (e) => {
         setBody({
@@ -84,7 +96,8 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                     (type === 'disapproving')?`/api/todisapprove/${data.user_id}`:
                     (type === 'Create Cohort')?`/api/class`:
                     (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
-                    (type === 'users')?`/api/assigning/${data.id}`:null
+                    (type === 'users')?`/api/assigning/${data.id}`:
+                    (type === 'Close Cohort')?`/api/closeCohort/${data.class_id}`:null
 
         if(type === 'users')
             axios({
@@ -100,6 +113,8 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 }
             })
                 .then(() => {
+                    socket.emit("changeUserRole", {user_id: data.id, user_role_id: data.role});
+
                     render()
                     handleClose()
                 })
@@ -114,6 +129,15 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 data: body.data
             }) 
             .then(() => {
+                if(type === 'Create Cohort'){
+                    socket.emit("createCohort", {data: body.data});
+                }
+
+                if(type === 'approving' || type === 'disapproving'){
+                    socket.emit("handleRoleRequest", {user_id: data.user_id, approval_status: body.data});
+                }
+
+                    
                 handleClose();
                 render();
             })

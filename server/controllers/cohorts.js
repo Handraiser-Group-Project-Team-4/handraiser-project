@@ -152,5 +152,24 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
+  },
+
+  closeCohort: (req, res) => {
+    const db = req.app.get('db');
+
+    db.classroom_details
+      .update(
+        {
+          class_id: req.params.id
+        },
+        {  
+          class_status: 'f'
+        }
+      )
+    .then(classroom => res.status(200).send(classroom))
+    .catch(err => {
+      console.err(err);
+      res.status(500).end();
+    });
   }
 };
