@@ -3,11 +3,11 @@ import axios from "axios";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import AdminTable from '../../tools/AdminTable'
 
 // Components
-import ApprovingModal from "../Modal/ApprovingModal";
-import DisapprovingModal from "../Modal/DisapprovingModal";
+
+import AdminTable from '../../tools/AdminTable'
+import PopupModal from '../../tools/PopupModal'
 
 const columns = [
   { id: "photo", label: "Photo", minWidth: 170 },
@@ -30,27 +30,29 @@ export default function Pending() {
   const [pending, setPending] = useState([]);
   const [temp, setTemp] = useState([]);
 
-  const [approving, setApproving] = useState(false);
-  const [disapproving, setDisapproving] = useState(false);
-  const [handleId, setHandleId] = useState('')
-  const [data, setData] = useState('')
+  const [approving, setApproving] = useState({
+    open: false,
+    data: ""
+  })
+  const [disapproving, setDisapproving] = useState({
+    open: false,
+    data: ""
+  })
 
   const approvingfunc = row => {
-    setHandleId(row);
-    setApproving(true);
+    setApproving({ open: true, data: row })
   };
 
   const closeApproving = () => {
-    setApproving(false);
+    setApproving({ ...approving, open: false });
   };
 
   const disApprovingfunc = row => {
-    setData(row)
-    setDisapproving(true)
+    setDisapproving({ open: true, data: row })
   }
 
-  const closeDisApprovingfunc = () => {
-    setDisapproving(false);
+  const closeDisApproving = () => {
+    setDisapproving({ ...disapproving, open: false });
   };
 
   useEffect(() => {
@@ -75,24 +77,26 @@ export default function Pending() {
       .catch(err => console.log("object"));
   };
 
-
   return (
     <React.Fragment>
-      {approving && (
-        <ApprovingModal
-          handleId={handleId}
-          open={approving}
+      {approving.open && (
+        <PopupModal
+          data={approving.data}
+          open={approving.open}
           handleClose={closeApproving}
-          renderPending={renderPending}
+          render={renderPending}
+          type="approving"
         />
       )}
 
-      {disapproving && (
-        <DisapprovingModal
-          data={data}
-          open={disapproving}
-          handleClose={closeDisApprovingfunc}
-          renderPending={renderPending}
+      {disapproving.open && (
+        <PopupModal
+          title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
+          data={disapproving.data}
+          open={disapproving.open}
+          handleClose={closeDisApproving}
+          render={renderPending}
+          type="disapproving"
         />
       )}
 

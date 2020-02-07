@@ -40,6 +40,8 @@ massive({
     app.post('/api/cohorts', cohorts.create)
     app.get('/api/cohort-check/:id', cohorts.checkUser)
     app.post('/api/submit-key/', cohorts.submitKey)
+    app.get('/api/viewJoinedStudents/:id', cohorts.viewCohort)
+    app.delete('/api/kickstud/:userId/:classId', cohorts.deleteStud)
 
 
     // ADMIN - USERS

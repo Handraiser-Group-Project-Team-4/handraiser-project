@@ -20,6 +20,38 @@ module.exports = {
       });
   },
 
+  viewCohort: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `select classroom_students.date_joined, users.firstname, users.lastname, users.email, users.avatar, users.user_status, users.user_id, classroom_details.class_title, classroom_details.class_created, classroom_students.class_id 
+      from classroom_students
+      inner join users
+      on classroom_students.user_id = users.user_id
+      inner join classroom_details
+      on  classroom_details.class_id = classroom_students.class_id
+      where classroom_students.class_id = ${req.params.id}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
+  deleteStud: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `delete from classroom_students where user_id = '${req.params.userId}' and class_id = ${req.params.classId}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
   checkUser: (req, res) => {
     const db = req.app.get("db");
     const { user_id } = req.query;
