@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import io from "socket.io-client";
-import jwtToken from "../tools/jwtToken";
+import jwtToken from "../tools/assets/jwtToken";
 import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 import Card from "@material-ui/core/Card";

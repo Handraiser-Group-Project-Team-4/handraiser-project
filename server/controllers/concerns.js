@@ -1,5 +1,6 @@
 module.exports = {
   concernSockets: (socket, io, db) => {
+    const users = [];
     socket.on("joinConcern", ({ id }, callback) => {
       db.concern.find().then(res =>
         io.to(`${id}`).emit("concernData", {

@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 import GoogleLogin from "react-google-login";
 import googleIcon from "../../images/google-icon.svg";
 import axios from "axios";
-import jwtToken from "../tools/jwtToken";
+import jwtToken from "../tools/assets/jwtToken";
 
 export default function LoginBtn() {
   const userObj = jwtToken();

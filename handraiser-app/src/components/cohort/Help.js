@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
 import io from "socket.io-client";
 import { UserContext } from "./CohortPage";
-import jwtToken from "../tools/jwtToken";
+import jwtToken from "../tools/assets/jwtToken";
 
 let socket;
 export default function Help() {

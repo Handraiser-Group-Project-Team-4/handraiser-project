@@ -6,7 +6,7 @@ import NeedHelp from "./NeedHelp";
 import BeingHelp from "./BeingHelp";
 import Chat from "../Chat/Chat";
 import Axios from "axios";
-import jwtToken from "../tools/jwtToken";
+import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
