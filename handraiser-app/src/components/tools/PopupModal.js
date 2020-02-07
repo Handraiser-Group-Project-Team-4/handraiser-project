@@ -155,12 +155,12 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             }
         }) 
-        .then(() => {
+        .then(res => {
+            // console.log(res)
             handleClose();
             // openViewStudentsModal(data)
         })
         .catch(err => console.log(err))
-    
     } 
 
     return (

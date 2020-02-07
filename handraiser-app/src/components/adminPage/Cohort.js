@@ -13,7 +13,6 @@ import PopupModal from '../tools/PopupModal'
 
 // Material Icons
 import AddIcon from "@material-ui/icons/Add";
-import { alterMaterializedView } from "node-pg-migrate/dist/operations/viewsMaterialized";
 
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },

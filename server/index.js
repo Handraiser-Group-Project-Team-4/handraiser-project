@@ -41,7 +41,7 @@ massive({
     app.get('/api/cohort-check/:id', cohorts.checkUser)
     app.post('/api/submit-key/', cohorts.submitKey)
     app.get('/api/viewJoinedStudents/:id', cohorts.viewCohort)
-    app.delete('/api/kickstud/:userId/:classId', cohorts.deleteStud)
+  
 
 
     // ADMIN - USERS
@@ -58,6 +58,7 @@ massive({
     app.post('/api/class', cohorts.make)
     app.patch('/api/class/:id', cohorts.changeKey)
     app.patch('/api/toggleCohort/:id', cohorts.toggleCohort)
+    app.delete('/api/kickstud/:userId/:classId', cohorts.deleteStud)
   
 
     //CHATS

@@ -87,7 +87,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                     open={kickStudBool}
                     handleClose = {closeKickStudFn}
                     data={kickStudObj}
-                    openViewStudentsModal = {openViewStudentsModal}
+                    // openViewStudentsModal = {openViewStudentsModal}
                     type={'Kick Stud'}   
                 />
             )}
@@ -189,7 +189,12 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                         (type === 'users') ?
                                             <>
                                                 <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
-                                                <TableCell>{row.lastname}, {row.firstname}</TableCell>
+                                                <TableCell>
+                                                    <div style={{display:`flex`}}>
+                                                        <div style={{height: "15px", width: "15px", backgroundColor: (row.user_status) ? "green" : "red", borderRadius: "50%", margin:`0 10px`}}/>
+                                                        {row.lastname}, {row.firstname}
+                                                    </div>
+                                                </TableCell>
                                                 <TableCell>{row.email}</TableCell>
                                                 <TableCell>
                                                 {(row.user_role_id===2 )? "Mentor" : "Student"} 
