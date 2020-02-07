@@ -4,11 +4,50 @@ module.exports = {
   list: (req, res) => {
     const db = req.app.get("db");
 
-    db.classroom_details
-      .find()
-      .then(classroom => res.status(200).json(classroom))
+    db.query(
+      `select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
+    classroom_details.class_created, 
+    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
+    classroom.class_key
+    from classroom_details
+    inner join classroom
+    on classroom_details.class_id = classroom.class_id`
+    )
+      .then(get => res.status(200).json(get))
       .catch(err => {
-        console.log(err);
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
+  viewCohort: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `select classroom_students.date_joined, users.firstname, users.lastname, users.email, users.avatar, users.user_status, users.user_id, classroom_details.class_title, classroom_details.class_created, classroom_students.class_id 
+      from classroom_students
+      inner join users
+      on classroom_students.user_id = users.user_id
+      inner join classroom_details
+      on  classroom_details.class_id = classroom_students.class_id
+      where classroom_students.class_id = ${req.params.id}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
+  deleteStud: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `delete from classroom_students where user_id = '${req.params.userId}' and class_id = ${req.params.classId}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
         res.status(500).end();
       });
   },
@@ -90,6 +129,7 @@ module.exports = {
         res.status(500).end();
       });
   },
+  
   //Zion
   make: (req, res) => {
     const db = req.app.get("db");
@@ -126,25 +166,6 @@ module.exports = {
       });
   },
 
-  lista: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
-    classroom_details.class_created, 
-    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
-    classroom.class_key
-    from classroom_details
-    inner join classroom
-    on classroom_details.class_id = classroom.class_id`
-    )
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-
   changeKey: (req, res) => {
     const db = req.app.get("db");
     const { class_id, class_key } = req.body;
@@ -163,5 +184,26 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
+  },
+
+  toggleCohort: (req, res) => {
+    const db = req.app.get('db');
+    const {toggle_class_status} = req.query
+    let class_status = (toggle_class_status === 'true')?'t':'f'
+
+    db.classroom_details
+      .update(
+        {
+          class_id: req.params.id
+        },
+        {  
+          class_status
+        }
+      )
+    .then(classroom => res.status(200).send(classroom))
+    .catch(err => {
+      console.err(err);
+      res.status(500).end();
+    });
   }
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 let socket;
 const Chat = () => {
@@ -17,7 +17,7 @@ const Chat = () => {
     const [oldChat, setOldChat] = useState([]);
     const [currentChat, setCurrentChat] = useState([]);
     const [message, setMessage] = useState("");
-    const ENDPOINT = "localhost:4000";
+    const ENDPOINT = "localhost:3001";
   
     useEffect(() => {
         axios({
@@ -66,7 +66,7 @@ const Chat = () => {
     const sendMessage = event => {
         event.preventDefault();
         if (message) {
-            socket.emit("sendMessage", {message}, () => setMessage(""));
+            socket.emit("createCohort", {message}, () => setMessage(""));
         }
     };
 

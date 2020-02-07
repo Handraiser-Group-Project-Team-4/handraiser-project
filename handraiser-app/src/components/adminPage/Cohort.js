@@ -3,33 +3,23 @@ import axios from "axios";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import Button from "@material-ui/core/Button";
 import Fab from "@material-ui/core/Fab";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
+import AdminTable from '../tools/AdminTable'
 
 // Components
-import CreateCohort from "./Actions/CreateCohort";
-import ChangeKey from "./Actions/ChangeKey";
+// import CreateCohort from "./Actions/CreateCohort";
+// import ChangeKey from "./Actions/ChangeKey";
+import PopupModal from '../tools/PopupModal'
 
 // Material Icons
-import EditIcon from "@material-ui/icons/Edit";
 import AddIcon from "@material-ui/icons/Add";
-import SearchIcon from "@material-ui/icons/Search";
-
 
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },
   { id: "description", label: "Description", minWidth: 170 },
   { id: "key", label: "Key", minWidth: 170 },
-  { id: "action", label: "Acttion", minWidth: 170 }
+  { id: "status", label: "Status", minWidth: 170 },
+  { id: "action", label: "Action", minWidth: 60 }
 ];
 
 const useStyles = makeStyles({
@@ -41,167 +31,146 @@ const useStyles = makeStyles({
   }
 });
 
-export default function StickyHeadTable() {
+export default function Cohort() {
   const classes = useStyles();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [cohort, setCohort] = useState([]);
-  const [temp, setTemp] = useState([]) 
-  const [handleValues, sethandleValues] = useState({});
+  const [temp, setTemp] = useState([])
+  const [moment, setMoment] = useState([])
+  const [subject, setSubject] = useState("")
+  const [created, setCreated] = useState("")
   const [createCohort, setCreateCohort] = useState(false);
-  const [editCohort, setEditCohort] = useState(false);
+  const [editCohort, setEditCohort] = useState({
+    open: false,
+    data: ""
+  })
+  const [toggleCohort, setToggleCohort] = useState({
+    open: false,
+    data: ""
+  })
+  const [viewStudBool, setViewStudBool] = useState(false);
+  const [joinedStudObj, setJoinedStudObj] = useState({})
 
-  const handleClickOpen = () => {
-    setCreateCohort(true);
-  };
 
-  const handleClose = () => {
-    setCreateCohort(false);
-  };
+  const openViewStudentsModal = (row) => {
+    
+    axios({
+      method: "get",
+      url: `/api/viewJoinedStudents/${row.class_id}`,
+      headers: {
+        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+      }
+      // data: body.data
+    })
+      .then(data => {
+        setJoinedStudObj(data.data);
+        setSubject(row.class_title)
+        setCreated(row.class_created)
+        setMoment(data.data)
+      })
+      .then(()=>{
+        setViewStudBool(true)
+        
+      })
+      .catch(err => console.log("object"));
+  }
+
+   
+
+  const closeViewStudentsModal = () => {
+    setViewStudBool(false)
+  }
 
   useEffect(() => {
-    renderCohorts();
+    let isCancelled = false;
+
+    if(!isCancelled)
+      renderCohorts();
+    
+    return () => {  
+      isCancelled = true
+    }
+    
   }, []);
 
   // GET THE COHORT VALUES
   const renderCohorts = () => {
     axios({
       method: "get",
-      url: `http://localhost:4000/api/class`,
+      url: `/api/cohorts`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    }
+      }
       // data: body.data
     })
       .then(data => {
-        console.log(data.data);
+        // console.log(data.data);
         setCohort(data.data);
         setTemp(data.data)
       })
       .catch(err => console.log("object"));
   };
 
-  //SEARCH FUNCTION 
-  const handleSearch = e => {
-    const filteredContacts = cohort.filter(
-      el =>
-        el.class_title.toLowerCase().indexOf(e.target.value.toLowerCase()) !==
-          -1 
-    );
-  
-    setTemp(filteredContacts);
-  };
-
-  const changeKey = row => {
-    sethandleValues(row);
-    setEditCohort(true);
-  };
-
-  const closeEditCohort = () => {
-    setEditCohort(false);
-  };
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = event => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
   return (
     <React.Fragment>
       {createCohort && (
-        <CreateCohort
+        <PopupModal 
+          title={'Create Cohort'}
           open={createCohort}
-          handleClose={handleClose}
-          renderCohorts={renderCohorts}
+          handleClose={() => setCreateCohort(false)}
+          render={renderCohorts}
+          type={'Create Cohort'}
         />
       )}
 
-      {editCohort && (
-        <ChangeKey
-            row={handleValues}
-            open={editCohort}
-            handleClose={closeEditCohort}
-            renderCohorts={renderCohorts}
+      {editCohort.open && (
+        <PopupModal 
+          title={'Change Key'}
+          data={editCohort.data}
+          open={editCohort.open}
+          handleClose={() => setEditCohort({...editCohort, open: false})}
+          render={renderCohorts}
+          type={'Change Key'}
+        />
+      )}
+
+      {viewStudBool && (
+        <PopupModal 
+          open={viewStudBool}
+          title={`${subject} Created: ${created}`}
+          handleClose={closeViewStudentsModal}
+          type={'View Joined'}
+          temp={moment}
+          setTemp={(filteredContacts) => setMoment(filteredContacts)}
+          data={joinedStudObj}
+        />
+      )}
+
+
+      {toggleCohort.open && (
+        <PopupModal 
+          title={`Are you Sure to CLOSE/OPEN this class`}
+          data={toggleCohort.data}
+          open={toggleCohort.open}
+          handleClose={() => setToggleCohort({...toggleCohort, open: false})}
+          render={renderCohorts}
+          type={'Toggle Cohort'}
         />
       )}
 
       <Paper className={classes.root}>
-     
-      <TextField
-                 label="Search Contact"
-                 onChange={e => handleSearch(e)}
-                 InputProps={{
-                   startAdornment: (
-                     <InputAdornment position="start">
-                       <SearchIcon />
-                     </InputAdornment>
-                   )
-                 }}
-               />
-
-        <TableContainer className={classes.container}>
-          <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map(column => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {temp
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(row => {
-                  return (
-                    <TableRow
-                      hover
-                      role="checkbox"
-                      tabIndex={-1}
-                      key={row.class_id}
-                    >
-                      <TableCell>{row.class_title}</TableCell>
-                      <TableCell>{row.class_description}</TableCell>
-                      <TableCell>{row.class_key}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          className={classes.button}
-                          startIcon={<EditIcon />}
-                          onClick={e => changeKey(row)}
-                        >
-                          Change Key
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={cohort.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onChangePage={handleChangePage}
-          onChangeRowsPerPage={handleChangeRowsPerPage}
+        <AdminTable
+          columns={columns}
+          temp={temp}
+          setTemp={(filteredContacts) => setTemp(filteredContacts)}
+          data={cohort}
+          type={'cohort'}
+          openViewStudentsModal={openViewStudentsModal}
+          changeKeyFn={row => setEditCohort({open: true, data: row}) }
+          toggleClassFn={(e, row) => setToggleCohort({open: true, data: {row, toggle_class_status: e}})}
         />
       </Paper>
 
-      <Fab color="primary" aria-label="add" onClick={handleClickOpen}>
+      <Fab color="primary" aria-label="add" onClick={() => setCreateCohort(true) }>
         <AddIcon />
       </Fab>
     </React.Fragment>

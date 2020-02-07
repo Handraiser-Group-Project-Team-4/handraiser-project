@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
+import io from "socket.io-client";
 
+let socket;
 export default function CohortList({mentor}) {
+    const ENDPOINT = "localhost:3001";
     const userObj = jwtToken();
     const history = useHistory()
     const [cohorts, setCohorts] = useState([])
@@ -13,8 +16,30 @@ export default function CohortList({mentor}) {
         classroomObj: {},
         error: false
     })
-    
+
     useEffect(() => {
+        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+    }, [ENDPOINT]);
+
+    useEffect(() => {
+        socket.on("fetchCohort", data => {
+            // console.log(data)
+            // setCohorts([...cohorts, data])
+            renderCohorts();  
+        });
+
+        return () => {
+            socket.emit("disconnect");
+            socket.off();
+        };
+    })
+
+    useEffect(() => {
+        renderCohorts();        
+        return () => {  };
+    }, [])
+
+    const renderCohorts = () => {
         axios({
             method: `get`,
             url: '/api/cohorts',
@@ -29,9 +54,7 @@ export default function CohortList({mentor}) {
         .catch(err => {
             console.log(err)
         })
-        
-        return () => {  };
-    }, [])
+    }
 
 
     const handleCohort = (x) => {
@@ -60,10 +83,8 @@ export default function CohortList({mentor}) {
         const input_key = isKey.key;
         const class_id = isKey.classroomObj.class_id;
 
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
-        var yyyy = today.getFullYear();
+        let date = new Date();
+        let newDate = date.toLocaleString();
 
         axios({
             method:"post",
@@ -71,7 +92,7 @@ export default function CohortList({mentor}) {
             data: {
                 class_id,
                 user_id: userObj.user_id,
-                date_joined: `${mm+'/'+dd+'/'+yyyy}`,
+                date_joined: newDate,
                 input_key
             },
             headers: {
@@ -105,12 +126,15 @@ export default function CohortList({mentor}) {
             <div style={{display:`flex`}}>
                 {cohorts.map((x, i) => (
                     <div 
-                        onClick={() => handleCohort(x)} 
+                        onClick={() => (x.class_status === 't')?handleCohort(x):alert('Sorry This class is closed')} 
                         key={i} 
                         style={{background:`white`, padding:`20px`, margin:`10px`, borderRadius:`5px`, cursor:`pointer`, width:`100%`}}
                     >
                         <h3>{x.class_title}</h3>
                         <p>{x.class_description}</p>
+                        {(x.class_status === "t")?
+                        <span style={{background:`green`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>active</span>
+                        :<span style={{background:`red`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>close</span>}
                     </div>
                 ))}
             </div>

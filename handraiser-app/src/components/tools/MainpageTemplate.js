@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 
 export default function MainpageTemplate({children}) {
@@ -9,6 +9,7 @@ export default function MainpageTemplate({children}) {
     const [user, setUser] = useState()
 
     useEffect(() => {
+        let isCancelled = false;
         axios({
             method: 'get',
             url: `/api/users/${(userObj)&&userObj.user_id}`,
@@ -18,13 +19,16 @@ export default function MainpageTemplate({children}) {
         })
         .then(res => {
             // console.log(res.data)
-            setUser(res.data)
+            if(!isCancelled)
+                setUser(res.data)
         })
         .catch(err => {
             console.log(err)
         })
 
-        return () => { };
+        return () => { 
+            isCancelled = true;
+        };
     }, [])
 
     const handleLogout = () => {

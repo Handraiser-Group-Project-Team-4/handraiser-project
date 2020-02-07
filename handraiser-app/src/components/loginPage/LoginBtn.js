@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import GoogleLogin from 'react-google-login';
 import googleIcon from "../../images/google-icon.svg";
 import axios from 'axios'
-import jwtToken from '../tools/jwtToken'
+import jwtToken from '../tools/assets/jwtToken'
 
 export default function LoginBtn() {
     const userObj = jwtToken();
@@ -19,7 +19,9 @@ export default function LoginBtn() {
             url: `/api/users?user_id=${response.profileObj.googleId}`,
         })
         .then(res => {
-            sessionStorage.setItem('accessToken', res.data.token);
+            // console.log(res.data)
+            if(res.data[0] !== undefined)
+                sessionStorage.setItem('accessToken', res.data.token);
 
             if (res.data[0] === undefined) {
                 axios({
@@ -33,11 +35,12 @@ export default function LoginBtn() {
                         lastname: response.profileObj.familyName
                     },
                     headers: {
-                        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+                        Authorization: 'Bearer ' + res.data.token
                     }
                 })
                 .then(res => {
-                    // console.log(res)
+                    console.log(res)
+                    sessionStorage.setItem('accessToken', res.data.token);
                     setUser({ ...user, loginSuccess: true, isNew: true})
                 })
                 .catch(err => console.log(err))
