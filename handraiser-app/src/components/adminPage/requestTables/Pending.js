@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import io from "socket.io-client";
 
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -25,7 +26,9 @@ const useStyles = makeStyles({
   }
 });
 
+let socket;
 export default function Pending() {
+  const ENDPOINT = "localhost:3001";
   const classes = useStyles();
   const [pending, setPending] = useState([]);
   const [temp, setTemp] = useState([]);
@@ -39,25 +42,47 @@ export default function Pending() {
     data: ""
   })
 
-  const approvingfunc = row => {
-    setApproving({ open: true, data: row })
-  };
+  // const approvingfunc = row => {
+  //   setApproving({ open: true, data: row })
+  // };
 
-  const closeApproving = () => {
-    setApproving({ ...approving, open: false });
-  };
+  // const closeApproving = () => {
+  //   setApproving({ ...approving, open: false });
+  // };
 
-  const disApprovingfunc = row => {
-    setDisapproving({ open: true, data: row })
-  }
+  // const disApprovingfunc = row => {
+  //   setDisapproving({ open: true, data: row })
+  // }
 
-  const closeDisApproving = () => {
-    setDisapproving({ ...disapproving, open: false });
-  };
+  // const closeDisApproving = () => {
+  //   setDisapproving({ ...disapproving, open: false });
+  // };
 
   useEffect(() => {
-    renderPending();
+      socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if(!isCancelled)
+      renderPending();
+    
+    return () => {
+      isCancelled = true
+    }
   }, []);
+
+  useEffect(() => {
+    socket.on("fetchMentorRequest", () => {
+      renderPending();
+    })
+    
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  })
 
   // GET THE COHORT VALUES
   const renderPending = () => {
@@ -83,7 +108,7 @@ export default function Pending() {
         <PopupModal
           data={approving.data}
           open={approving.open}
-          handleClose={closeApproving}
+          handleClose={() => setApproving({ ...approving, open: false }) }
           render={renderPending}
           type="approving"
         />
@@ -94,7 +119,7 @@ export default function Pending() {
           title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
           data={disapproving.data}
           open={disapproving.open}
-          handleClose={closeDisApproving}
+          handleClose={() => setDisapproving({ ...disapproving, open: false }) }
           render={renderPending}
           type="disapproving"
         />
@@ -108,8 +133,8 @@ export default function Pending() {
           data={pending}
           type={'pending'}
 
-          approvingfunc={approvingfunc}
-          disApprovingfunc={disApprovingfunc}
+          approvingfunc={row => setApproving({ open: true, data: row }) }
+          disApprovingfunc={row => setDisapproving({ open: true, data: row })}
         />
 
       </Paper>

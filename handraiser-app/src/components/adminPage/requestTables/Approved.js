@@ -26,7 +26,14 @@ export default function Approved() {
   const [temp, setTemp] = useState([]);
 
   useEffect(() => {
-    renderApproved();
+    let isCancelled = false;
+
+    if(!isCancelled)
+      renderApproved();
+    
+    return () => {
+      isCancelled = true
+    }
   }, []);
 
   const renderApproved = () => {

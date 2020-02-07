@@ -9,6 +9,7 @@ export default function MainpageTemplate({children}) {
     const [user, setUser] = useState()
 
     useEffect(() => {
+        let isCancelled = false;
         axios({
             method: 'get',
             url: `/api/users/${(userObj)&&userObj.user_id}`,
@@ -18,14 +19,17 @@ export default function MainpageTemplate({children}) {
         })
         .then(res => {
             // console.log(res.data)
-            setUser(res.data)
+            if(!isCancelled)
+                setUser(res.data)
         })
         .catch(err => {
             console.log(err)
         })
 
-        return () => { };
-    }, [userObj])
+        return () => { 
+            isCancelled = true;
+        };
+    }, [])
 
     const handleLogout = () => {
         axios({

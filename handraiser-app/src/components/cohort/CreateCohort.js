@@ -12,11 +12,8 @@ export default function CreateCohort() {
     })
 
     const handleSubmit = () => {
-        // const today = date.toLocaleString('default', { month: 'long', day:'numeric', year:'numeric'});
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
-        var yyyy = today.getFullYear();
+        let date = new Date();
+        let newDate = date.toLocaleString();
 
         axios({
             method: `post`,
@@ -24,7 +21,7 @@ export default function CreateCohort() {
             data: {
                 class_title: modal.class_title,
                 class_description: modal.class_description,
-                class_created: `${mm+'/'+dd+'/'+yyyy}`,
+                class_created: newDate,
                 class_status: 'active',
                 user_id: userObj.user_id
             },

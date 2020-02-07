@@ -13,12 +13,14 @@ import PopupModal from '../tools/PopupModal'
 
 // Material Icons
 import AddIcon from "@material-ui/icons/Add";
+import { alterMaterializedView } from "node-pg-migrate/dist/operations/viewsMaterialized";
 
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },
   { id: "description", label: "Description", minWidth: 170 },
   { id: "key", label: "Key", minWidth: 170 },
-  { id: "action", label: "Acttion", minWidth: 170 }
+  { id: "status", label: "Status", minWidth: 170 },
+  { id: "action", label: "Action", minWidth: 60 }
 ];
 
 const useStyles = makeStyles({
@@ -30,7 +32,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function StickyHeadTable() {
+export default function Cohort() {
   const classes = useStyles();
   const [cohort, setCohort] = useState([]);
   const [temp, setTemp] = useState([])
@@ -38,18 +40,17 @@ export default function StickyHeadTable() {
   const [subject, setSubject] = useState("")
   const [created, setCreated] = useState("")
   const [createCohort, setCreateCohort] = useState(false);
-  const [handleValues, sethandleValues] = useState({});
-  const [editCohort, setEditCohort] = useState(false);
+  const [editCohort, setEditCohort] = useState({
+    open: false,
+    data: ""
+  })
+  const [toggleCohort, setToggleCohort] = useState({
+    open: false,
+    data: ""
+  })
   const [viewStudBool, setViewStudBool] = useState(false);
   const [joinedStudObj, setJoinedStudObj] = useState({})
 
-  const handleClickOpen = () => {
-    setCreateCohort(true);
-  };
-
-  const handleClose = () => {
-    setCreateCohort(false);
-  };
 
   const openViewStudentsModal = (row) => {
     
@@ -81,7 +82,15 @@ export default function StickyHeadTable() {
   }
 
   useEffect(() => {
-    renderCohorts();
+    let isCancelled = false;
+
+    if(!isCancelled)
+      renderCohorts();
+    
+    return () => {  
+      isCancelled = true
+    }
+    
   }, []);
 
   // GET THE COHORT VALUES
@@ -102,33 +111,24 @@ export default function StickyHeadTable() {
       .catch(err => console.log("object"));
   };
 
-  const changeKey = row => {
-    sethandleValues(row);
-    setEditCohort(true);
-  };
-
-  const closeEditCohort = () => {
-    setEditCohort(false);
-  };
-
   return (
     <React.Fragment>
       {createCohort && (
         <PopupModal 
           title={'Create Cohort'}
           open={createCohort}
-          handleClose={handleClose}
+          handleClose={() => setCreateCohort(false)}
           render={renderCohorts}
           type={'Create Cohort'}
         />
       )}
 
-      {editCohort && (
+      {editCohort.open && (
         <PopupModal 
           title={'Change Key'}
-          data={handleValues}
-          open={editCohort}
-          handleClose={closeEditCohort}
+          data={editCohort.data}
+          open={editCohort.open}
+          handleClose={() => setEditCohort({...editCohort, open: false})}
           render={renderCohorts}
           type={'Change Key'}
         />
@@ -147,6 +147,17 @@ export default function StickyHeadTable() {
       )}
 
 
+      {toggleCohort.open && (
+        <PopupModal 
+          title={`Are you Sure to CLOSE/OPEN this class`}
+          data={toggleCohort.data}
+          open={toggleCohort.open}
+          handleClose={() => setToggleCohort({...toggleCohort, open: false})}
+          render={renderCohorts}
+          type={'Toggle Cohort'}
+        />
+      )}
+
       <Paper className={classes.root}>
         <AdminTable
           columns={columns}
@@ -154,12 +165,13 @@ export default function StickyHeadTable() {
           setTemp={(filteredContacts) => setTemp(filteredContacts)}
           data={cohort}
           type={'cohort'}
-          changeKeyFn={changeKey}
           openViewStudentsModal={openViewStudentsModal}
+          changeKeyFn={row => setEditCohort({open: true, data: row}) }
+          toggleClassFn={(e, row) => setToggleCohort({open: true, data: {row, toggle_class_status: e}})}
         />
       </Paper>
 
-      <Fab color="primary" aria-label="add" onClick={handleClickOpen}>
+      <Fab color="primary" aria-label="add" onClick={() => setCreateCohort(true) }>
         <AddIcon />
       </Fab>
     </React.Fragment>

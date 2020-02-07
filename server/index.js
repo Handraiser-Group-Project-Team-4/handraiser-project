@@ -57,6 +57,7 @@ massive({
     // ADMIN - COHORTS
     app.post('/api/class', cohorts.make)
     app.patch('/api/class/:id', cohorts.changeKey)
+    app.patch('/api/toggleCohort/:id', cohorts.toggleCohort)
   
 
     //CHATS
@@ -106,26 +107,64 @@ massive({
             messages = Object.assign([], currentChat)
         });
 
+
+        // ADMIN SOCKET
+        socket.on(`mentorRequest`, ({data}) => {
+            io.emit("fetchMentorRequest");
+        })
+
+        socket.on(`handleRoleRequest`, ({user_id, approval_status}) => {
+            // db.users.find(user_id)
+            // .then(user => {
+                io.emit("notifyUser", {user_id, approval_status});
+            // })
+        })
+
+        socket.on(`renderCohort`, ({data}) => {
+            io.emit("fetchCohort", data);
+        })
+
+        socket.on(`changeUserRole`, ({user_id, user_role_id}) => {
+            // db.users.find(user_id)
+            // .then(user => {
+                // console.log(user)
+                if(user_role_id === 2)
+                    io.emit("studentToMentor", user_id);
+                
+                else if (user_role_id === 3)
+                    io.emit("mentorToStudent", user_id);
+            // })
+        })
+
         socket.on("disconnect", () => {
             const user = users.find(user => user.id === socket.id);
 
-            if(user.room !== undefined)
-                messages.map(conversation => {
-                    // db.query(`SELECT message from messages`)
-                    // .then(res => {
-                    //     if(Object.keys(res).length === 0)
-                    //         db.query(`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(conversation)}', ${user.room}) `)
-                    // })
-                    // .catch(err => console.log(err))   
-
-
-                    db.query(`SELECT message from messages WHERE message = '${JSON.stringify(conversation)}'`)
+            user
+            ? user.room !== undefined
+              ? messages.map(conversation => {
+                  // db.query(`SELECT message from messages`)
+                  // .then(res => {
+                  //     if(Object.keys(res).length === 0)
+                  //         db.query(`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(conversation)}', ${user.room}) `)
+                  // })
+                  // .catch(err => console.log(err))
+                  db.query(
+                    `SELECT message from messages WHERE message = '${JSON.stringify(
+                      conversation
+                    )}'`
+                  )
                     .then(res => {
-                        if(Object.keys(res).length === 0)
-                            db.query(`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(conversation)}', ${user.room}) `)
+                      if (Object.keys(res).length === 0)
+                        db.query(
+                          `INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(
+                            conversation
+                          )}', ${user.room}) `
+                        );
                     })
-                    .catch(err => console.log(err))            
+                    .catch(err => console.log(err));
                 })
+              : ""
+            : "";
                
             console.log("user disconnected");
         });

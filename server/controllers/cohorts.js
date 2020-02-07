@@ -184,5 +184,26 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
+  },
+
+  toggleCohort: (req, res) => {
+    const db = req.app.get('db');
+    const {toggle_class_status} = req.query
+    let class_status = (toggle_class_status === 'true')?'t':'f'
+
+    db.classroom_details
+      .update(
+        {
+          class_id: req.params.id
+        },
+        {  
+          class_status
+        }
+      )
+    .then(classroom => res.status(200).send(classroom))
+    .catch(err => {
+      console.err(err);
+      res.status(500).end();
+    });
   }
 };

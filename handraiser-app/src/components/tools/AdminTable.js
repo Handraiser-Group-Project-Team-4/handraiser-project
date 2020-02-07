@@ -1,20 +1,24 @@
 import React, { useState } from 'react'
 
 import { makeStyles } from "@material-ui/core/styles";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TablePagination from "@material-ui/core/TablePagination";
-import TableRow from "@material-ui/core/TableRow";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TextField,
+    Button,
+    InputAdornment,
+    Switch
+} from "@material-ui/core"
 
 
 // Material Icons
 import EditIcon from "@material-ui/icons/Edit";
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from '@material-ui/icons/FilterList';
 import PopupModal from './PopupModal';
@@ -28,7 +32,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn, openViewStudentsModal}) {
+export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn, openViewStudentsModal, toggleClassFn}) {
     
     const classes = useStyles();
     const [page, setPage] = useState(0);
@@ -70,6 +74,11 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
         setPage(0);
     };
 
+    // const handleChange = event => {
+    //     alert(event.target.checked)
+    //     // setState({ ...state, [name]: event.target.checked });
+    // };
+
     return (
         <>
             {kickStudBool && (
@@ -104,7 +113,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                     <TableCell
                                         key={column.id}
                                         align={column.align}
-                                        style={{ minWidth: column.minWidth }}
+                                        style={{ minWidth: column.minWidth, textAlign: (column.id==='action')&&`center` }}
                                     >
                                         {column.label}
                                     </TableCell>
@@ -219,7 +228,13 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                 <TableCell>{row.class_description}</TableCell>
                                                 <TableCell>{row.class_key}</TableCell>
                                                 <TableCell>
-                                                    <Button
+                                                    {(row.class_status === "t")?
+                                                    <span style={{background:`green`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>active</span>
+                                                    :<span style={{background:`red`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>close</span>}
+                                                
+                                                </TableCell>
+                                                <TableCell style={{display:`flex`, alignItems:`center`, justifyContent:`center`}}>
+                                                    {/* <Button
                                                         variant="contained"
                                                         color="primary"
                                                         size="small"
@@ -228,10 +243,24 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                         onClick={e => changeKeyFn(row)}
                                                     >
                                                         Change Key
-                                                    </Button>
-                                                   
+                                                    </Button> */}
+                                                    <div style={{display:`flex`, flexDirection:`column`, justifyContent:`center`}}>
+                                                        <label>Toggle Class</label>
+                                                        <Switch
+                                                            checked={(row.class_status === "t")?true:false}
+                                                            onChange={(e) =>  toggleClassFn(e.target.checked, row)}
+                                                        />
+                                                    </div>
 
-                                                   
+                                                    <EditIcon 
+                                                        style={{color:`blue`, cursor:`pointer`, margin:`30px`}}
+                                                        onClick={e => changeKeyFn(row)}
+                                                    />
+            
+                                                    <DeleteOutlineIcon 
+                                                        style={{color:`red`, cursor:`pointer`}}
+                                                        onClick={() => console.log(row)}
+                                                    />
                                                 </TableCell>
                                             </>:
                                         

@@ -19,10 +19,9 @@ export default function AdminPage() {
 
     return (
         <>
-        <MainpageTemplate>
-          
-        </MainpageTemplate>
-        <Tabs/>
+            <MainpageTemplate>
+                <Tabs/>
+            </MainpageTemplate>
         </>
     )
 }
