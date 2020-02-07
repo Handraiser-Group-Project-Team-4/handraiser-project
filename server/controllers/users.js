@@ -18,7 +18,7 @@ module.exports = {
                     const token = jwt.sign({ 
                             user_id, 
                             user_role_id, 
-                            user_approval_status_id: user[0].user_approval_status_id 
+                            user_approval_status_id: user[0].user_approval_status_id                        
                         },
                         process.env.SECRET_KEY
                     );

@@ -19,7 +19,8 @@ const columns = [
   { id: "title", label: "Title", minWidth: 170 },
   { id: "description", label: "Description", minWidth: 170 },
   { id: "key", label: "Key", minWidth: 170 },
-  { id: "action", label: "Action", minWidth: 170 }
+  { id: "status", label: "Status", minWidth: 170 },
+  { id: "action", label: "Action", minWidth: 60 }
 ];
 
 const useStyles = makeStyles({
@@ -41,7 +42,7 @@ export default function Cohort() {
     open: false,
     data: ""
   })
-  const [closeCohort, setCloseCohort] = useState({
+  const [toggleCohort, setToggleCohort] = useState({
     open: false,
     data: ""
   })
@@ -99,14 +100,14 @@ export default function Cohort() {
         />
       )}
 
-      {closeCohort.open && (
+      {toggleCohort.open && (
         <PopupModal 
-          title={'Close Cohort'}
-          data={closeCohort.data}
-          open={closeCohort.open}
-          handleClose={() => setCloseCohort({...closeCohort, open: false})}
+          title={`Are you Sure to CLOSE/OPEN this class`}
+          data={toggleCohort.data}
+          open={toggleCohort.open}
+          handleClose={() => setToggleCohort({...toggleCohort, open: false})}
           render={renderCohorts}
-          type={'Close Cohort'}
+          type={'Toggle Cohort'}
         />
       )}
 
@@ -117,8 +118,9 @@ export default function Cohort() {
           setTemp={(filteredContacts) => setTemp(filteredContacts)}
           data={cohort}
           type={'cohort'}
+          
           changeKeyFn={row => setEditCohort({open: true, data: row}) }
-          closeCohortFn={row => setCloseCohort({open: true, data: row})}
+          toggleClassFn={(e, row) => setToggleCohort({open: true, data: {row, toggle_class_status: e}})}
         />
       </Paper>
 

@@ -11,12 +11,12 @@ import {
     TableRow,
     TextField,
     Button,
-    InputAdornment
+    InputAdornment,
+    Switch
 } from "@material-ui/core"
 
 
 // Material Icons
-import BlockIcon from '@material-ui/icons/Block';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import SearchIcon from "@material-ui/icons/Search";
@@ -31,7 +31,7 @@ const useStyles = makeStyles({
     }
 });
 
-export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn, closeCohortFn}) {
+export default function AdminTable({ columns, setTemp, temp, data, type, approvingfunc, disApprovingfunc, changeKeyFn, ascDescFn, openAssignModalFn, toggleClassFn}) {
     
     const classes = useStyles();
     const [page, setPage] = useState(0);
@@ -60,6 +60,11 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    // const handleChange = event => {
+    //     alert(event.target.checked)
+    //     // setState({ ...state, [name]: event.target.checked });
+    // };
 
     return (
         <>
@@ -185,7 +190,13 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                 <TableCell>{row.class_title}</TableCell>
                                                 <TableCell>{row.class_description}</TableCell>
                                                 <TableCell>{row.class_key}</TableCell>
-                                                <TableCell style={{display:`flex`, alignItems:`center`, justifyContent:`space-around`}}>
+                                                <TableCell>
+                                                    {(row.class_status === "t")?
+                                                    <span style={{background:`green`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>active</span>
+                                                    :<span style={{background:`red`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>close</span>}
+                                                
+                                                </TableCell>
+                                                <TableCell style={{display:`flex`, alignItems:`center`, justifyContent:`center`}}>
                                                     {/* <Button
                                                         variant="contained"
                                                         color="primary"
@@ -196,17 +207,22 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                                     >
                                                         Change Key
                                                     </Button> */}
+                                                    <div style={{display:`flex`, flexDirection:`column`, justifyContent:`center`}}>
+                                                        <label>Toggle Class</label>
+                                                        <Switch
+                                                            checked={(row.class_status === "t")?true:false}
+                                                            onChange={(e) =>  toggleClassFn(e.target.checked, row)}
+                                                        />
+                                                    </div>
+
                                                     <EditIcon 
-                                                        style={{color:`blue`, cursor:`pointer`}}
+                                                        style={{color:`blue`, cursor:`pointer`, margin:`30px`}}
                                                         onClick={e => changeKeyFn(row)}
                                                     />
-                                                    <BlockIcon 
-                                                        style={{color:`orange`, cursor:`pointer`}}
-                                                        onClick={e => closeCohortFn(row)}
-                                                    />
+            
                                                     <DeleteOutlineIcon 
                                                         style={{color:`red`, cursor:`pointer`}}
-
+                                                        onClick={() => console.log(row)}
                                                     />
                                                 </TableCell>
                                             </>:null

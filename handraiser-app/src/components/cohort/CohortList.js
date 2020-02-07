@@ -126,12 +126,15 @@ export default function CohortList({mentor}) {
             <div style={{display:`flex`}}>
                 {cohorts.map((x, i) => (
                     <div 
-                        onClick={() => handleCohort(x)} 
+                        onClick={() => (x.class_status === 't')?handleCohort(x):alert('Sorry This class is closed')} 
                         key={i} 
                         style={{background:`white`, padding:`20px`, margin:`10px`, borderRadius:`5px`, cursor:`pointer`, width:`100%`}}
                     >
                         <h3>{x.class_title}</h3>
                         <p>{x.class_description}</p>
+                        {(x.class_status === "t")?
+                        <span style={{background:`green`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>active</span>
+                        :<span style={{background:`red`, color:`white`, padding:`2px 4px`, borderRadius:`3px`}}>close</span>}
                     </div>
                 ))}
             </div>

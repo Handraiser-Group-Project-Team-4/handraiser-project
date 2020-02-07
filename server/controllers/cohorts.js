@@ -154,8 +154,10 @@ module.exports = {
       });
   },
 
-  closeCohort: (req, res) => {
+  toggleCohort: (req, res) => {
     const db = req.app.get('db');
+    const {toggle_class_status} = req.query
+    let class_status = (toggle_class_status === 'true')?'t':'f'
 
     db.classroom_details
       .update(
@@ -163,7 +165,7 @@ module.exports = {
           class_id: req.params.id
         },
         {  
-          class_status: 'f'
+          class_status
         }
       )
     .then(classroom => res.status(200).send(classroom))

@@ -55,7 +55,7 @@ massive({
     // ADMIN - COHORTS
     app.post('/api/class', cohorts.make)
     app.patch('/api/class/:id', cohorts.changeKey)
-    app.patch('/api/closeCohort/:id', cohorts.closeCohort)
+    app.patch('/api/toggleCohort/:id', cohorts.toggleCohort)
   
 
     //CHATS
@@ -118,7 +118,7 @@ massive({
             // })
         })
 
-        socket.on(`createCohort`, ({data}) => {
+        socket.on(`renderCohort`, ({data}) => {
             io.emit("fetchCohort", data);
         })
 

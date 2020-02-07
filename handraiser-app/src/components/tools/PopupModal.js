@@ -97,7 +97,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                     (type === 'Create Cohort')?`/api/class`:
                     (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
                     (type === 'users')?`/api/assigning/${data.id}`:
-                    (type === 'Close Cohort')?`/api/closeCohort/${data.class_id}`:null
+                    (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}`:null
 
         if(type === 'users')
             axios({
@@ -129,15 +129,14 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 data: body.data
             }) 
             .then(() => {
-                if(type === 'Create Cohort'){
-                    socket.emit("createCohort", {data: body.data});
+                if(type === 'Create Cohort' || type === 'Toggle Cohort'){
+                    socket.emit("renderCohort", {data: body.data});
                 }
 
                 if(type === 'approving' || type === 'disapproving'){
                     socket.emit("handleRoleRequest", {user_id: data.user_id, approval_status: body.data});
                 }
 
-                    
                 handleClose();
                 render();
             })

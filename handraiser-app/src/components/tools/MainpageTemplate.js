@@ -29,7 +29,7 @@ export default function MainpageTemplate({children}) {
         return () => { 
             isCancelled = true;
         };
-    }, [userObj])
+    }, [])
 
     const handleLogout = () => {
         axios({

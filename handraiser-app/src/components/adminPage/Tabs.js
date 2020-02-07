@@ -72,7 +72,7 @@ export default function AdminTabs() {
           aria-label="scrollable auto tabs example"
         >
           <Tab label="Approval" {...a11yProps(0)} />
-          <Tab label="Create Cohort" {...a11yProps(1)} />
+          <Tab label="Cohorts" {...a11yProps(1)} />
           <Tab label="Users" {...a11yProps(2)} />
 
         </Tabs>
