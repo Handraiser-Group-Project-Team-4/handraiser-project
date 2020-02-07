@@ -8,6 +8,7 @@ const router = require('./router');
 const users = require('./controllers/users');
 const cohorts = require('./controllers/cohorts');
 const concern = require('./controllers/concern');
+const data = require('./controllers/data');
 require('dotenv').config();
 
 massive({
@@ -58,28 +59,49 @@ massive({
 	app.patch('/api/concern/:id', concern.update);
 	app.delete('/api/concern/:id', concern.delete);
 
-	//CHATS
+	//SOCKETS
 	io.on('connection', socket => {
-		const users = [];
-		let messages = [];
 		console.log('a user connected');
 
-		socket.on('join', ({ username, room, userObj }, callback) => {
-			const user = {
-				id: socket.id,
-				name: username,
-				room: room,
-				user_id: userObj.user_id
-			};
-
-			// console.log(userObj)
-			users.push(user);
-
-			socket.join(`${user.room}`);
+		socket.on('join', ({ class_id, user_id }, callback) => {
+			const { user } = data.addUser({ id: socket.id, class_id, user_id });
+			socket.join(user.class_id);
 			callback();
 		});
 
-		socket.on('sendMessage', ({ message }, callback) => {
+		socket.on('concern', (values, callback) => {
+			const user = data.users.find(user => user.id === socket.id);
+			io.to(`${user.class_id}`).emit('output', values);
+			callback();
+		});
+
+		socket.on('chatRoom', (values, callback) => {
+			const user = data.users.find(user => user.id === socket.id);
+			io.to(`${user.class_id}`).emit('chatRoom', values);
+			callback();
+		});
+
+		socket.on('joinChat', (values, callback) => {
+			const { chat, concern_id, mentor_id, student_id } = values;
+			const concern = data.concerns.find(
+				concerns => concerns.concern_id === concern_id
+			);
+
+			if (!concern) {
+				data.concerns.push({
+					chat,
+					concern_id,
+					mentor_id,
+					student_id,
+					id: socket.id
+				});
+				socket.join(concern_id);
+			}
+
+			callback();
+		});
+
+		socket.on('sendMessage', ({ message, concern_id }, callback) => {
 			const new_date = new Intl.DateTimeFormat('en-US', {
 				year: 'numeric',
 				month: 'short',
@@ -89,49 +111,41 @@ massive({
 				second: '2-digit'
 			}).format(new Date());
 
-			const user = users.find(user => user.id === socket.id);
-
-			io.to(`${user.room}`).emit('message', {
+			const concern = data.concerns.find(
+				concerns => concerns.concern_id === concern_id
+			);
+			io.to(`${concern.concern_id}`).emit('message', {
 				text: message,
-				user: user.name,
-				user_id: user.user_id,
+				concern_id: concern.concern_id,
+				student_id: concern.student_id,
+				mentor_id: concern.mentor_id,
 				time_sent: new_date
 			});
-
 			callback();
 		});
-
 		socket.on('saveChat', currentChat => {
-			messages = Object.assign([], currentChat);
+			data.messages = Object.assign([], currentChat);
 		});
 
 		socket.on('disconnect', () => {
-			const user = users.find(user => user.id === socket.id);
+			const concern = data.concerns.find(concerns => concerns.id === socket.id);
 
-			if (user.room !== undefined)
-				messages.map(conversation => {
-					// db.query(`SELECT message from messages`)
-					// .then(res => {
-					//     if(Object.keys(res).length === 0)
-					//         db.query(`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(conversation)}', ${user.room}) `)
-					// })
-					// .catch(err => console.log(err))
-
-					db.query(
-						`SELECT message from messages WHERE message = '${JSON.stringify(
-							conversation
-						)}'`
-					)
-						.then(res => {
-							if (Object.keys(res).length === 0)
-								db.query(
-									`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(
-										conversation
-									)}', ${user.room}) `
-								);
-						})
-						.catch(err => console.log(err));
-				});
+			data.messages.map(conversation => {
+				db.query(
+					`SELECT message from messages WHERE message = '${JSON.stringify(
+						conversation
+					)}'`
+				)
+					.then(res => {
+						if (Object.keys(res).length === 0)
+							db.query(
+								`INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(
+									conversation
+								)}', ${concern.concern_id}) `
+							);
+					})
+					.catch(err => console.log(err));
+			});
 
 			console.log('user disconnected');
 		});

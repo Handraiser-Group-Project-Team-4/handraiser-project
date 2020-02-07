@@ -48,11 +48,11 @@ module.exports = {
 
 	fetch: (req, res) => {
 		const db = req.app.get('db');
-		const { chat } = req.query;
+		const { chat, concern_id } = req.query;
 		if (chat) {
 			let users = {};
 			db.query(
-				`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = 40`
+				`SELECT * FROM users, concern WHERE users.user_id = '${req.params.id}' AND concern.concern_id = ${concern_id}`
 			).then(concern => {
 				users.concern = concern[0];
 				// res.status(200).json(...concern)

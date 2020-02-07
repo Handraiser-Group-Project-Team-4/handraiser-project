@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import jwtToken from '../tools/jwtToken';
+import { UserContext } from './../cohort/CohortPage';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -19,43 +19,6 @@ import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Container from '@material-ui/core/Container';
 
-const useStyles = makeStyles(theme => ({
-	root: {
-		maxWidth: 900
-	},
-	media: {
-		height: '500px'
-	},
-	expand: {
-		transform: 'rotate(0deg)',
-		marginLeft: 'auto',
-		transition: theme.transitions.create('transform', {
-			duration: theme.transitions.duration.shortest
-		})
-	},
-	expandOpen: {
-		transform: 'rotate(360deg)'
-	},
-	avatar: {
-		backgroundColor: purple[300]
-	},
-	chatAvatar: {
-		marginRight: '10px'
-	},
-	chatLeftAvatar: {
-		marginLeft: '10px'
-	},
-	chat: {
-		// paddingBottom: "15px",
-		padding: '10px',
-		margin: '0',
-		width: 'auto',
-		backgroundColor: 'lightgrey',
-		borderRadius: '50px'
-	}
-}));
-
-let socket;
 const Chat = () => {
 	const classes = useStyles();
 	const [expanded, setExpanded] = React.useState(false);
@@ -63,118 +26,53 @@ const Chat = () => {
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
 	};
-	const username = `noe`,
-		room = '40';
 	const userObj = jwtToken();
-	// const [chatDetails, setChatDetails] = useState({
-	//     name:"",
-	//     room:"",
-	//     avatar:"",
-	// });
-	// const [username, setUsername] = useState("");
-	// const [room, setRoom] = useState("");
 	const [oldChat, setOldChat] = useState([]);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
-	const ENDPOINT = 'localhost:3001';
+	const { chatRoom, socket } = useContext(UserContext);
+	const { concern_id } = chatRoom;
 
 	useEffect(() => {
 		axios({
 			method: 'get',
-			url: `/api/users/${userObj.user_id}?chat=true`,
+			url: `/api/users/${userObj.user_id}?chat=true&concern_id=${concern_id}`,
 			headers: {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 			}
 		})
 			.then(res => {
-				// console.log(res.data)
-				// setChatDetails({
-				//     name: res.data.firstname + " " + res.data.lastname,
-				//     room: `'${res.data.concern_id}'`,
-				//     avatar: res.data.avatar
-				// })
-
-				// setUsername(res.data.users_concern.firstname + " " + res.data.users_concern.lastname);
-				// setRoom(res.data.users_concern.concern_id);
-
 				setOldChat(res.data.messages);
 			})
 			.catch(err => {
 				console.log(err);
 			});
-	}, []);
-
-	useEffect(() => {
-		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-		socket.emit('join', { username, room, userObj }, error => {});
-	}, [ENDPOINT]);
+	}, [concern_id]);
 
 	useEffect(() => {
 		socket.on('message', message => {
-			// console.log(message)
-			setCurrentChat([...currentChat, message]);
+			// console.log(message);
+			if (message.concern_id === concern_id) {
+				setCurrentChat([...currentChat, message]);
+			}
 		});
 		socket.emit('saveChat', currentChat);
-
-		return () => {
-			socket.emit('disconnect');
-			socket.off();
-		};
 	}, [currentChat]);
 
 	const sendMessage = event => {
 		event.preventDefault();
 		if (message) {
-			socket.emit('sendMessage', { message }, () => setMessage(''));
+			socket.emit('sendMessage', { message, concern_id }, () => setMessage(''));
 		}
 	};
 
-	// console.log(message, currentChat);
 	return (
-		// <div
-		//   style={{
-		//     display: "flex",
-		//     flexDirection: "column",
-		//     justifyContent: "center",
-		//     alignContent: "center",
-		//     padding: "100px",
-		//     flexWrap: "wrap"
-		//   }}
-		// >
-		//   <h1>Chat</h1>
-		//   <p>{"Name: " + username}</p>
-		//   <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
-		//   {oldChat.map((message, i) => (
-		//     <div key={i}>
-		//       <div>{message.user + " " + message.text}</div>
-		//       <p style={{ opacity: `0.5`, fontSize: `10px`, margin: `0` }}>
-		//         {message.time_sent}
-		//       </p>
-		//     </div>
-		//   ))}
-		//   {currentChat.map((message, i) => (
-		//     <div key={i}>
-		//       <div>{message.user + " " + message.text}</div>
-		//       <p style={{ opacity: `0.5`, fontSize: `10px`, margin: `0` }}>
-		//         {message.time_sent}
-		//       </p>
-		//     </div>
-		//   ))}
-		//   <input
-		//     style={{ marginTop: "50px", padding: "30px" }}
-		//     value={message}
-		//     onChange={({ target: { value } }) => setMessage(value)}
-		//     onKeyPress={event =>
-		//       event.key === "Enter" ? sendMessage(event) : null
-		//     }
-		//   />
-		// </div>
 		<Container maxWidth="md">
 			<Card className={classes.root}>
 				<CardHeader
 					avatar={
 						<Avatar aria-label="recipe" className={classes.avatar}>
-							R
+							{concern_id}
 						</Avatar>
 					}
 					action={
@@ -279,3 +177,39 @@ const Chat = () => {
 };
 
 export default Chat;
+
+const useStyles = makeStyles(theme => ({
+	root: {
+		maxWidth: 900
+	},
+	media: {
+		height: '500px'
+	},
+	expand: {
+		transform: 'rotate(0deg)',
+		marginLeft: 'auto',
+		transition: theme.transitions.create('transform', {
+			duration: theme.transitions.duration.shortest
+		})
+	},
+	expandOpen: {
+		transform: 'rotate(360deg)'
+	},
+	avatar: {
+		backgroundColor: purple[300]
+	},
+	chatAvatar: {
+		marginRight: '10px'
+	},
+	chatLeftAvatar: {
+		marginLeft: '10px'
+	},
+	chat: {
+		// paddingBottom: "15px",
+		padding: '10px',
+		margin: '0',
+		width: 'auto',
+		backgroundColor: 'lightgrey',
+		borderRadius: '50px'
+	}
+}));

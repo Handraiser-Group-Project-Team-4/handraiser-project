@@ -5,7 +5,7 @@ import { UserContext } from './CohortPage';
 export default function Help() {
 	const [value, setValue] = useState('');
 	const [isTrue, setIsTrue] = useState(false);
-	const { id, data, setData, user } = useContext(UserContext);
+	const { id, data, setData, user, socket } = useContext(UserContext);
 
 	useEffect(() => {
 		if (user) {
@@ -18,7 +18,7 @@ export default function Help() {
 			});
 			setIsTrue(isNull);
 		}
-	});
+	}, [data, user, isTrue]);
 
 	const handleClick = () => {
 		Axios({
@@ -36,8 +36,10 @@ export default function Help() {
 			}
 		})
 			.then(res => {
-				setData([...data, res.data]);
-				setValue('');
+				let arr = data;
+				arr.push(res.data);
+				setData(arr);
+				socket.emit('concern', arr, () => setValue(''));
 				setIsTrue(true);
 			})
 			.catch(err => console.log(err));

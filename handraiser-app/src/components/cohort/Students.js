@@ -19,7 +19,7 @@ export default function Students(props) {
 	const { id, index, status, student_id, text } = props;
 	const [student, setStudent] = useState([]);
 
-	const { data, setData, user } = useContext(UserContext);
+	const { data, user, socket } = useContext(UserContext);
 
 	useEffect(() => {
 		Axios({
@@ -53,8 +53,7 @@ export default function Students(props) {
 					}
 					return arr.push(student);
 				});
-				setData(arr);
-				// socket.emit('set-concern', res.data);
+				socket.emit('concern', arr, () => {});
 			})
 			.catch(err => console.log(err));
 	};
@@ -75,7 +74,7 @@ export default function Students(props) {
 					}
 					return arr;
 				});
-				setData(arr);
+				socket.emit('concern', arr, () => {});
 			})
 			.catch(err => console.log(err));
 	};
@@ -84,7 +83,21 @@ export default function Students(props) {
 	}
 	return (
 		<>
-			<ListItem alignItems="flex-start">
+			<ListItem
+				alignItems="flex-start"
+				onClick={() => {
+					socket.emit(
+						'chatRoom',
+						{
+							chat: true,
+							concern_id: id,
+							mentor_id: user.user_id,
+							student_id: student_id
+						},
+						() => {}
+					);
+				}}
+			>
 				<ListItemAvatar>
 					<Avatar alt={student.firstname} src={student.avatar} />
 				</ListItemAvatar>
