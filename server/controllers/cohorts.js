@@ -67,23 +67,26 @@ module.exports = {
   },
 
   submitKey: (req, res) => {
-    const db = req.app.get('db')
-    const {class_id, user_id, date_joined, input_key} = req.body
-    db.query(`SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`)
-    .then(classroom => {
-        if(classroom.length !== 0){
-            db.classroom_students.insert({class_id, user_id, date_joined})
+    const db = req.app.get("db");
+    const { class_id, user_id, date_joined, input_key } = req.body;
+    db.query(
+      `SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`
+    )
+      .then(classroom => {
+        if (classroom.length !== 0) {
+          db.classroom_students
+            .insert({ class_id, user_id, date_joined })
             // db.query(`INSERT INTO classroom_students (class_id, user_id, date_joined) VALUES (${class_id}, '${user_id}, '${date_joined}')`)
-            .then(classroom_students => res.status(201).json(classroom_students) )
-        }
-        else
-            res.status(400).end();
-    })
-    .catch(err => {
-        console.log(err)
+            .then(classroom_students =>
+              res.status(201).json(classroom_students)
+            );
+        } else res.status(400).end();
+      })
+      .catch(err => {
+        console.log(err);
         res.status(500).end();
-    })
-},
+      });
+  },
 
   create: (req, res) => {
     // console.log(keyGenerator.keyGen())
@@ -129,7 +132,7 @@ module.exports = {
         res.status(500).end();
       });
   },
-  
+
   //Zion
   make: (req, res) => {
     const db = req.app.get("db");
@@ -187,23 +190,23 @@ module.exports = {
   },
 
   toggleCohort: (req, res) => {
-    const db = req.app.get('db');
-    const {toggle_class_status} = req.query
-    let class_status = (toggle_class_status === 'true')?'t':'f'
+    const db = req.app.get("db");
+    const { toggle_class_status } = req.query;
+    let class_status = toggle_class_status === "true" ? "t" : "f";
 
     db.classroom_details
       .update(
         {
           class_id: req.params.id
         },
-        {  
+        {
           class_status
         }
       )
-    .then(classroom => res.status(200).send(classroom))
-    .catch(err => {
-      console.err(err);
-      res.status(500).end();
-    });
+      .then(classroom => res.status(200).send(classroom))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
   }
 };

@@ -16,7 +16,9 @@
     "react-google-login": "^5.0.7",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
-    "socket.io-client": "^2.3.0"
+    "react-scrollable-feed": "^1.1.2",
+    "socket.io-client": "^2.3.0",
+    "styled-components": "^5.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
