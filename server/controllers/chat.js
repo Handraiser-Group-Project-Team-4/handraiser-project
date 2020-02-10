@@ -1,7 +1,6 @@
 module.exports = {
   chatSockets: (socket, io, db) => {
     const users = [];
-    let messages = [];
     socket.on("join", ({ username, chatroom, userObj }, callback) => {
       console.log("a user connected to chat");
       const user = {
@@ -17,18 +16,19 @@ module.exports = {
         `SELECT * FROM users, concern WHERE users.user_id = '${user.user_id}' AND concern.concern_id = ${user.room}`
       ).then(concern => {
         chatUsers.concern = concern[0];
-        db.query(
-          `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`
-        ).then(messages => {
-          let temp = [];
-          messages.map(x => {
-            temp.push(x.message);
+        if (concern.length > 0)
+          db.query(
+            `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`
+          ).then(messages => {
+            let temp = [];
+            messages.map(x => {
+              temp.push(x.message);
+            });
+            chatUsers.messages = temp;
+            io.to(`${user.room}`).emit("oldChat", {
+              data: chatUsers
+            });
           });
-          chatUsers.messages = temp;
-          io.to(`${user.room}`).emit("oldChat", {
-            data: chatUsers
-          });
-        });
       });
       socket.join(`${user.room}`);
       callback();
