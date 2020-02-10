@@ -13,7 +13,6 @@ import PopupModal from '../tools/PopupModal'
 
 // Material Icons
 import AddIcon from "@material-ui/icons/Add";
-import { alterMaterializedView } from "node-pg-migrate/dist/operations/viewsMaterialized";
 
 const columns = [
   { id: "title", label: "Title", minWidth: 170 },
@@ -50,6 +49,11 @@ export default function Cohort() {
   })
   const [viewStudBool, setViewStudBool] = useState(false);
   const [joinedStudObj, setJoinedStudObj] = useState({})
+  const noDataObj = {
+  
+      date_joined : "No data Found"
+   
+  }
 
 
   const openViewStudentsModal = (row) => {
@@ -63,7 +67,13 @@ export default function Cohort() {
       // data: body.data
     })
       .then(data => {
-        setJoinedStudObj(data.data);
+        if(data.data.length === 0){
+          setJoinedStudObj(noDataObj)
+        }else{
+          setJoinedStudObj(data.data);
+        }
+        // console.log(data)
+        
         setSubject(row.class_title)
         setCreated(row.class_created)
         setMoment(data.data)
