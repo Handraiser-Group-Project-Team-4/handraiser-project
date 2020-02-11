@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+import {  Button } from "@material-ui/core"
+import EditIcon from "@material-ui/icons/Edit";
+import MaterialTable from 'material-table';
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 
 // Components
-import AdminTable from '../tools/AdminTable'
 import PopupModal from '../tools/PopupModal'
 
 const useStyles = makeStyles({
@@ -19,10 +20,58 @@ const useStyles = makeStyles({
 
 export default function StickyHeadTable() {
   const classes = useStyles();
-
-  const [users, setUsers] = useState([]);
-  const [temp, setTemp] = useState([]) 
-  const [sorter, setSorter] = useState(false);
+  const [users, setUsers] = useState({
+    columns: [
+      { title: 'Lastname', field: 'lastname', headerStyle: { display: `none` }, cellStyle: { display: `none` } },
+      {
+        title: 'Name', field: 'firstname', headerStyle: { textAlign: `center` },
+        render: (rowData) => (
+          <div style={{ display: `flex`, alignItems: `center` }}>
+            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 50px` }} />
+            <p>{rowData.firstname} {rowData.lastname}</p>
+          </div>
+        )
+      },
+      {
+        field: "user_status", headerStyle: { border: `none`, width: `0px`, padding: `0px` }, cellStyle: { width: `0px`, padding: `0px` },
+        render: (rowData) => (
+          (rowData.user_status)? 
+            <status-indicator active pulse positive />
+          :
+            <status-indicator active pulse negative />
+        ),
+        export: false
+      },
+      { title: 'Email', field: 'email' },
+      { title: "Role", field: 'user_role_id', lookup: {3: "Student", 2:"Mentor"} },
+      { headerStyle: { border: `none`},
+        render: (rowData) => (
+        (rowData.user_role_id===2 )? 
+          <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              startIcon={<EditIcon />}
+              onClick={e => openAssignModal(rowData, 3)}
+          >
+              Assign as Student
+          </Button> 
+        
+        : 
+          <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              startIcon={<EditIcon />}
+              onClick={e => openAssignModal(rowData, 2)}
+          >
+              Assign as Mentor
+          </Button>
+        )
+      }
+    ],
+    data: []
+  });
   const [assignModal, setAssignModal] = useState(false)
   const [assignObj, setAssignObj] = useState({})
 
@@ -36,10 +85,6 @@ export default function StickyHeadTable() {
     })
   }
 
-  const closeAssignModal = () => {
-    setAssignModal(false);
-  }
-
   useEffect(() => {
     renderUsers();
   }, []);
@@ -51,80 +96,37 @@ export default function StickyHeadTable() {
       url: `/api/allusers`,
       headers: {
         Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-    }
-      // data: body.data
+      }
     })
       .then(data => {
         console.log(data.data);
-        setUsers(data.data);
-        setTemp(data.data)
+        setUsers({ ...users, data: data.data });
       })
       .catch(err => console.log("err"));
-  };
-
-  const ascDesc = () => {
-    if (sorter) {
-      setSorter(false);
-    } else {
-      setSorter(true);
-    }
-    filterRole();
-  };
-
-  const filterRole = () => {
-    if (sorter) {
-      axios({
-        method: "get",
-        url: `/api/asc`,
-        headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-      }
-     
-      })
-        .then(data => {
-          setTemp(data.data);
-        })
-        .catch(() => console.log("err"));
-    } else {
-      axios({
-        method: "get",
-        url: `/api/desc`,
-        headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-      }
-      
-      })
-        .then(data => {
-          setTemp(data.data);
-        })
-        .catch(err => console.log("err"));
-    }
   };
 
   return (
     <React.Fragment>
       {assignModal && (
-        <PopupModal 
-          title={`Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3?'student':'mentor'}?`}
+        <PopupModal
+          title={`Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3 ? 'student' : 'mentor'}?`}
           data={assignObj}
-          open ={assignModal}
+          open={assignModal}
           render={renderUsers}
-          handleClose={closeAssignModal}
+          handleClose={ () => setAssignModal(false)}
           type={'users'}
         />
       )}
 
-      <Paper className={classes.root}>
-        <AdminTable
-         temp={temp}
-         setTemp={(filteredContacts) => setTemp(filteredContacts)}
-         data={users}
-         type={'users'}
-
-         ascDescFn={ascDesc}     
-         openAssignModalFn={openAssignModal}   
-        />
-      </Paper>
+      <MaterialTable
+        title="List of Users"
+        columns={users.columns}
+        data={users.data}
+        options={{
+          actionsColumnIndex: -1,
+          exportButton: true
+        }}
+      />
     </React.Fragment>
   );
 }
