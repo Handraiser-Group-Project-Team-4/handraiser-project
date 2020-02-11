@@ -24,7 +24,10 @@ module.exports = {
     const db = req.app.get("db");
 
     db.query(
-      `select classroom_students.date_joined, users.firstname, users.lastname, users.email, users.avatar, users.user_status, users.user_id, classroom_details.class_title, classroom_details.class_created, classroom_students.class_id 
+      `select classroom_students.date_joined, users.firstname, users.lastname,
+       users.email, users.avatar, users.user_status, users.user_id, 
+       classroom_details.class_title, classroom_details.class_created, 
+       classroom_students.class_id, users.user_role_id 
       from classroom_students
       inner join users
       on classroom_students.user_id = users.user_id
@@ -67,23 +70,26 @@ module.exports = {
   },
 
   submitKey: (req, res) => {
-    const db = req.app.get('db')
-    const {class_id, user_id, date_joined, input_key} = req.body
-    db.query(`SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`)
-    .then(classroom => {
-        if(classroom.length !== 0){
-            db.classroom_students.insert({class_id, user_id, date_joined})
+    const db = req.app.get("db");
+    const { class_id, user_id, date_joined, input_key } = req.body;
+    db.query(
+      `SELECT * FROM classroom WHERE class_id = ${class_id} AND class_key = '${input_key}'`
+    )
+      .then(classroom => {
+        if (classroom.length !== 0) {
+          db.classroom_students
+            .insert({ class_id, user_id, date_joined })
             // db.query(`INSERT INTO classroom_students (class_id, user_id, date_joined) VALUES (${class_id}, '${user_id}, '${date_joined}')`)
-            .then(classroom_students => res.status(201).json(classroom_students) )
-        }
-        else
-            res.status(400).end();
-    })
-    .catch(err => {
-        console.log(err)
+            .then(classroom_students =>
+              res.status(201).json(classroom_students)
+            );
+        } else res.status(400).end();
+      })
+      .catch(err => {
+        console.log(err);
         res.status(500).end();
-    })
-},
+      });
+  },
 
   create: (req, res) => {
     // console.log(keyGenerator.keyGen())
@@ -129,7 +135,7 @@ module.exports = {
         res.status(500).end();
       });
   },
-  
+
   //Zion
   make: (req, res) => {
     const db = req.app.get("db");
@@ -187,23 +193,37 @@ module.exports = {
   },
 
   toggleCohort: (req, res) => {
-    const db = req.app.get('db');
-    const {toggle_class_status} = req.query
-    let class_status = (toggle_class_status === 'true')?'t':'f'
+    const db = req.app.get("db");
+    const { class_status } = req.body;
+    // let class_status = toggle_class_status === "true" ? "true" : "false";
 
     db.classroom_details
       .update(
         {
           class_id: req.params.id
         },
-        {  
-          class_status
+        {
+          class_status: class_status
         }
       )
-    .then(classroom => res.status(200).send(classroom))
-    .catch(err => {
-      console.err(err);
-      res.status(500).end();
-    });
-  }
+      .then(classroom => res.status(200).send(classroom))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
+  },
+
+  deleteClass: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `delete from classroom where class_id = ${req.params.id};
+      delete from classroom_details where class_id = ${req.params.id}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
 };
