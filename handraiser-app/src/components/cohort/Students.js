@@ -53,14 +53,18 @@ export default function Students(props) {
     };
     socket.emit(
       "updateConcern",
-      { id: room_id, concern_id: id, updateData: obj },
+      { id: room_id, concern_id: id, updateData: obj, userObj: userObj },
       () => {}
     );
   };
 
   const handleDelete = event => {
     event.stopPropagation();
-    socket.emit("deleteConcern", { id: room_id, concern_id: id }, () => {});
+    socket.emit(
+      "deleteConcern",
+      { id: room_id, concern_id: id, userObj: userObj },
+      () => {}
+    );
   };
 
   return (
@@ -93,7 +97,12 @@ export default function Students(props) {
           />
         ) : status === "onprocess" && userObj.user_role_id === 2 ? (
           <>
-            <CheckCircleIcon style={{ marginLeft: 10 }} />
+            <CheckCircleIcon
+              style={{ marginLeft: 10 }}
+              onClick={e => {
+                handleUpdate(e, "done");
+              }}
+            />
 
             <RemoveCircleIcon
               style={{ marginLeft: 10 }}

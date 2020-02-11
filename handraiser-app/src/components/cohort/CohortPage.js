@@ -9,12 +9,12 @@ import Axios from "axios";
 import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
 import { makeStyles } from "@material-ui/core/styles";
+import { Avatar, Typography } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
+import { useSnackbar } from "notistack";
 
 export const UserContext = createContext(null);
 let socket;
-// const username = `noe`,
-//   room = "3";
 const userDetails = {
   username: "noe",
   room: "3"
@@ -31,6 +31,7 @@ export default function CohortPage(props) {
     room: 187,
     concern: "Request for help"
   });
+  const { enqueueSnackbar } = useSnackbar();
   // const [concern] = useState({
   //   class_id: 1,
   //   mentor_id: null,
@@ -54,7 +55,7 @@ export default function CohortPage(props) {
         });
       })
       .catch(err => console.log(err));
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     Axios({
@@ -78,8 +79,16 @@ export default function CohortPage(props) {
   }, [ENDPOINT]);
 
   useEffect(() => {
-    socket.on("concernData", concern => {
-      setData([...concern.res]);
+    socket.on("concernData", ({ concern, alert }) => {
+      setData([...concern]);
+      alert &&
+        enqueueSnackbar(`${alert.name + " " + alert.action}`, {
+          variant: alert.variant,
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right"
+          }
+        });
     });
     return () => {
       socket.emit("disconnectConcern");
@@ -97,9 +106,16 @@ export default function CohortPage(props) {
   const chatHandler = (event, value) => {
     event.stopPropagation();
     setChatRoom(value);
+  };
 
-    socket.emit("disconnect");
-    socket.off();
+  const handleClickVariant = userVariant => () => {
+    enqueueSnackbar(`${userObj.name} request for help`, {
+      variant: userVariant,
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right"
+      }
+    });
   };
 
   return (
@@ -132,7 +148,9 @@ export default function CohortPage(props) {
                 ) : (
                   ""
                 )} */}
-
+                <button onClick={handleClickVariant("success")}>
+                  Click Me
+                </button>
                 <Help />
                 <NeedHelp />
                 <BeingHelp />
