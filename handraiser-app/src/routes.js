@@ -18,7 +18,6 @@ const Routes = props => {
       <Route exact path="/mentor-page" component={MentorPage} />
       <Route exact path="/student-page" component={StudentPage} />
       <Route exact path="/cohort/:id" component={CohortPage} />
-      <Route path="/chat" render={() => <Chat data={props} />} />
       <Route path="/design" render={() => <Design />} />
       <Route component={NotFound} />
     </Switch>
