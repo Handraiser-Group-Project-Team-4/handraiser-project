@@ -11,7 +11,7 @@ module.exports = {
     classroom.class_key
     from classroom_details
     inner join classroom
-    on classroom_details.class_id = classroom.class_id`
+    on classroom_details.class_id = classroom.class_id order by classroom_details.class_id asc`
     )
       .then(get => res.status(200).json(get))
       .catch(err => {
@@ -24,7 +24,10 @@ module.exports = {
     const db = req.app.get("db");
 
     db.query(
-      `select classroom_students.date_joined, users.firstname, users.lastname, users.email, users.avatar, users.user_status, users.user_id, classroom_details.class_title, classroom_details.class_created, classroom_students.class_id 
+      `select classroom_students.date_joined, users.firstname, users.lastname,
+       users.email, users.avatar, users.user_status, users.user_id, 
+       classroom_details.class_title, classroom_details.class_created, 
+       classroom_students.class_id, users.user_role_id 
       from classroom_students
       inner join users
       on classroom_students.user_id = users.user_id
@@ -191,8 +194,8 @@ module.exports = {
 
   toggleCohort: (req, res) => {
     const db = req.app.get("db");
-    const { toggle_class_status } = req.query;
-    let class_status = toggle_class_status === "true" ? "t" : "f";
+    const { class_status } = req.body;
+    // let class_status = toggle_class_status === "true" ? "true" : "false";
 
     db.classroom_details
       .update(
@@ -200,7 +203,7 @@ module.exports = {
           class_id: req.params.id
         },
         {
-          class_status
+          class_status: class_status
         }
       )
       .then(classroom => res.status(200).send(classroom))
@@ -208,5 +211,19 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
-  }
+  },
+
+  deleteClass: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `delete from classroom where class_id = ${req.params.id};
+      delete from classroom_details where class_id = ${req.params.id}`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
 };

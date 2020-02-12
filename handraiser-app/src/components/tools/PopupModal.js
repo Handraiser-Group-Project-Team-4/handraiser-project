@@ -14,7 +14,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import AdminTable from "./AdminTable"
 
 let socket;
-export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type}) {
+export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete}) {
     const ENDPOINT = "localhost:3001";
     const [body, setBody] = useState({
         data: 
@@ -73,7 +73,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             [e.target.name]: e.target.value,
             class_created: newDate,
             class_key: key,
-            class_status: "t"
+            class_status: "true"
         }
         });
         console.log(body);
@@ -93,15 +93,24 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
 
     const submitUserData = e => {
         e.preventDefault();
-        const METHOD = (type === "Create Cohort")? 'post' : 'patch';
+        const METHOD = (type === "Create Cohort")? 'post' :
+                        (type === "disapproving") ? 'patch' : 
+                        (type === "approving") ? 'patch' : 
+                        (type === "Create Cohort") ? 'patch':
+                        (type === "Change Key") ? 'patch' :
+                        (type === "users") ? 'patch' :
+                        (type === 'Toggle Cohort') ? 'patch' : 
+                        (type === 'Delete Cohort') ? 'delete' : null 
+                            
         const URL = (type === 'approving')?`/api/toapprove/${data.user_id}`:
                     (type === 'disapproving')?`/api/todisapprove/${data.user_id}`:
                     (type === 'Create Cohort')?`/api/class`:
                     (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
                     (type === 'users')?`/api/assigning/${data.id}`:
-                    (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}`:null
-
-        if(type === 'users')
+                    (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
+                    (type === 'Delete Cohort') ? `/api/deleteClass/${id}`: null
+       
+       if (type === 'users')
             axios({
                 method: METHOD,
                 url: URL,
@@ -144,24 +153,6 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             })
             .catch(err => console.log(err))
     };
-
-    const kick = (e, data) => {
-        e.preventDefault();
-        // console.log(data)
-        axios({
-            method: "delete",
-            url: `/api/kickstud/${data.user_id}/${data.class_id}`,
-            headers: {
-                Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-            }
-        }) 
-        .then(res => {
-            // console.log(res)
-            handleClose();
-            // openViewStudentsModal(data)
-        })
-        .catch(err => console.log(err))
-    } 
 
     return (
         <Dialog
@@ -237,17 +228,34 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                     </DialogContent>
 
                     <DialogActions>
+                        {(type !== 'Delete Cohort')
+                        
+                        ?
+                        <>
                         <Button onClick={handleClose} color="primary">
                             Disagree
                         </Button>
-                        {(type !== 'Kick Stud') ?
+                       
                         <Button type="submit" color="primary" autoFocus>
                             Agree
                         </Button>
-                        :
-                        <Button onClick={e => kick(e, data)} color="primary" autoFocus>
-                            Agree
+                        </> :
+
+                        <>
+                        <Button onClick={handleClose} color="primary">
+                            Disagree
                         </Button>
+                            {(canDelete === "yes")
+                            ?
+                            <Button type="submit" color="primary" autoFocus>
+                                Agree
+                            </Button>
+                            :
+                            <Button onClick={handleClose}  color="primary" autoFocus>
+                                Agree
+                            </Button>
+                            }
+                        </>
                         }
                     </DialogActions>
                 </form>
@@ -264,11 +272,12 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                         <Button onClick={handleClose} color="primary">
                             Disagree
                     </Button>
-                        
+            
+                
                         <Button onClick={e => submitUserData(e)} color="primary" autoFocus>
                             Agree
                     </Button>
-                       
+                          
                        
                     </DialogActions>
                 </>

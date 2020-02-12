@@ -65,6 +65,7 @@ massive({
     app.patch("/api/toggleCohort/:id", cohorts.toggleCohort);
     app.delete("/api/kickstud/:userId/:classId", cohorts.deleteStud);
     app.get("/api/viewJoinedStudents/:id", cohorts.viewCohort);
+    app.delete("/api/deleteClass/:id", cohorts.deleteClass)
 
     //WEBSOCKETS
     io.on("connection", socket => {
@@ -87,6 +88,7 @@ massive({
       });
 
       socket.on(`renderCohort`, ({ data }) => {
+        console.log(data)
         io.emit("fetchCohort", data);
       });
 

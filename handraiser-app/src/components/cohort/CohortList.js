@@ -135,7 +135,7 @@ export default function CohortList({ mentor }) {
         {cohorts.map((x, i) => (
           <div
             onClick={() =>
-              x.class_status === "t"
+              x.class_status === "true"
                 ? handleCohort(x)
                 : alert("Sorry This class is closed")
             }
@@ -151,7 +151,7 @@ export default function CohortList({ mentor }) {
           >
             <h3>{x.class_title}</h3>
             <p>{x.class_description}</p>
-            {x.class_status === "t" ? (
+            {x.class_status === "true" ? (
               <span
                 style={{
                   background: `green`,

@@ -7,7 +7,7 @@ import MaterialTable from 'material-table';
 import { makeStyles } from "@material-ui/core/styles";
 
 // Components
-import PopupModal from '../tools/PopupModal'
+import PopupModal from '../../tools/PopupModal'
 
 const useStyles = makeStyles({
   root: {
@@ -22,18 +22,16 @@ export default function StickyHeadTable() {
   const classes = useStyles();
   const [users, setUsers] = useState({
     columns: [
-      { title: 'Lastname', field: 'lastname', headerStyle: { display: `none` }, cellStyle: { display: `none` } },
-      {
-        title: 'Name', field: 'firstname', headerStyle: { textAlign: `center` },
+      { title: 'Avatar', field: 'avatar',
         render: (rowData) => (
-          <div style={{ display: `flex`, alignItems: `center` }}>
-            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 50px` }} />
-            <p>{rowData.firstname} {rowData.lastname}</p>
-          </div>
+          <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`,}} />
         )
       },
-      {
-        field: "user_status", headerStyle: { border: `none`, width: `0px`, padding: `0px` }, cellStyle: { width: `0px`, padding: `0px` },
+      { title: "Role", field: 'user_role_id', lookup: {3: "Student", 2:"Mentor"} },
+      { title: 'Firstname', field: 'firstname' },
+      { title: 'Lastname', field: 'lastname' },
+      { title: 'Email', field: 'email' },
+      { title: "Status", field: "user_status",
         render: (rowData) => (
           (rowData.user_status)? 
             <status-indicator active pulse positive />
@@ -41,10 +39,8 @@ export default function StickyHeadTable() {
             <status-indicator active pulse negative />
         ),
         export: false
-      },
-      { title: 'Email', field: 'email' },
-      { title: "Role", field: 'user_role_id', lookup: {3: "Student", 2:"Mentor"} },
-      { headerStyle: { border: `none`},
+      },     
+      { title: "Actions",
         render: (rowData) => (
         (rowData.user_role_id===2 )? 
           <Button
@@ -119,12 +115,14 @@ export default function StickyHeadTable() {
       )}
 
       <MaterialTable
-        title="List of Users"
+        title=""
         columns={users.columns}
         data={users.data}
         options={{
+          pageSize: 10,
           actionsColumnIndex: -1,
-          exportButton: true
+          exportButton: true,
+          headerStyle: {textTransform:`uppercase`, fontWeight:`bold`}
         }}
       />
     </React.Fragment>
