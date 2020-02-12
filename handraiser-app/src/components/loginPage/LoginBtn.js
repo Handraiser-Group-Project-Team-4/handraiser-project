@@ -1,14 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import GoogleLogin from 'react-google-login';
 import googleIcon from '../../images/google-icon.svg';
 import axios from 'axios';
-import jwtToken from '../tools/assets/jwtToken';
-import { DarkModeContext } from '../../App';
+import jwtToken from '../tools/jwtToken';
 
 export default function LoginBtn() {
 	const userObj = jwtToken();
-	const { setDarkMode } = useContext(DarkModeContext);
 	const [user, setUser] = useState({
 		isNew: false,
 		loginSuccess: false,
@@ -21,8 +19,8 @@ export default function LoginBtn() {
 			url: `/api/users?user_id=${response.profileObj.googleId}`
 		})
 			.then(res => {
-				if (res.data[0] !== undefined)
-					sessionStorage.setItem('accessToken', res.data.token);
+				sessionStorage.setItem('accessToken', res.data.token);
+
 				if (res.data[0] === undefined) {
 					axios({
 						method: `post`,
@@ -35,12 +33,11 @@ export default function LoginBtn() {
 							lastname: response.profileObj.familyName
 						},
 						headers: {
-							Authorization: 'Bearer ' + res.data.token
+							Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
 						}
 					})
 						.then(res => {
-							console.log(res);
-							sessionStorage.setItem('accessToken', res.data.token);
+							// console.log(res)
 							setUser({ ...user, loginSuccess: true, isNew: true });
 						})
 						.catch(err => console.log(err));
@@ -50,7 +47,6 @@ export default function LoginBtn() {
 						loginSuccess: true,
 						role: res.data[0].user_role_id
 					});
-					return setDarkMode(res.data[0].dark_mode);
 				}
 			})
 			.catch(err => {

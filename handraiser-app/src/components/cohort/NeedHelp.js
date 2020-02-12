@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 
 export default function NeedHelp(props) {
 	const classes = useStyles();
-	const { id, data } = useContext(UserContext);
+	const { data } = useContext(UserContext);
 
 	return (
 		<Paper className={classes.paper}>
@@ -19,23 +19,27 @@ export default function NeedHelp(props) {
 			</Typography>
 			<Divider />
 			<List className={classes.list}>
-				{data
-					? data.map((concern, index) => {
-							if (concern.concern_status === 'pending') {
-								return (
-									<Students
-										key={index}
-										room_id={id}
-										id={concern.concern_id}
-										student_id={concern.student_id}
-										status={concern.concern_status}
-										text={concern.concern_title}
-										index={index}
-									/>
-								);
-							} else return null;
-					  })
-					: ''}
+				{data.map((concern, index) => {
+					const {
+						concern_status,
+						concern_id,
+						student_id,
+						concern_title
+					} = concern;
+
+					if (concern_status === 'pending') {
+						return (
+							<Students
+								key={index}
+								index={index}
+								id={concern_id}
+								student_id={student_id}
+								status={concern_status}
+								text={concern_title}
+							/>
+						);
+					} else return null;
+				})}
 			</List>
 		</Paper>
 	);

@@ -10,7 +10,6 @@ import Box from '@material-ui/core/Box';
 // Components
 import Approval from './Approval';
 import Cohort from './Cohort'
-import Users from './Users'
 
 
 function TabPanel(props) {
@@ -51,7 +50,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function AdminTabs() {
+export default function ScrollableTabsButtonAuto() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -72,24 +71,19 @@ export default function AdminTabs() {
           aria-label="scrollable auto tabs example"
         >
           <Tab label="Approval" {...a11yProps(0)} />
-          <Tab label="Cohorts" {...a11yProps(1)} />
-          <Tab label="Users" {...a11yProps(2)} />
-
+          <Tab label="Create Cohort" {...a11yProps(1)} />
+          
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
-        <Approval />
-
+        <Approval/>
+       
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Cohort />
-
+        <Cohort/>
+      
       </TabPanel>
-      <TabPanel value={value} index={2}>
-        <Users />
-
-      </TabPanel>
-
+      
     </div>
   );
 }
