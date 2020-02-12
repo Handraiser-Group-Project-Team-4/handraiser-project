@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Axios from 'axios';
 import io from 'socket.io-client';
 import { UserContext } from './CohortPage';
 import jwtToken from '../tools/assets/jwtToken';
@@ -18,7 +17,8 @@ import { useMediaQuery, TextField, Button } from '@material-ui/core';
 let socket;
 export default function Helps() {
 	const [value, setValue] = useState('');
-	const { id, data, user, isTrue, setIsTrue } = useContext(UserContext);
+	const [isTrue, setIsTrue] = useState(false);
+	const { id, data, user } = useContext(UserContext);
 	const userObj = jwtToken();
 	const ENDPOINT = 'localhost:3001';
 
@@ -105,6 +105,22 @@ export default function Helps() {
 	//     })
 	//     .catch(err => console.log(err));
 	// };
+
+	useEffect(() => {
+		if (user) {
+			let isNull = false;
+			data.map(student => {
+				if (
+					user.user_id === student.student_id &&
+					student.concern_status !== 'done'
+				) {
+					isNull = true;
+				}
+				return isNull;
+			});
+			setIsTrue(isNull);
+		}
+	});
 
 	return user ? (
 		!isTrue && user.user_role_id === 3 ? (

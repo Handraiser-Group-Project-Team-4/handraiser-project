@@ -13,10 +13,14 @@ module.exports = {
 
     socket.on("getChatroom", ({ id }, callback) => {
       db.concern
-        .find({ class_id: id, concern_status: "onprocess" })
+        .find({
+          class_id: id,
+          concern_status: "onprocess"
+        })
         .then(data => {
           io.to(`${id}`).emit("chatroomData", { data });
         });
+
       callback();
     });
 
@@ -68,16 +72,19 @@ module.exports = {
 
     socket.on("deleteConcern", ({ id, concern_id, userObj }, callback) => {
       db.concern.destroy(concern_id).then(() =>
-        db.concern.find({ class_id: id }).then(res =>
-          io.to(`${id}`).emit("concernData", {
-            concern: res,
-            alert: {
-              variant: "error",
-              name: userObj.name,
-              action: "removes request"
-            }
-          })
-        )
+        db.concern
+          .find({ class_id: id })
+          .then(res =>
+            io.to(`${id}`).emit("concernData", {
+              concern: res,
+              alert: {
+                variant: "error",
+                name: userObj.name,
+                action: "removes request"
+              }
+            })
+          )
+          .catch()
       );
       callback();
     });

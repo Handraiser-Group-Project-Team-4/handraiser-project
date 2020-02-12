@@ -135,6 +135,7 @@ export default function Students({
 			onClick={e =>
 				userObj.user_id === student_id ||
 				(userObj.user_role_id === 2 &&
+					status !== 'pending' &&
 					chatHandler(e, { room: id, concern: text }))
 			}
 		>
@@ -179,13 +180,13 @@ export default function Students({
 								</MenuItem>
 							) : status === 'onprocess' && userObj.user_role_id === 2 ? (
 								<>
-									<MenuItem>
+									<MenuItem
+										onClick={e => {
+											handleUpdate(e, 'done');
+										}}
+									>
 										<ListItemIcon>
-											<CheckCircleIcon
-												onClick={e => {
-													handleUpdate(e, 'done');
-												}}
-											/>
+											<CheckCircleIcon />
 										</ListItemIcon>
 										<Typography variant="inherit">Done</Typography>
 									</MenuItem>
