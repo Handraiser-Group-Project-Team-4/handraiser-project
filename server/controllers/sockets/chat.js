@@ -1,7 +1,7 @@
 module.exports = {
   chatSockets: (socket, io, db) => {
     const users = [];
-    socket.on("join", ({ username, chatroom, userObj }, callback) => {
+    socket.on("join", ({ username, chatroom, userObj }, callback) => { 
       console.log("a user connected to chat");
       const user = {
         id: socket.id,

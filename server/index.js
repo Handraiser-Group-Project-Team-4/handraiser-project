@@ -3,14 +3,18 @@ const http = require("http");
 const express = require("express");
 const io = require("socket.io")();
 const cors = require("cors");
-const auth = require("./controllers/auth");
-// const router = require("./router");
-const users = require("./controllers/users");
-const chats = require("./controllers/chat");
-const concerns = require("./controllers/concerns");
-const cohorts = require("./controllers/cohorts");
-const concern = require("./controllers/concern");
+
 require("dotenv").config();
+
+//ENDPOINTS
+const auth = require("./controllers/auth");
+const users = require("./controllers/users");
+const cohorts = require("./controllers/cohorts");
+
+//SOCKETS
+const admin = require("./controllers/sockets/admin");
+const chats = require("./controllers/sockets/chat");
+const concerns = require("./controllers/sockets/concerns");
 
 massive({
   host: process.env.DB_HOST,
@@ -28,7 +32,6 @@ massive({
 
     app.use(express.json());
     app.use(cors());
-    // app.use(router);
 
     app.get("/api/users", users.login);
     app.use(auth.header);
@@ -44,12 +47,6 @@ massive({
     app.post("/api/cohorts", cohorts.create);
     app.get("/api/cohort-check/:id", cohorts.checkUser);
     app.post("/api/submit-key/", cohorts.submitKey);
-
-    // CONCERN
-    app.get("/api/concern/:id", concern.list);
-    app.post("/api/concern/", concern.create);
-    app.patch("/api/concern/:id", concern.update);
-    app.delete("/api/concern/:id", concern.delete);
 
     // ADMIN - USERS
     app.patch("/api/assigning/:id", users.assign);
@@ -76,30 +73,7 @@ massive({
       concerns.concernSockets(socket, io, db);
 
       // ADMIN SOCKET
-      socket.on(`mentorRequest`, ({ data }) => {
-        io.emit("fetchMentorRequest");
-      });
-
-      socket.on(`handleRoleRequest`, ({ user_id, approval_status }) => {
-        // db.users.find(user_id)
-        // .then(user => {
-        io.emit("notifyUser", { user_id, approval_status });
-        // })
-      });
-
-      socket.on(`renderCohort`, ({ data }) => {
-        console.log(data)
-        io.emit("fetchCohort", data);
-      });
-
-      socket.on(`changeUserRole`, ({ user_id, user_role_id }) => {
-        // db.users.find(user_id)
-        // .then(user => {
-        // console.log(user)
-        if (user_role_id === 2) io.emit("studentToMentor", user_id);
-        else if (user_role_id === 3) io.emit("mentorToStudent", user_id);
-        // })
-      });
+      admin.adminSockets(socket, io, db);
     });
 
     const PORT = process.env.PORT || 3001;
