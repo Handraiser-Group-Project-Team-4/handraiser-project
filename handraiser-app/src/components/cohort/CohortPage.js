@@ -35,26 +35,19 @@ export default function CohortPage(props) {
 	const userObj = jwtToken();
 	const { id } = props.match.params;
 	const [data, setData] = useState([]);
-	const [isTrue, setIsTrue] = useState(false);
 	const [user, setUser] = useState();
 	const [chatroom, setChatRoom] = useState();
+	const { enqueueSnackbar } = useSnackbar();
+
 	const theme = useTheme();
 	const inputLabel = React.useRef(null);
 	const [filter, setFilter] = React.useState('');
 	const handleChange = event => setFilter(event.target.value);
-	const { enqueueSnackbar } = useSnackbar();
 	const matches = useMediaQuery(
 		json2mq({
 			minWidth: 960
 		})
 	);
-	// const [concern] = useState({
-	//   class_id: 1,
-	//   mentor_id: null,
-	//   student_id: userObj.user_id,
-	//   concern_title: "Request for help",
-	//   concern_status: "pending"
-	// });
 
 	useEffect(() => {
 		Axios({
@@ -78,15 +71,19 @@ export default function CohortPage(props) {
 	}, [ENDPOINT]);
 
 	useEffect(() => {
-		socket.emit('getChatroom', { id }, () => {});
-		socket.on('chatroomData', ({ data }) => {
-			data.length
-				? setChatRoom({
-						room: data[0].concern_id,
-						concern: data[0].concern_title
-				  })
-				: setChatRoom();
+		socket.emit('getChatroom', { id }, () => {
+			socket.on('chatroomData', ({ data }) => {
+				data.length &&
+				(data[0].mentor_id === userObj.user_id ||
+					data[0].student_id === userObj.user_id)
+					? setChatRoom({
+							room: data[0].concern_id,
+							concern: data[0].concern_title
+					  })
+					: setChatRoom();
+			});
 		});
+
 		socket.on('concernData', ({ concern, alert }) => {
 			setData([...concern]);
 			alert &&
@@ -108,18 +105,6 @@ export default function CohortPage(props) {
 		event.stopPropagation();
 		setChatRoom(value);
 	};
-	useEffect(() => {
-		if (user) {
-			let isNull = false;
-			data.map(student => {
-				if (user.user_id === student.student_id) {
-					isNull = true;
-				}
-				return isNull;
-			});
-			setIsTrue(isNull);
-		}
-	}, [data]);
 
 	return (
 		<MainpageTemplate>
@@ -133,8 +118,6 @@ export default function CohortPage(props) {
 						setData,
 						user,
 						setUser,
-						isTrue,
-						setIsTrue,
 						chatHandler
 					}}
 				>
@@ -202,7 +185,7 @@ export default function CohortPage(props) {
 										{chatroom ? (
 											<Chat />
 										) : (
-											!isTrue && userObj.user_role_id === 3 && <Helps />
+											userObj.user_role_id === 3 && <Helps />
 										)}
 									</section>
 								</Grid>

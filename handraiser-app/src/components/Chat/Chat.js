@@ -74,18 +74,19 @@ let socket;
 const Chat = () => {
 	const classes = useStyles();
 	const userObj = jwtToken();
-	const [isTyping, setIsTyping] = useState('');
-	const [open, setOpen] = useState(false);
 	const { chatroom } = useContext(UserContext);
-	const [expanded, setExpanded] = useState(false);
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
 	const [typing, setTyping] = useState(false);
 	const ENDPOINT = 'localhost:3001';
+
+	const [open, setOpen] = useState(false);
+	const [expanded, setExpanded] = useState(false);
 	const handleClose = () => setAnchorEl(null);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const handleClick = e => setAnchorEl(e.currentTarget);
+
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
 		socket.emit(
@@ -121,23 +122,7 @@ const Chat = () => {
 			socket.off();
 		};
 	}, [currentChat]);
-	// useEffect(() => {
-	//   socket.on("backTyping", ({ nameTyping, value }) => {
-	//     // console.log(nameTyping.name);
-	//     setIsTyping(`${nameTyping.name} is typing...`);
-	//     if (value.length !== 0) {
-	//       setIsTyping(`${nameTyping.name} is typing...`);
-	//     } else {
-	//       setIsTyping(``);
-	//     }
-	//   });
-	// });
-	// const typing = event => {};
-	// const personTyping = value => {
-	//   setMessage(value);
-	//   const nameTyping = userObj;
-	//   socket.emit("typingMessage", { nameTyping, value });
-	// };
+
 	const sendMessage = event => {
 		setOpen(true);
 		setMessage('');
@@ -150,18 +135,7 @@ const Chat = () => {
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
 	};
-	const addEmoji = e => {
-		setMessage(message + e.native);
-	};
-	// const handleClose = (event, reason) => {
-	//   if (reason === "clickaway") {
-	//     return;
-	//   }
-	//   setOpen(false);
-	// };
-	// const Alert = props => {
-	//   return <MuiAlert elevation={6} variant="filled" {...props} />;
-	// };
+
 	const toggleEmoji = () => {
 		setShowEmoji(!showEmoji);
 	};
