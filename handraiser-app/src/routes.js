@@ -6,7 +6,6 @@ import MentorPage from "./components/mainPage/MentorPage";
 import AdminPage from "./components/mainPage/AdminPage";
 // import CohortPage from "./components/cohort/CohortPageOld";
 import CohortPage from "./components/cohort/CohortPage";
-import Chat from "./components/Chat/Chat";
 import Design from "./components/Chat/design";
 import NotFound from "./components/tools/NotFound";
 import Team from "./components/tools/Team";
