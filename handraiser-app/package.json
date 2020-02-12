@@ -11,6 +11,7 @@
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "emoji-mart": "^2.11.2",
+    "json2mq": "^0.2.0",
     "jwt-decode": "^2.2.0",
     "notistack": "^0.9.7",
     "react": "^16.12.0",
