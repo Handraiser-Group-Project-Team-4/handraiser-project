@@ -163,7 +163,7 @@ export default function MaterialTableDemo() {
   const renderCohorts = () => {
     axios({
       method: "get",
-      url: `/api/cohorts`,
+      url: `/api/cohorts/`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
@@ -175,7 +175,7 @@ export default function MaterialTableDemo() {
           data: data.data
         });
       })
-      .catch(err => console.log("object"));
+      .catch(err => console.log(err));
   };
 
   const toggleClassFn = data => {

@@ -27,7 +27,9 @@ module.exports = {
   },
   list: (req, res) => {
     const db = req.app.get("db");
-    db.query(`SELECT * FROM concern WHERE class_id = ${req.params.id}`)
+    db.query(
+      `SELECT * FROM concern WHERE class_id = ${req.params.id} AND concern_status='onprocess'`
+    )
       .then(concern => res.status(200).json(concern))
       .catch(err => {
         console.log(err);

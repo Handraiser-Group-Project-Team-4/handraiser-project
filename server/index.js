@@ -40,7 +40,7 @@ massive({
     app.get("/api/users/:id/:room", users.chatFetch);
 
     // COHORTS
-    app.get("/api/cohorts", cohorts.list);
+    app.get("/api/cohorts/", cohorts.list);
     app.post("/api/cohorts", cohorts.create);
     app.get("/api/cohort-check/:id", cohorts.checkUser);
     app.post("/api/submit-key/", cohorts.submitKey);

@@ -2,30 +2,40 @@ import React, { useEffect, useState, useContext } from "react";
 import Axios from "axios";
 import jwtToken from "../tools/assets/jwtToken";
 import { UserContext } from "./CohortPage";
-
-import { makeStyles } from "@material-ui/core/styles";
-import ListItem from "@material-ui/core/ListItem";
-import Divider from "@material-ui/core/Divider";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListItemAvatar from "@material-ui/core/ListItemAvatar";
-import Avatar from "@material-ui/core/Avatar";
 import HelpIcon from "@material-ui/icons/Help";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 import DeleteIcon from "@material-ui/icons/Delete";
-import Typography from "@material-ui/core/Typography";
 import io from "socket.io-client";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
 
+import {
+  IconButton,
+  ListItem,
+  Typography,
+  CardHeader,
+  Avatar,
+  Menu,
+  MenuItem
+} from "@material-ui/core";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 let socket;
-export default function Students(props) {
-  const classes = useStyles();
+export default function Students({
+  room_id,
+  id,
+  status,
+  student_id,
+  index,
+  text,
+  classes
+}) {
   const userObj = jwtToken();
   const ENDPOINT = "localhost:3001";
-  const { room_id, id, status, student_id, index, text } = props;
   const [student, setStudent] = useState([]);
-
   const { chatHandler } = useContext(UserContext);
-
+  const handleClose = () => setAnchorEl(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = e => setAnchorEl(e.currentTarget);
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
@@ -39,87 +49,169 @@ export default function Students(props) {
       }
     })
       .then(res => {
-        // console.log(res.data);
         setStudent(res.data);
       })
       .catch(err => console.log(err));
   }, [student_id]);
 
-  const handleUpdate = (event, value) => {
-    event.stopPropagation();
+  const handleUpdate = (e, value) => {
+    e.preventDefault();
     const obj = {
       concern_status: value,
       mentor_id: userObj.user_id
     };
     socket.emit(
       "updateConcern",
-      { id: room_id, concern_id: id, updateData: obj },
+      { id: room_id, concern_id: id, updateData: obj, userObj: userObj },
+      () => {}
+    );
+  };
+  const handleDelete = event => {
+    event.stopPropagation();
+    socket.emit(
+      "deleteConcern",
+      { id: room_id, concern_id: id, userObj: userObj },
       () => {}
     );
   };
 
-  const handleDelete = event => {
-    event.stopPropagation();
-    socket.emit("deleteConcern", { id: room_id, concern_id: id }, () => {});
-  };
+  // return (
+  //   <>
+  //     <ListItem
+  //       alignItems="flex-start"
+  //       onClick={e => chatHandler(e, { room: id, concern: text })}
+  //     >
+  //       <ListItemAvatar>
+  //         <Avatar alt={student.firstname} src={student.avatar} />
+  //       </ListItemAvatar>
+  //       <ListItemText
+  //         primary={`${student.firstname} ${student.lastname}`}
+  //         secondary={
+  //           <React.Fragment>
+  //             {`Problem: ${text}`}
+  //             <Typography
+  //               component="span"
+  //               variant="body2"
+  //               className={classes.inline}
+  //             ></Typography>
+  //           </React.Fragment>
+  //         }
+  //       />
+  //       {status === "pending" && userObj.user_role_id === 2 ? (
+  //         <HelpIcon
+  //           onClick={e => {
+  //             handleUpdate(e, "onprocess");
+  //           }}
+  //         />
+  //       ) : status === "onprocess" && userObj.user_role_id === 2 ? (
+  //         <>
+  //           <CheckCircleIcon style={{ marginLeft: 10 }} />
 
+  //           <RemoveCircleIcon
+  //             style={{ marginLeft: 10 }}
+  //             onClick={e => {
+  //               handleUpdate(e, "pending");
+  //             }}
+  //           />
+  //         </>
+  //       ) : status === "pending" &&
+  //         userObj.user_role_id === 3 &&
+  //         userObj.user_id === student_id ? (
+  //         <DeleteIcon
+  //           onClick={e => {
+  //             handleDelete(e);
+  //           }}
+  //         />
+  //       ) : null}
+  //     </ListItem>
+  //     <Divider variant="inset" component="li" />
+  //   </>
+  // );
   return (
-    <>
-      <ListItem
-        alignItems="flex-start"
-        onClick={e => chatHandler(e, { room: id, concern: text })}
-      >
-        <ListItemAvatar>
-          <Avatar alt={student.firstname} src={student.avatar} />
-        </ListItemAvatar>
-        <ListItemText
-          primary={`${student.firstname} ${student.lastname}`}
-          secondary={
-            <React.Fragment>
-              {`Problem: ${text}`}
-              <Typography
-                component="span"
-                variant="body2"
-                className={classes.inline}
-              ></Typography>
-            </React.Fragment>
-          }
-        />
-        {status === "pending" && userObj.user_role_id === 2 ? (
-          <HelpIcon
-            onClick={e => {
-              handleUpdate(e, "onprocess");
-            }}
+    <ListItem
+      key={index}
+      className={classes.beingHelped}
+      button={userObj.user_id === student_id || userObj.user_role_id === 2}
+      onClick={e =>
+        userObj.user_id === student_id ||
+        (userObj.user_role_id === 2 &&
+          chatHandler(e, { room: id, concern: text }))
+      }
+    >
+      <CardHeader
+        className={classes.cardHeaderRoot}
+        style={{
+          border: userObj.user_id === student_id ? "2px solid #673ab7" : "none"
+        }}
+        classes={{
+          span: "una"
+        }}
+        avatar={
+          <Avatar
+            alt={student.firstname}
+            className={classes.avatar}
+            src={student.avatar}
           />
-        ) : status === "onprocess" && userObj.user_role_id === 2 ? (
-          <>
-            <CheckCircleIcon style={{ marginLeft: 10 }} />
-
-            <RemoveCircleIcon
-              style={{ marginLeft: 10 }}
-              onClick={e => {
-                handleUpdate(e, "pending");
-              }}
-            />
-          </>
-        ) : status === "pending" &&
-          userObj.user_role_id === 3 &&
-          userObj.user_id === student_id ? (
-          <DeleteIcon
-            onClick={e => {
-              handleDelete(e);
-            }}
-          />
-        ) : null}
-      </ListItem>
-      <Divider variant="inset" component="li" />
-    </>
+        }
+        action={
+          (userObj.user_id === student_id || userObj.user_role_id === 2) && (
+            <div>
+              <IconButton aria-label="settings" onClick={handleClick}>
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                elevation={1}
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                {status === "pending" && userObj.user_role_id === 2 ? (
+                  <MenuItem onClick={e => handleUpdate(e, "onprocess")}>
+                    <ListItemIcon>
+                      <HelpIcon />
+                    </ListItemIcon>
+                    <Typography variant="inherit">Help Mentee!</Typography>
+                  </MenuItem>
+                ) : status === "onprocess" && userObj.user_role_id === 2 ? (
+                  <>
+                    <MenuItem>
+                      <ListItemIcon>
+                        <CheckCircleIcon
+                          onClick={e => {
+                            handleUpdate(e, "done");
+                          }}
+                        />
+                      </ListItemIcon>
+                      <Typography variant="inherit">Done</Typography>
+                    </MenuItem>
+                    <MenuItem onClick={e => handleUpdate(e, "pending")}>
+                      <ListItemIcon>
+                        <RemoveCircleIcon />
+                      </ListItemIcon>
+                      <Typography variant="inherit">
+                        Send back to Need Help Queue
+                      </Typography>
+                    </MenuItem>
+                  </>
+                ) : status === "pending" &&
+                  userObj.user_role_id === 3 &&
+                  userObj.user_id === student_id ? (
+                  <MenuItem onClick={e => handleDelete(e)}>
+                    <ListItemIcon>
+                      <DeleteIcon />
+                    </ListItemIcon>
+                    <Typography variant="inherit">Remove Handraise</Typography>
+                  </MenuItem>
+                ) : null}
+              </Menu>
+            </div>
+          )
+        }
+        title={`Problem: ${text}`}
+        subheader={student.firstname + " " + student.lastname}
+      />
+    </ListItem>
   );
 }
-
-const useStyles = makeStyles(theme => ({
-  inline: {
-    display: "inline",
-    color: "#000"
-  }
-}));
