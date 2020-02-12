@@ -307,6 +307,7 @@ export default function CohortList({ classes, value }) {
             <Grid container spacing={0} className={classes.gridContainerrr}>
               {[1, 2, 3, 4, 5].map(i => (
                 <Grid
+                  key={i}
                   item
                   xl={6}
                   lg={6}

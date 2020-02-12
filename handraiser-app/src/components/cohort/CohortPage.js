@@ -27,10 +27,6 @@ import { useSnackbar } from "notistack";
 
 export const UserContext = createContext(null);
 let socket;
-const userDetails = {
-  username: "noe",
-  room: "3"
-};
 
 export default function CohortPage(props) {
   const ENDPOINT = "localhost:3001";
@@ -40,10 +36,7 @@ export default function CohortPage(props) {
   const [data, setData] = useState([]);
   const [isTrue, setIsTrue] = useState(false);
   const [user, setUser] = useState();
-  const [chatroom, setChatRoom] = useState({
-    room: 187,
-    concern: "Request for help"
-  });
+  const [chatroom, setChatRoom] = useState();
   const theme = useTheme();
   const inputLabel = React.useRef(null);
   const [filter, setFilter] = React.useState("");
@@ -66,7 +59,6 @@ export default function CohortPage(props) {
       }
     })
       .then(res => {
-        console.log(res.data);
         setUser(res.data);
       })
       .catch(err => {
@@ -121,55 +113,8 @@ export default function CohortPage(props) {
       });
       setIsTrue(isNull);
     }
-  });
+  }, [data]);
 
-  {
-    /* //////////////////////////////////Old return Code///////////////////////////////////////////////// */
-  }
-  // return (
-  //   <MainpageTemplate>
-  //     <Link to="/">Go Back</Link>
-  //     <div
-  //     // style={{
-  //     //   height: `100vh`
-  //     // }}
-  //     >
-  //       <div className={classes.root}>
-  //         <UserContext.Provider
-  //           value={{
-  //             id,
-  //             chatroom,
-  //             setChatRoom,
-  //             data,
-  //             setData,
-  //             user,
-  //             setUser,
-  //             chatHandler
-  //           }}
-  //         >
-  //           <Grid container spacing={3}>
-  //             <Grid item xs={6} lg={3}>
-  //               {/* {userObj.user_role_id === 3 ? (
-  //                 <button onClick={e => sendConcern(e, concern)}>
-  //                   Send Concern
-  //                 </button>
-  //               ) : (
-  //                 ""
-  //               )} */}
-
-  //               <Help />
-  //               <NeedHelp />
-  //               <BeingHelp />
-  //             </Grid>
-  //             <Grid item xs={6} lg={9}>
-  //               <Chat userDetails={userDetails} room={chatroom} />
-  //             </Grid>
-  //           </Grid>
-  //         </UserContext.Provider>
-  //       </div>
-  //     </div>
-  //   </MainpageTemplate>
-  // );
   return (
     <MainpageTemplate>
       <div className={classes.parentDiv}>
@@ -182,6 +127,8 @@ export default function CohortPage(props) {
             setData,
             user,
             setUser,
+            isTrue,
+            setIsTrue,
             chatHandler
           }}
         >
@@ -189,16 +136,7 @@ export default function CohortPage(props) {
             <Grid container spacing={0} className={classes.gridContainerr}>
               <Grid item md={6} xs={12} className={classes.gridItemm}>
                 <Grid container spacing={0} className={classes.topNavi}>
-                  <Typography
-                    variant="h4"
-                    noWrap
-                    className={classes.typoTitle}
-                    style={{
-                      [theme.breakpoints.down("md")]: {
-                        order: useMediaQuery("(min-width:960px)") ? 1 : 3
-                      }
-                    }}
-                  >
+                  <Typography variant="h4" noWrap className={classes.typoTitle}>
                     Handraiser Queue
                     <Chip className={classes.largeChip} label="10" />
                   </Typography>
@@ -231,11 +169,6 @@ export default function CohortPage(props) {
                     noValidate
                     autoComplete="off"
                     className={classes.searchform}
-                    style={{
-                      [theme.breakpoints.down("md")]: {
-                        order: useMediaQuery("(min-width:960px)") ? 3 : 1
-                      }
-                    }}
                   >
                     <TextField
                       id="outlined-search"
@@ -252,53 +185,10 @@ export default function CohortPage(props) {
                     />
                   </form>
                 </Grid>
-                {/* <Divider /> */}
                 <div>
                   <NeedHelps classes={classes} />
                   <BeingHelps classes={classes} />
                 </div>
-                {/* <List className={classes.roots}>
-                {images.map((item, index) => (
-                  <ListItem key={index} dense>
-                    <CardHeader
-                      className={classes.cardHeaderRoot}
-                      classes={{
-                        span: "una"
-                      }}
-                      avatar={
-                        <Avatar aria-label="recipe" className={classes.avatar}>
-                          RD
-                        </Avatar>
-                      }
-                      action={
-                        <div>
-                          <IconButton
-                            aria-label="settings"
-                            onClick={handleClick}
-                          >
-                            <MoreVertIcon />
-                          </IconButton>
-                          <Menu
-                            elevation={1}
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                          >
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>
-                              My account
-                            </MenuItem>
-                          </Menu>
-                        </div>
-                      }
-                      title="Error"
-                      subheader="Aodhan Hayter"
-                    />
-                  </ListItem>
-                ))}
-              </List> */}
               </Grid>
               <Hidden mdDown>
                 <Grid item xs={12} md={6} className={classes.gridItemm}>
@@ -306,7 +196,7 @@ export default function CohortPage(props) {
                     {chatroom ? (
                       <Chat />
                     ) : (
-                      isTrue && userObj.user_role_id === 2 && <Helps />
+                      !isTrue && userObj.user_role_id === 3 && <Helps />
                     )}
                   </section>
                 </Grid>
@@ -354,7 +244,11 @@ const useStyles = makeStyles(theme => ({
   typoTitle: {
     fontFamily: "'Rubik', sans-serif",
     marginBottom: "1rem",
-    fontSize: 26
+    fontSize: 26,
+    order: 2,
+    "@media (max-width:960px)": {
+      order: 3
+    }
   },
   gridItemm: {
     height: "100%",
@@ -463,7 +357,11 @@ const useStyles = makeStyles(theme => ({
   searchform: {
     [theme.breakpoints.down("md")]: {
       marginBottom: 10,
-      marginRight: 10
+      marginRight: 10,
+      order: 1,
+      "@media (max-width:960px)": {
+        order: 3
+      }
     }
   },
   searchIcon: {

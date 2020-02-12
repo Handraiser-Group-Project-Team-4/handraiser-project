@@ -199,7 +199,7 @@ export default function MainpageTemplate({
           label={
             <ListItem
               to="/"
-              renderAs={Link}
+              renderas={Link}
               onClick={handleLogout}
               button
               className={classes.listItemButton}
