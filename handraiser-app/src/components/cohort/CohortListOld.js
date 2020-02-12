@@ -24,14 +24,9 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import InputLabel from "@material-ui/core/InputLabel";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import FilledInput from "@material-ui/core/FilledInput";
 
 let socket;
-export default function CohortList({ mentor, classes, value }) {
+export default function CohortList({ classes, value }) {
   const theme = useTheme();
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
@@ -230,7 +225,7 @@ export default function CohortList({ mentor, classes, value }) {
                 <Grid
                   key={i}
                   item
-                  xl={4}
+                  xl={6}
                   lg={6}
                   md={12}
                   sm={12}
@@ -313,7 +308,7 @@ export default function CohortList({ mentor, classes, value }) {
               {[1, 2, 3, 4, 5].map(i => (
                 <Grid
                   item
-                  xl={4}
+                  xl={6}
                   lg={6}
                   md={12}
                   sm={12}

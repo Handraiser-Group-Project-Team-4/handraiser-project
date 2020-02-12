@@ -176,6 +176,7 @@ const useStyles = makeStyles(theme => ({
   },
   cardRoot: {
     minWidth: 590,
+    maxWidth: 590,
     borderRadius: 10,
     "& > div:first-of-type": {
       paddingBottom: 10
@@ -204,7 +205,7 @@ const useStyles = makeStyles(theme => ({
       justifyContent: "space-between"
     },
     "& > div:first-of-type": {
-      height: "55%"
+      height: "48%"
     },
     "& > div:last-of-type": {
       height: "45%"
