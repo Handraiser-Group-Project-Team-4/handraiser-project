@@ -154,8 +154,7 @@ export default function Students({
           />
         }
         action={
-          userObj.user_id === student_id ||
-          (userObj.user_role_id === 2 && (
+          (userObj.user_id === student_id || userObj.user_role_id === 2) && (
             <div>
               <IconButton aria-label="settings" onClick={handleClick}>
                 <MoreVertIcon />
@@ -208,7 +207,7 @@ export default function Students({
                 ) : null}
               </Menu>
             </div>
-          ))
+          )
         }
         title={`Problem: ${text}`}
         subheader={student.firstname + " " + student.lastname}

@@ -92,7 +92,6 @@ export default function Helps() {
           student.concern_status !== "done"
         ) {
           isNull = true;
-          console.log(student);
         }
         return isNull;
       });

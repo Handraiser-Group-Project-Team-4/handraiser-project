@@ -60,29 +60,13 @@ export default function CohortPage(props) {
   useEffect(() => {
     Axios({
       method: "get",
-      url: `/api/concern/${id}`,
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    })
-      .then(res => {
-        setChatRoom({
-          room: res.data[0].concern_id,
-          concern: res.data[0].concern_title
-        });
-      })
-      .catch(err => console.log(err));
-  }, [data]);
-
-  useEffect(() => {
-    Axios({
-      method: "get",
       url: `/api/users/${userObj.user_id}`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
     })
       .then(res => {
+        console.log(res.data);
         setUser(res.data);
       })
       .catch(err => {
@@ -92,10 +76,19 @@ export default function CohortPage(props) {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, error => {});
+    socket.emit("joinConcern", { id }, () => {});
   }, [ENDPOINT]);
 
   useEffect(() => {
+    socket.emit("getChatroom", { id }, () => {});
+    socket.on("chatroomData", ({ data }) => {
+      data.length
+        ? setChatRoom({
+            room: data[0].concern_id,
+            concern: data[0].concern_title
+          })
+        : setChatRoom();
+    });
     socket.on("concernData", ({ concern, alert }) => {
       setData([...concern]);
       alert &&
@@ -108,10 +101,15 @@ export default function CohortPage(props) {
         });
     });
     return () => {
-      socket.emit("disconnectConcern");
+      socket.emit("disconnectConcern", () => {});
       socket.off();
     };
   }, [data]);
+
+  const chatHandler = (event, value) => {
+    event.stopPropagation();
+    setChatRoom(value);
+  };
   useEffect(() => {
     if (user) {
       let isNull = false;
@@ -124,27 +122,6 @@ export default function CohortPage(props) {
       setIsTrue(isNull);
     }
   });
-  const sendConcern = (event, concern) => {
-    event.stopPropagation();
-    if (concern) {
-      socket.emit("sendConcern", { concern }, () => {});
-    }
-  };
-
-  const chatHandler = (event, value) => {
-    event.stopPropagation();
-    setChatRoom(value);
-  };
-
-  const handleClickVariant = userVariant => () => {
-    enqueueSnackbar(`${userObj.name} request for help`, {
-      variant: userVariant,
-      anchorOrigin: {
-        vertical: "top",
-        horizontal: "right"
-      }
-    });
-  };
 
   {
     /* //////////////////////////////////Old return Code///////////////////////////////////////////////// */
@@ -326,10 +303,10 @@ export default function CohortPage(props) {
               <Hidden mdDown>
                 <Grid item xs={12} md={6} className={classes.gridItemm}>
                   <section className={classes.rootq}>
-                    {isTrue || userObj.user_role_id === 2 ? (
-                      <Chat userDetails={userDetails} room={chatroom} />
+                    {chatroom ? (
+                      <Chat />
                     ) : (
-                      <Helps />
+                      isTrue && userObj.user_role_id === 2 && <Helps />
                     )}
                   </section>
                 </Grid>
