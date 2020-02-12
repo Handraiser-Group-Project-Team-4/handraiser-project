@@ -1,30 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-import axios from 'axios';
-import jwtToken from '../tools/jwtToken';
-import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import Box from '@material-ui/core/Box';
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-// import styled from 'styled-components';
+import React, { useEffect, useState, useContext } from 'react';
+import {
+	makeStyles,
+	Card,
+	CardHeader,
+	Box,
+	CardContent,
+	CardActions,
+	Avatar,
+	IconButton,
+	Typography,
+	TextField,
+	Divider,
+	Container,
+	InputAdornment,
+	MenuItem,
+	Menu
+} from '@material-ui/core';
 import { purple } from '@material-ui/core/colors';
-import TextField from '@material-ui/core/TextField';
-import Divider from '@material-ui/core/Divider';
+import io from 'socket.io-client';
+import clsx from 'clsx';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
+import ReactHtmlParser from 'react-html-parser';
+import ScrollableFeed from 'react-scrollable-feed';
+import { UserContext } from '../cohort/CohortPage';
 import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import Container from '@material-ui/core/Container';
-
+import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
+import jwtToken from '../tools/assets/jwtToken';
 const useStyles = makeStyles(theme => ({
 	root: {
-		maxWidth: 900
+		borderRadius: 10,
+		boxShadow: '4px 4px 12px 1px rgba(0, 0, 0, 0.2)',
+		lineHeight: 1.5,
+		overflowY: 'auto',
+		// minHeight: "80vh",
+		width: '80%'
 	},
 	media: {
-		height: '500px'
+		height: '100%',
+		minHeight: '500px',
+		padding: '0px!important'
 	},
 	expand: {
 		transform: 'rotate(0deg)',
@@ -46,236 +62,285 @@ const useStyles = makeStyles(theme => ({
 		marginLeft: '10px'
 	},
 	chat: {
-		// paddingBottom: "15px",
 		padding: '10px',
 		margin: '0',
 		width: 'auto',
-		backgroundColor: 'lightgrey',
-		borderRadius: '50px'
+		backgroundColor: '#F5F5F5',
+		borderRadius: '15px',
+		maxWidth: '50%'
 	}
 }));
-
 let socket;
 const Chat = () => {
 	const classes = useStyles();
-	const [expanded, setExpanded] = React.useState(false);
-
-	const handleExpandClick = () => {
-		setExpanded(!expanded);
-	};
-	const username = `noe`,
-		room = '40';
 	const userObj = jwtToken();
-	// const [chatDetails, setChatDetails] = useState({
-	//     name:"",
-	//     room:"",
-	//     avatar:"",
-	// });
-	// const [username, setUsername] = useState("");
-	// const [room, setRoom] = useState("");
-	const [oldChat, setOldChat] = useState([]);
+	const [isTyping, setIsTyping] = useState('');
+	const [open, setOpen] = useState(false);
+	const { chatroom } = useContext(UserContext);
+	const [expanded, setExpanded] = useState(false);
+	const [showEmoji, setShowEmoji] = useState(false);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
+	const [typing, setTyping] = useState(false);
 	const ENDPOINT = 'localhost:3001';
-
-	useEffect(() => {
-		axios({
-			method: 'get',
-			url: `/api/users/${userObj.user_id}?chat=true`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				// console.log(res.data)
-				// setChatDetails({
-				//     name: res.data.firstname + " " + res.data.lastname,
-				//     room: `'${res.data.concern_id}'`,
-				//     avatar: res.data.avatar
-				// })
-
-				// setUsername(res.data.users_concern.firstname + " " + res.data.users_concern.lastname);
-				// setRoom(res.data.users_concern.concern_id);
-
-				setOldChat(res.data.messages);
-			})
-			.catch(err => {
-				console.log(err);
-			});
-	}, []);
-
+	const handleClose = () => setAnchorEl(null);
+	const [anchorEl, setAnchorEl] = React.useState(null);
+	const handleClick = e => setAnchorEl(e.currentTarget);
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-		socket.emit('join', { username, room, userObj }, error => {});
-	}, [ENDPOINT]);
-
+		socket.emit(
+			'join',
+			{ username: userObj.name, chatroom: chatroom.room, userObj },
+			() => {
+				socket.on('oldChat', data => {
+					setCurrentChat(data.data.messages);
+				});
+			}
+		);
+	}, [ENDPOINT, chatroom]);
+	useEffect(() => {
+		const handleTyping = () => {
+			socket.emit('typing', { name: userObj.name });
+		};
+		window.addEventListener('keypress', handleTyping);
+		return () => {
+			window.removeEventListener('keypress', handleTyping);
+		};
+	}, []);
+	useEffect(() => {
+		socket.on('displayTyping', ({ name }) => {
+			setTyping(true);
+		});
+	}, []);
 	useEffect(() => {
 		socket.on('message', message => {
-			// console.log(message)
 			setCurrentChat([...currentChat, message]);
 		});
-		socket.emit('saveChat', currentChat);
-
 		return () => {
 			socket.emit('disconnect');
 			socket.off();
 		};
 	}, [currentChat]);
-
+	// useEffect(() => {
+	//   socket.on("backTyping", ({ nameTyping, value }) => {
+	//     // console.log(nameTyping.name);
+	//     setIsTyping(`${nameTyping.name} is typing...`);
+	//     if (value.length !== 0) {
+	//       setIsTyping(`${nameTyping.name} is typing...`);
+	//     } else {
+	//       setIsTyping(``);
+	//     }
+	//   });
+	// });
+	// const typing = event => {};
+	// const personTyping = value => {
+	//   setMessage(value);
+	//   const nameTyping = userObj;
+	//   socket.emit("typingMessage", { nameTyping, value });
+	// };
 	const sendMessage = event => {
+		setOpen(true);
+		setMessage('');
 		event.preventDefault();
+		const temp = message.replace(/\n/g, '<br />');
 		if (message) {
-			socket.emit('sendMessage', { message }, () => setMessage(''));
+			socket.emit('sendMessage', { message: temp }, () => setMessage(''));
 		}
 	};
-
-	// console.log(message, currentChat);
+	const handleExpandClick = () => {
+		setExpanded(!expanded);
+	};
+	const addEmoji = e => {
+		setMessage(message + e.native);
+	};
+	// const handleClose = (event, reason) => {
+	//   if (reason === "clickaway") {
+	//     return;
+	//   }
+	//   setOpen(false);
+	// };
+	// const Alert = props => {
+	//   return <MuiAlert elevation={6} variant="filled" {...props} />;
+	// };
+	const toggleEmoji = () => {
+		setShowEmoji(!showEmoji);
+	};
 	return (
-		// <div
-		//   style={{
-		//     display: "flex",
-		//     flexDirection: "column",
-		//     justifyContent: "center",
-		//     alignContent: "center",
-		//     padding: "100px",
-		//     flexWrap: "wrap"
-		//   }}
-		// >
-		//   <h1>Chat</h1>
-		//   <p>{"Name: " + username}</p>
-		//   <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
-		//   {oldChat.map((message, i) => (
-		//     <div key={i}>
-		//       <div>{message.user + " " + message.text}</div>
-		//       <p style={{ opacity: `0.5`, fontSize: `10px`, margin: `0` }}>
-		//         {message.time_sent}
-		//       </p>
-		//     </div>
-		//   ))}
-		//   {currentChat.map((message, i) => (
-		//     <div key={i}>
-		//       <div>{message.user + " " + message.text}</div>
-		//       <p style={{ opacity: `0.5`, fontSize: `10px`, margin: `0` }}>
-		//         {message.time_sent}
-		//       </p>
-		//     </div>
-		//   ))}
-		//   <input
-		//     style={{ marginTop: "50px", padding: "30px" }}
-		//     value={message}
-		//     onChange={({ target: { value } }) => setMessage(value)}
-		//     onKeyPress={event =>
-		//       event.key === "Enter" ? sendMessage(event) : null
-		//     }
-		//   />
-		// </div>
-		<Container maxWidth="md">
-			<Card className={classes.root}>
-				<CardHeader
-					avatar={
-						<Avatar aria-label="recipe" className={classes.avatar}>
-							R
-						</Avatar>
-					}
-					action={
-						<IconButton aria-label="settings">
+		// <Container maxWidth="md">
+		<Card className={classes.root}>
+			<CardHeader
+				avatar={
+					<Avatar aria-label="recipe" className={classes.avatar}>
+						R
+					</Avatar>
+				}
+				action={
+					<>
+						<IconButton aria-label="settings" onClick={handleClick}>
 							<MoreVertIcon />
 						</IconButton>
+						<Menu
+							elevation={1}
+							id="simple-menu"
+							anchorEl={anchorEl}
+							keepMounted
+							open={Boolean(anchorEl)}
+							onClose={handleClose}
+						>
+							<MenuItem onClick={e => alert('Add Mentor')}>
+								{/* <ListItemIcon>
+                      <HelpIcon />
+                    </ListItemIcon> */}
+								<Typography variant="inherit">Add Mentor</Typography>
+							</MenuItem>
+						</Menu>
+					</>
+				}
+				title={chatroom.concern}
+				subheader="September 14, 2016"
+			/>
+			<Divider />
+			<CardContent className={classes.media}>
+				<Box
+					style={{
+						maxHeight: 600,
+						overflow: 'auto'
+					}}
+				>
+					<ScrollableFeed>
+						{currentChat.map(
+							(message, i) =>
+								message.concern_id === chatroom.room && (
+									<div key={i}>
+										{message.user_id !== userObj.user_id ? (
+											<Box
+												display="flex"
+												justifyContent="flex-start"
+												alignContent="flex-start"
+												style={{
+													paddingBottom: 15,
+													paddingRight: 12,
+													paddingTop: i === 0 ? 10 : 0,
+													paddingLeft: 12
+												}}
+											>
+												<Avatar
+													className={classes.chatAvatar}
+													src={message.avatar}
+												/>
+												<Container className={classes.chat}>
+													<Typography variant="body2">
+														{ReactHtmlParser(message.text)}
+													</Typography>
+													<p
+														style={{
+															opacity: `0.4`,
+															fontSize: '10px',
+															margin: '0',
+															paddingTop: '10px'
+														}}
+													>
+														{message.time_sent}
+													</p>
+												</Container>
+											</Box>
+										) : (
+											<Box
+												display="flex"
+												justifyContent="flex-end"
+												alignContent="flex-start"
+												style={{
+													paddingBottom: 15,
+													paddingRight: 12,
+													paddingTop: i === 0 ? 10 : 0,
+													paddingLeft: 12
+												}}
+											>
+												<Container className={classes.chat}>
+													<Typography variant="body2">
+														{ReactHtmlParser(message.text)}
+													</Typography>
+													<p
+														style={{
+															opacity: `0.5`,
+															fontSize: '10px',
+															margin: '0',
+															paddingTop: '10px'
+														}}
+													>
+														{message.time_sent}
+													</p>
+												</Container>
+												<Avatar
+													className={classes.chatLeftAvatar}
+													src={message.avatar}
+												/>
+											</Box>
+										)}
+									</div>
+								)
+						)}
+					</ScrollableFeed>
+				</Box>
+			</CardContent>
+			<CardActions disableSpacing>
+				<TextField
+					InputProps={{
+						startAdornment: showEmoji && (
+							<Picker
+								set="facebook"
+								title="Pick your emoji…"
+								emoji="point_up"
+								sheetSize={64}
+								onSelect={emoji => setMessage(message + emoji.native)}
+								style={{
+									position: 'absolute',
+									bottom: '45px',
+									right: '20px',
+									zIndex: 2
+								}}
+							/>
+						),
+						endAdornment: (
+							<InputAdornment position="start">
+								<InsertEmoticonIcon
+									style={{ cursor: 'pointer' }}
+									onClick={() => toggleEmoji()}
+								/>
+							</InputAdornment>
+						)
+					}}
+					multiline
+					rowsMax="5"
+					style={{ margin: 8 }}
+					placeholder="Send a message here"
+					fullWidth
+					margin="normal"
+					variant="outlined"
+					value={message}
+					onChange={({ target: { value } }) => setMessage(value)}
+					onKeyDown={event =>
+						message.match(/\s/g) &&
+						message.match(/\s/g).length === message.length
+							? null
+							: event.keyCode === 13 && !event.shiftKey
+							? sendMessage(event)
+							: null
 					}
-					title="React Hook useEffect has a missing dependency"
-					subheader="September 14, 2016"
 				/>
-				<Divider />
-				<CardContent className={classes.media}>
-					<Box style={{ maxHeight: 500, overflow: 'auto' }}>
-						{oldChat.map((message, i) => (
-							<div key={i}>
-								{message.user_id != userObj.user_id ? (
-									<Box
-										display="flex"
-										justifyContent="flex-start"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Avatar className={classes.chatAvatar}>H</Avatar>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-									</Box>
-								) : (
-									<Box
-										display="flex"
-										justifyContent="flex-end"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-										<Avatar className={classes.chatLeftAvatar} />
-									</Box>
-								)}
-							</div>
-						))}
-						{currentChat.map((message, i) => (
-							<div key={i}>
-								{message.user_id != userObj.user_id ? (
-									<Box
-										display="flex"
-										justifyContent="flex-start"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Avatar className={classes.chatAvatar}>H</Avatar>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-									</Box>
-								) : (
-									<Box
-										display="flex"
-										justifyContent="flex-end"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-										<Avatar className={classes.chatLeftAvatar} />
-									</Box>
-								)}
-							</div>
-						))}
-					</Box>
-				</CardContent>
-				<CardActions disableSpacing>
-					<TextField
-						id="filled-full-width"
-						style={{ margin: 8 }}
-						placeholder="Send a message here"
-						fullWidth
-						margin="normal"
-						variant="outlined"
-						value={message}
-						onChange={({ target: { value } }) => setMessage(value)}
-						onKeyPress={event =>
-							event.key === 'Enter' ? sendMessage(event) : null
-						}
-					/>
-					<IconButton
-						className={clsx(classes.expand, {
-							[classes.expandOpen]: expanded
-						})}
-						onClick={handleExpandClick}
-						aria-expanded={expanded}
-						aria-label="show more"
-					>
-						<SendIcon />
-					</IconButton>
-				</CardActions>
-			</Card>
-		</Container>
+				<IconButton
+					className={clsx(classes.expand, {
+						[classes.expandOpen]: expanded
+					})}
+					onClick={handleExpandClick}
+					aria-expanded={expanded}
+					aria-label="show more"
+				>
+					<SendIcon />
+				</IconButton>
+			</CardActions>
+		</Card>
+		// </Container>
 	);
 };
-
 export default Chat;
