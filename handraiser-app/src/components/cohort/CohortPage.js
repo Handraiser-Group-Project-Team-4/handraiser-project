@@ -23,11 +23,10 @@ import {
   Chip
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
+import { useSnackbar } from "notistack";
 
 export const UserContext = createContext(null);
 let socket;
-// const username = `noe`,
-//   room = "3";
 const userDetails = {
   username: "noe",
   room: "3"
@@ -49,6 +48,7 @@ export default function CohortPage(props) {
   const inputLabel = React.useRef(null);
   const [filter, setFilter] = React.useState("");
   const handleChange = event => setFilter(event.target.value);
+  const { enqueueSnackbar } = useSnackbar();
   // const [concern] = useState({
   //   class_id: 1,
   //   mentor_id: null,
@@ -72,7 +72,7 @@ export default function CohortPage(props) {
         });
       })
       .catch(err => console.log(err));
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     Axios({
@@ -96,8 +96,16 @@ export default function CohortPage(props) {
   }, [ENDPOINT]);
 
   useEffect(() => {
-    socket.on("concernData", concern => {
-      setData([...concern.res]);
+    socket.on("concernData", ({ concern, alert }) => {
+      setData([...concern]);
+      alert &&
+        enqueueSnackbar(`${alert.name + " " + alert.action}`, {
+          variant: alert.variant,
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right"
+          }
+        });
     });
     return () => {
       socket.emit("disconnectConcern");
@@ -126,9 +134,16 @@ export default function CohortPage(props) {
   const chatHandler = (event, value) => {
     event.stopPropagation();
     setChatRoom(value);
+  };
 
-    socket.emit("disconnect");
-    socket.off();
+  const handleClickVariant = userVariant => () => {
+    enqueueSnackbar(`${userObj.name} request for help`, {
+      variant: userVariant,
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right"
+      }
+    });
   };
 
   {

@@ -80,15 +80,19 @@ export default function Helps() {
       concern_title: value,
       concern_status: "pending"
     };
-    socket.emit("sendConcern", { concern }, () => {});
+    socket.emit("sendConcern", { concern, userObj }, () => {});
     handleClose();
   };
   useEffect(() => {
     if (user) {
       let isNull = false;
       data.map(student => {
-        if (user.user_id === student.student_id) {
+        if (
+          user.user_id === student.student_id &&
+          student.concern_status !== "done"
+        ) {
           isNull = true;
+          console.log(student);
         }
         return isNull;
       });

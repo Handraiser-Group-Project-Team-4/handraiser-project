@@ -1,28 +1,33 @@
 import React, { useEffect, useState, useContext } from "react";
-import io from "socket.io-client";
-import jwtToken from "../tools/assets/jwtToken";
-import { makeStyles } from "@material-ui/core/styles";
-import clsx from "clsx";
 import {
-  CardHeader,
-  Typography,
-  MenuItem,
-  Menu,
+  makeStyles,
   Card,
+  CardHeader,
   Box,
   CardContent,
   CardActions,
   Avatar,
   IconButton,
+  Typography,
   TextField,
   Divider,
-  Container
+  Container,
+  InputAdornment,
+  MenuItem,
+  Menu
 } from "@material-ui/core";
+import { purple } from "@material-ui/core/colors";
+import io from "socket.io-client";
+import clsx from "clsx";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
+import ReactHtmlParser from "react-html-parser";
 import ScrollableFeed from "react-scrollable-feed";
 import { UserContext } from "../cohort/CohortPage";
-import { purple } from "@material-ui/core/colors";
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
+import jwtToken from "../tools/assets/jwtToken";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -62,7 +67,8 @@ const useStyles = makeStyles(theme => ({
     margin: "0",
     width: "auto",
     backgroundColor: "#F5F5F5",
-    borderRadius: "15px"
+    borderRadius: "15px",
+    maxWidth: "50%"
   }
 }));
 
@@ -72,9 +78,10 @@ const Chat = () => {
   const userObj = jwtToken();
   const { chatroom } = useContext(UserContext);
   const [expanded, setExpanded] = useState(false);
-  const [oldChat, setOldChat] = useState([]);
+  const [showEmoji, setShowEmoji] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
   const [message, setMessage] = useState("");
+  const [typing, setTyping] = useState(false);
   const ENDPOINT = "localhost:3001";
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -86,18 +93,32 @@ const Chat = () => {
       { username: userObj.name, chatroom: chatroom.room, userObj },
       () => {
         socket.on("oldChat", data => {
-          setCurrentChat([]);
-          setOldChat(data.data.messages);
+          setCurrentChat(data.data.messages);
         });
       }
     );
   }, [ENDPOINT, chatroom]);
 
   useEffect(() => {
+    const handleTyping = () => {
+      socket.emit("typing", { name: userObj.name });
+    };
+    window.addEventListener("keypress", handleTyping);
+    return () => {
+      window.removeEventListener("keypress", handleTyping);
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on("displayTyping", ({ name }) => {
+      setTyping(true);
+    });
+  }, []);
+
+  useEffect(() => {
     socket.on("message", message => {
       setCurrentChat([...currentChat, message]);
     });
-    // socket.emit("saveChat", currentChat);
     return () => {
       socket.emit("disconnect");
       socket.off();
@@ -106,13 +127,18 @@ const Chat = () => {
 
   const sendMessage = event => {
     event.preventDefault();
+    const temp = message.replace(/\n/g, "<br />");
     if (message) {
-      socket.emit("sendMessage", { message }, () => setMessage(""));
+      socket.emit("sendMessage", { message: temp }, () => setMessage(""));
     }
   };
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const toggleEmoji = () => {
+    setShowEmoji(!showEmoji);
   };
 
   return (
@@ -158,74 +184,6 @@ const Chat = () => {
           }}
         >
           <ScrollableFeed>
-            {oldChat.map(
-              (message, i) =>
-                message.concern_id === chatroom.room && (
-                  <div key={i}>
-                    {message.user_id !== userObj.user_id ? (
-                      <Box
-                        display="flex"
-                        justifyContent="flex-start"
-                        alignContent="flex-start"
-                        style={{
-                          paddingBottom: 15,
-                          paddingRight: 12,
-                          paddingTop: i === 0 ? 10 : 0,
-                          paddingLeft: 12
-                        }}
-                      >
-                        <Avatar
-                          className={classes.chatAvatar}
-                          src={message.avatar}
-                        />
-                        <Container className={classes.chat}>
-                          {message.text}
-                          <p
-                            style={{
-                              opacity: `0.4`,
-                              fontSize: "10px",
-                              margin: "0",
-                              paddingTop: "10px"
-                            }}
-                          >
-                            {message.time_sent}
-                          </p>
-                        </Container>
-                      </Box>
-                    ) : (
-                      <Box
-                        display="flex"
-                        justifyContent="flex-end"
-                        alignContent="flex-start"
-                        style={{
-                          paddingBottom: 15,
-                          paddingRight: 12,
-                          paddingTop: i === 0 ? 10 : 0,
-                          paddingLeft: 12
-                        }}
-                      >
-                        <Container className={classes.chat}>
-                          {message.text}
-                          <p
-                            style={{
-                              opacity: `0.5`,
-                              fontSize: "10px",
-                              margin: "0",
-                              paddingTop: "10px"
-                            }}
-                          >
-                            {message.time_sent}
-                          </p>
-                        </Container>
-                        <Avatar
-                          className={classes.chatLeftAvatar}
-                          src={message.avatar}
-                        />
-                      </Box>
-                    )}
-                  </div>
-                )
-            )}
             {currentChat.map(
               (message, i) =>
                 message.concern_id === chatroom.room && (
@@ -235,13 +193,21 @@ const Chat = () => {
                         display="flex"
                         justifyContent="flex-start"
                         alignContent="flex-start"
+                        style={{
+                          paddingBottom: 15,
+                          paddingRight: 12,
+                          paddingTop: i === 0 ? 10 : 0,
+                          paddingLeft: 12
+                        }}
                       >
                         <Avatar
                           className={classes.chatAvatar}
                           src={message.avatar}
                         />
                         <Container className={classes.chat}>
-                          {message.text}
+                          <Typography variant="body2">
+                            {ReactHtmlParser(message.text)}
+                          </Typography>
                           <p
                             style={{
                               opacity: `0.4`,
@@ -259,9 +225,17 @@ const Chat = () => {
                         display="flex"
                         justifyContent="flex-end"
                         alignContent="flex-start"
+                        style={{
+                          paddingBottom: 15,
+                          paddingRight: 12,
+                          paddingTop: i === 0 ? 10 : 0,
+                          paddingLeft: 12
+                        }}
                       >
                         <Container className={classes.chat}>
-                          {message.text}
+                          <Typography variant="body2">
+                            {ReactHtmlParser(message.text)}
+                          </Typography>
                           <p
                             style={{
                               opacity: `0.5`,
@@ -287,6 +261,33 @@ const Chat = () => {
       </CardContent>
       <CardActions disableSpacing>
         <TextField
+          InputProps={{
+            startAdornment: showEmoji && (
+              <Picker
+                set="facebook"
+                title="Pick your emoji…"
+                emoji="point_up"
+                sheetSize={64}
+                onSelect={emoji => setMessage(message + emoji.native)}
+                style={{
+                  position: "absolute",
+                  bottom: "45px",
+                  right: "20px",
+                  zIndex: 2
+                }}
+              />
+            ),
+            endAdornment: (
+              <InputAdornment position="start">
+                <InsertEmoticonIcon
+                  style={{ cursor: "pointer" }}
+                  onClick={() => toggleEmoji()}
+                />
+              </InputAdornment>
+            )
+          }}
+          multiline
+          rowsMax="5"
           style={{ margin: 8 }}
           placeholder="Send a message here"
           fullWidth
@@ -294,8 +295,13 @@ const Chat = () => {
           variant="outlined"
           value={message}
           onChange={({ target: { value } }) => setMessage(value)}
-          onKeyPress={event =>
-            event.key === "Enter" ? sendMessage(event) : null
+          onKeyDown={event =>
+            message.match(/\s/g) &&
+            message.match(/\s/g).length === message.length
+              ? null
+              : event.keyCode === 13 && !event.shiftKey
+              ? sendMessage(event)
+              : null
           }
         />
         <IconButton

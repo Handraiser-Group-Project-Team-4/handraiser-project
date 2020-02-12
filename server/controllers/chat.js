@@ -18,7 +18,7 @@ module.exports = {
         chatUsers.concern = concern[0];
         if (concern.length > 0)
           db.query(
-            `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`
+            `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id} ORDER BY message_id ASC`
           ).then(messages => {
             let temp = [];
             messages.map(x => {
@@ -32,6 +32,9 @@ module.exports = {
       });
       socket.join(`${user.room}`);
       callback();
+    });
+    socket.on("typing", ({ name }) => {
+      socket.emit("displayTyping", name);
     });
     socket.on("sendMessage", ({ message }, callback) => {
       const new_date = new Intl.DateTimeFormat("en-US", {

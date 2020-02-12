@@ -5,7 +5,6 @@ import { List, Typography, Card, CardContent, Chip } from "@material-ui/core";
 
 export default function BeingHelp({ classes }) {
   const { id, data } = useContext(UserContext);
-  console.log(data);
   return (
     <Card className={classes.cardRootContent}>
       <CardContent className={classes.cardRootContentContent}>
@@ -38,14 +37,24 @@ export default function BeingHelp({ classes }) {
             )}
           </List>
         ) : (
-          <Typography
-            gutterBottom
-            variant="h6"
-            component="h6"
-            // className={classes.cardRootContentTitle}
+          <List
+            style={{
+              padding: "40px"
+            }}
           >
-            Walang Nakita
-          </Typography>
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="h6"
+              style={{
+                textAlign: "center",
+                fontWeight: "300"
+              }}
+              // className={classes.cardRootContentTitle}
+            >
+              The mentor is not entertaining any request at the moment.
+            </Typography>
+          </List>
         )}
       </CardContent>
     </Card>

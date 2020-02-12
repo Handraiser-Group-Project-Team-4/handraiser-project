@@ -62,14 +62,17 @@ export default function Students({
     };
     socket.emit(
       "updateConcern",
-      { id: room_id, concern_id: id, updateData: obj },
+      { id: room_id, concern_id: id, updateData: obj, userObj: userObj },
       () => {}
     );
   };
-
-  const handleDelete = e => {
-    e.preventDefault();
-    socket.emit("deleteConcern", { id: room_id, concern_id: id }, () => {});
+  const handleDelete = event => {
+    event.stopPropagation();
+    socket.emit(
+      "deleteConcern",
+      { id: room_id, concern_id: id, userObj: userObj },
+      () => {}
+    );
   };
 
   // return (
@@ -176,15 +179,21 @@ export default function Students({
                   <>
                     <MenuItem>
                       <ListItemIcon>
-                        <CheckCircleIcon />
+                        <CheckCircleIcon
+                          onClick={e => {
+                            handleUpdate(e, "done");
+                          }}
+                        />
                       </ListItemIcon>
-                      <Typography variant="inherit"></Typography>
+                      <Typography variant="inherit">Done</Typography>
                     </MenuItem>
                     <MenuItem onClick={e => handleUpdate(e, "pending")}>
                       <ListItemIcon>
                         <RemoveCircleIcon />
                       </ListItemIcon>
-                      <Typography variant="inherit"></Typography>
+                      <Typography variant="inherit">
+                        Send back to Need Help Queue
+                      </Typography>
                     </MenuItem>
                   </>
                 ) : status === "pending" &&

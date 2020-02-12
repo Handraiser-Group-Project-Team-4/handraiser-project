@@ -63,14 +63,24 @@ export default function NeedHelps({ classes }) {
             )}
           </List>
         ) : (
-          <Typography
-            gutterBottom
-            variant="h6"
-            component="h6"
-            // className={classes.cardRootContentTitle}
+          <List
+            style={{
+              padding: "40px"
+            }}
           >
-            Walang Nakita
-          </Typography>
+            <Typography
+              gutterBottom
+              variant="h6"
+              component="h6"
+              style={{
+                textAlign: "center",
+                fontWeight: "300"
+              }}
+              // className={classes.cardRootContentTitle}
+            >
+              No one is requesting Help at the moment.
+            </Typography>
+          </List>
         )}
       </CardContent>
     </Card>
