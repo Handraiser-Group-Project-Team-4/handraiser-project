@@ -103,7 +103,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                     )
                 }}
             />
-
+            
             <TableContainer className={classes.container}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
@@ -142,6 +142,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        
                         {temp
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map(row => {
@@ -271,6 +272,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
                                         
                                         (type === 'View Joined') ?
                                                 <>
+                                             
                                                 <TableCell><img src={row.avatar} alt="Smiley face" height="80" width="80" /></TableCell>
                                                 <TableCell>{row.firstname}, {row.lastname}</TableCell>
                                                 <TableCell>{row.email}</TableCell>

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@material-ui/core/styles";
 import SwipeableViews from "react-swipeable-views";
-import TextField from "@material-ui/core/TextField";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
 import {
+  useTheme,
+  TextField,
   useMediaQuery,
   Container,
   Grid,
@@ -16,14 +16,14 @@ import {
   Typography,
   Box,
   Button,
-  Chip
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@material-ui/core";
 import Unnamed from "../../images/unnamed.jpg";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
 
 let socket;
 export default function CohortList({ classes, value }) {
@@ -60,20 +60,20 @@ export default function CohortList({ classes, value }) {
   });
 
   useEffect(() => {
-    renderCohorts();
-    return () => {};
-  }, []);
+    renderCohorts(value);
+    return () => { };
+  }, [value]);
 
   const renderCohorts = () => {
     axios({
       method: `get`,
-      url: "/api/cohorts",
+      url: `/api/cohorts?user_id=${userObj.user_id}&&value=${value}`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
     })
       .then(res => {
-        // console.log(res)
+        console.log(res.data)
         setCohorts(res.data);
       })
       .catch(err => {
@@ -216,7 +216,7 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-        // onChangeIndex={handleChangeIndex}
+      // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           <Container className={classes.paperr} maxWidth="xl">
@@ -259,7 +259,7 @@ export default function CohortList({ classes, value }) {
                             <span>
                               <p>Cohort Status</p>
                               <h5>
-                                {x.class_status === "t" ? (
+                                {x.class_status === "true" ? (
                                   <Chip
                                     label="Open"
                                     style={{
@@ -269,15 +269,15 @@ export default function CohortList({ classes, value }) {
                                     }}
                                   />
                                 ) : (
-                                  <Chip
-                                    label="Close"
-                                    style={{
-                                      backgroundColor: "red",
-                                      color: `white`,
-                                      marginTop: -5
-                                    }}
-                                  />
-                                )}
+                                    <Chip
+                                      label="Close"
+                                      style={{
+                                        backgroundColor: "red",
+                                        color: `white`,
+                                        marginTop: -5
+                                      }}
+                                    />
+                                  )}
                               </h5>
                             </span>
                           </div>
@@ -288,7 +288,7 @@ export default function CohortList({ classes, value }) {
                       <Button
                         size="small"
                         onClick={() =>
-                          x.class_status === "t"
+                          x.class_status === "true"
                             ? handleCohort(x)
                             : alert("Sorry This class is closed")
                         }
@@ -305,7 +305,7 @@ export default function CohortList({ classes, value }) {
         <TabPanel value={value} index={1} dir={theme.direction}>
           <Container className={classes.paperr} maxWidth="xl">
             <Grid container spacing={0} className={classes.gridContainerrr}>
-              {[1, 2, 3, 4, 5].map(i => (
+              {cohorts.map((x, i) => (
                 <Grid
                   key={i}
                   item
@@ -328,28 +328,57 @@ export default function CohortList({ classes, value }) {
                         </Grid>
                         <Grid item xs={8} className={classes.cardDesc}>
                           <div>
-                            <h3>Boom Camp Frontend Fall 2019</h3>
-                            <p>Software Development</p>
+                            <h3>{x.class_title}</h3>
+                            <p>{x.class_description}</p>
                           </div>
                           <div>
                             <span>
                               <p>Head Mentor</p>
-                              <h5>Aodhan Hayter</h5>
+                              <h5>*Aodhan Hayter</h5>
                             </span>
                             <span>
                               <p>Students</p>
-                              <h5>5</h5>
+                              <h5>*5</h5>
                             </span>
                             <span>
-                              <p>Subject</p>
-                              <h5>Web Programming</h5>
+                              <p>Cohort Status</p>
+                              <h5>
+                                {x.class_status === "true" ? (
+                                  <Chip
+                                    label="Open"
+                                    style={{
+                                      backgroundColor: "green",
+                                      color: `white`,
+                                      marginTop: -5
+                                    }}
+                                  />
+                                ) : (
+                                    <Chip
+                                      label="Close"
+                                      style={{
+                                        backgroundColor: "red",
+                                        color: `white`,
+                                        marginTop: -5
+                                      }}
+                                    />
+                                  )}
+                              </h5>
                             </span>
                           </div>
                         </Grid>
                       </Grid>
                     </CardContent>
                     <CardActions className={classes.cohortCardActions}>
-                      <Button size="small">Join Cohort</Button>
+                      <Button
+                        size="small"
+                        onClick={() =>
+                          x.class_status === "true"
+                            ? handleCohort(x)
+                            : alert("Sorry This class is closed")
+                        }
+                      >
+                        Join Cohort
+                      </Button>
                     </CardActions>
                   </Card>
                 </Grid>

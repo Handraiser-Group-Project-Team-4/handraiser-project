@@ -109,74 +109,74 @@ export default function CohortList({ mentor }) {
 			});
 	};
 
-	return (
-		<>
-			{isKey.open && (
-				<>
-					<h3>{isKey.classroomObj.class_title}</h3>
-					<input
-						type="text"
-						placeholder="Enter Class key here..."
-						value={isKey.key}
-						onChange={e => setIsKey({ ...isKey, key: e.target.value })}
-					/>
-					{isKey.error && (
-						<h5 style={{ color: `red`, margin: `0` }}>Invalid Key!</h5>
-					)}
-					<div style={{ display: `flex` }}>
-						<button onClick={() => handleSubmitKey(isKey)}>Submit</button>
-						<button onClick={() => setIsKey({ ...isKey, open: false })}>
-							Cancel
-						</button>
-					</div>
-				</>
-			)}
-			<div style={{ display: `flex` }}>
-				{cohorts.map((x, i) => (
-					<div
-						onClick={() =>
-							x.class_status === 't'
-								? handleCohort(x)
-								: alert('Sorry This class is closed')
-						}
-						key={i}
-						style={{
-							background: `white`,
-							padding: `20px`,
-							margin: `10px`,
-							borderRadius: `5px`,
-							cursor: `pointer`,
-							width: `100%`
-						}}
-					>
-						<h3>{x.class_title}</h3>
-						<p>{x.class_description}</p>
-						{x.class_status === 't' ? (
-							<span
-								style={{
-									background: `green`,
-									color: `white`,
-									padding: `2px 4px`,
-									borderRadius: `3px`
-								}}
-							>
-								active
-							</span>
-						) : (
-							<span
-								style={{
-									background: `red`,
-									color: `white`,
-									padding: `2px 4px`,
-									borderRadius: `3px`
-								}}
-							>
-								close
-							</span>
-						)}
-					</div>
-				))}
-			</div>
-		</>
-	);
+  return (
+    <>
+      {isKey.open && (
+        <>
+          <h3>{isKey.classroomObj.class_title}</h3>
+          <input
+            type="text"
+            placeholder="Enter Class key here..."
+            value={isKey.key}
+            onChange={e => setIsKey({ ...isKey, key: e.target.value })}
+          />
+          {isKey.error && (
+            <h5 style={{ color: `red`, margin: `0` }}>Invalid Key!</h5>
+          )}
+          <div style={{ display: `flex` }}>
+            <button onClick={() => handleSubmitKey(isKey)}>Submit</button>
+            <button onClick={() => setIsKey({ ...isKey, open: false })}>
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
+      <div style={{ display: `flex` }}>
+        {cohorts.map((x, i) => (
+          <div
+            onClick={() =>
+              x.class_status === "true"
+                ? handleCohort(x)
+                : alert("Sorry This class is closed")
+            }
+            key={i}
+            style={{
+              background: `white`,
+              padding: `20px`,
+              margin: `10px`,
+              borderRadius: `5px`,
+              cursor: `pointer`,
+              width: `100%`
+            }}
+          >
+            <h3>{x.class_title}</h3>
+            <p>{x.class_description}</p>
+            {x.class_status === "true" ? (
+              <span
+                style={{
+                  background: `green`,
+                  color: `white`,
+                  padding: `2px 4px`,
+                  borderRadius: `3px`
+                }}
+              >
+                active
+              </span>
+            ) : (
+              <span
+                style={{
+                  background: `red`,
+                  color: `white`,
+                  padding: `2px 4px`,
+                  borderRadius: `3px`
+                }}
+              >
+                close
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </>
+  );
 }
