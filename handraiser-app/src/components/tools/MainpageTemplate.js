@@ -28,6 +28,8 @@ import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 // import Unnamed from "./unnamed.jpg";
 import DnsIcon from "@material-ui/icons/Dns";
+import Chip from "@material-ui/core/Chip";
+import FaceIcon from "@material-ui/icons/Face";
 
 export default function MainpageTemplate({
   children,
@@ -130,6 +132,12 @@ export default function MainpageTemplate({
           <Typography className={classes.studentImgButton}>
             {user.firstname} {user.lastname}
           </Typography>
+          <Chip
+            // icon={<FaceIcon />}
+            label="*Student"
+            color="black"
+            style={{ backgroundColor: "white" }}
+          />
         </div>
       )}
       <Tabs
