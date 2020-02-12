@@ -109,7 +109,6 @@ export default function CohortPage(props) {
 		setChatRoom(value);
 	};
 	useEffect(() => {
-		console.log(data);
 		if (user) {
 			let isNull = false;
 			data.map(student => {
