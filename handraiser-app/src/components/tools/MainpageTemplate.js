@@ -42,8 +42,6 @@ export default function MainpageTemplate({
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  const [value, setValue] = React.useState(0);
-  const handleChanges = (e, newValue) => setValue(newValue);
   const history = useHistory();
 
   const handleLogout = () => {
@@ -140,12 +138,7 @@ export default function MainpageTemplate({
           />
         </div>
       )}
-      <Tabs
-        orientation="vertical"
-        value={tabIndex}
-        onChange={handleChanges}
-        className={classes.tabs}
-      >
+      <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
         {/* <Tab
           label={
             <ListItem button>
