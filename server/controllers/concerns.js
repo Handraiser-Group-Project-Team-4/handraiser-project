@@ -11,6 +11,15 @@ module.exports = {
       callback();
     });
 
+    socket.on("getChatroom", ({ id }, callback) => {
+      db.concern
+        .find({ class_id: id, concern_status: "onprocess" })
+        .then(data => {
+          io.to(`${id}`).emit("chatroomData", { data });
+        });
+      callback();
+    });
+
     socket.on("sendConcern", ({ concern, userObj }, callback) => {
       db.concern.insert(concern).then(() =>
         db.concern.find({ class_id: concern.class_id }).then(res =>
@@ -71,6 +80,9 @@ module.exports = {
         )
       );
       callback();
+    });
+    socket.on("disconnectConcern", () => {
+      console.log("user disconnected to concern");
     });
   }
 };
