@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import jwtToken from '../tools/jwtToken';
-import { UserContext } from './../cohort/CohortPage';
+import io from 'socket.io-client';
+import jwtToken from '../tools/assets/jwtToken';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -11,59 +10,101 @@ import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
-// import styled from 'styled-components';
+import ScrollableFeed from 'react-scrollable-feed';
+import { UserContext } from '../cohort/CohortPage';
 import { purple } from '@material-ui/core/colors';
 import TextField from '@material-ui/core/TextField';
 import Divider from '@material-ui/core/Divider';
 import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Container from '@material-ui/core/Container';
+import Typography from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import { DarkModeContext } from '../../App';
 
+const useStyles = makeStyles(theme => ({
+	root: {
+		maxWidth: 900
+	},
+	media: {
+		height: '500px'
+	},
+	expand: {
+		transform: 'rotate(0deg)',
+		marginLeft: 'auto',
+		transition: theme.transitions.create('transform', {
+			duration: theme.transitions.duration.shortest
+		})
+	},
+	expandOpen: {
+		transform: 'rotate(360deg)'
+	},
+	avatar: {
+		backgroundColor: purple[300]
+	},
+	chatAvatar: {
+		marginRight: '10px'
+	},
+	chatLeftAvatar: {
+		marginLeft: '10px'
+	},
+	chat: darkMode => ({
+		padding: '10px',
+		margin: '0',
+		width: 'auto',
+		backgroundColor: darkMode ? '#2D2D2D' : '#F5F5F5',
+		// backgroundColor: "#303030",
+		borderRadius: '15px',
+		marginRight: 10
+	})
+}));
+
+let socket;
 const Chat = () => {
-	const classes = useStyles();
-	const [expanded, setExpanded] = React.useState(false);
-
-	const handleExpandClick = () => {
-		setExpanded(!expanded);
-	};
+	const { darkMode } = useContext(DarkModeContext);
+	const { chatroom } = useContext(UserContext);
+	const classes = useStyles(darkMode);
 	const userObj = jwtToken();
+	const [expanded, setExpanded] = useState(false);
 	const [oldChat, setOldChat] = useState([]);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
-	const { chatRoom, socket } = useContext(UserContext);
-	const { concern_id } = chatRoom;
+	const ENDPOINT = 'localhost:3001';
 
 	useEffect(() => {
-		axios({
-			method: 'get',
-			url: `/api/users/${userObj.user_id}?chat=true&concern_id=${concern_id}`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+		socket.emit(
+			'join',
+			{ username: userObj.name, chatroom: chatroom.room, userObj },
+			() => {
+				socket.on('oldChat', data => {
+					setCurrentChat([]);
+					setOldChat(data.data.messages);
+				});
 			}
-		})
-			.then(res => {
-				setOldChat(res.data.messages);
-			})
-			.catch(err => {
-				console.log(err);
-			});
-	}, [concern_id]);
+		);
+	}, [ENDPOINT, chatroom]);
 
 	useEffect(() => {
 		socket.on('message', message => {
-			// console.log(message);
-			if (message.concern_id === concern_id) {
-				setCurrentChat([...currentChat, message]);
-			}
+			setCurrentChat([...currentChat, message]);
 		});
-		socket.emit('saveChat', currentChat);
+		// socket.emit("saveChat", currentChat);
+		return () => {
+			socket.emit('disconnect');
+			socket.off();
+		};
 	}, [currentChat]);
 
 	const sendMessage = event => {
 		event.preventDefault();
 		if (message) {
-			socket.emit('sendMessage', { message, concern_id }, () => setMessage(''));
+			socket.emit('sendMessage', { message }, () => setMessage(''));
 		}
+	};
+
+	const handleExpandClick = () => {
+		setExpanded(!expanded);
 	};
 
 	return (
@@ -72,7 +113,7 @@ const Chat = () => {
 				<CardHeader
 					avatar={
 						<Avatar aria-label="recipe" className={classes.avatar}>
-							{concern_id}
+							R
 						</Avatar>
 					}
 					action={
@@ -80,75 +121,137 @@ const Chat = () => {
 							<MoreVertIcon />
 						</IconButton>
 					}
-					title="React Hook useEffect has a missing dependency"
+					title={chatroom.concern}
 					subheader="September 14, 2016"
 				/>
 				<Divider />
 				<CardContent className={classes.media}>
 					<Box style={{ maxHeight: 500, overflow: 'auto' }}>
-						{oldChat.map((message, i) => (
-							<div key={i}>
-								{message.user_id != userObj.user_id ? (
-									<Box
-										display="flex"
-										justifyContent="flex-start"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Avatar className={classes.chatAvatar}>H</Avatar>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-									</Box>
-								) : (
-									<Box
-										display="flex"
-										justifyContent="flex-end"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-										<Avatar className={classes.chatLeftAvatar} />
-									</Box>
-								)}
-							</div>
-						))}
-						{currentChat.map((message, i) => (
-							<div key={i}>
-								{message.user_id != userObj.user_id ? (
-									<Box
-										display="flex"
-										justifyContent="flex-start"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Avatar className={classes.chatAvatar}>H</Avatar>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-									</Box>
-								) : (
-									<Box
-										display="flex"
-										justifyContent="flex-end"
-										alignContent="flex-start"
-										style={{ paddingBottom: '15px' }}
-									>
-										<Container className={classes.chat}>
-											{message.text}
-										</Container>
-										<Avatar className={classes.chatLeftAvatar} />
-									</Box>
-								)}
-							</div>
-						))}
+						<ScrollableFeed>
+							{oldChat.map(
+								(message, i) =>
+									message.concern_id === chatroom.room && (
+										<div key={i}>
+											{message.user_id !== userObj.user_id ? (
+												<Box
+													display="flex"
+													justifyContent="flex-start"
+													alignContent="flex-start"
+													style={{ paddingBottom: '15px' }}
+												>
+													<Avatar
+														className={classes.chatAvatar}
+														src={message.avatar}
+													/>
+													<Paper className={classes.chat} elevation={3}>
+														<Typography variant="subtitle1">
+															{message.text}
+														</Typography>
+														<Typography
+															variant="caption"
+															style={{
+																opacity: `0.4`,
+																fontSize: '10px',
+																margin: '0',
+																paddingTop: '10px'
+															}}
+														>
+															{message.time_sent}
+														</Typography>
+													</Paper>
+												</Box>
+											) : (
+												<Box
+													display="flex"
+													justifyContent="flex-end"
+													alignContent="flex-start"
+													style={{ paddingBottom: '15px' }}
+												>
+													<Paper className={classes.chat}>
+														{message.text}
+														<p
+															style={{
+																opacity: `0.5`,
+																fontSize: '10px',
+																margin: '0',
+																paddingTop: '10px'
+															}}
+														>
+															{message.time_sent}
+														</p>
+													</Paper>
+													<Avatar
+														className={classes.chatLeftAvatar}
+														src={message.avatar}
+													/>
+												</Box>
+											)}
+										</div>
+									)
+							)}
+							{currentChat.map(
+								(message, i) =>
+									message.concern_id === chatroom.room && (
+										<div key={i}>
+											{message.user_id !== userObj.user_id ? (
+												<Box
+													display="flex"
+													justifyContent="flex-start"
+													alignContent="flex-start"
+													style={{ paddingBottom: '15px' }}
+												>
+													<Avatar
+														className={classes.chatAvatar}
+														src={message.avatar}
+													/>
+													<Paper className={classes.chat} elevation={3}>
+														{message.text}
+														<p
+															style={{
+																opacity: `0.4`,
+																fontSize: '10px',
+																margin: '0',
+																paddingTop: '10px'
+															}}
+														>
+															{message.time_sent}
+														</p>
+													</Paper>
+												</Box>
+											) : (
+												<Box
+													display="flex"
+													justifyContent="flex-end"
+													alignContent="flex-start"
+													style={{ paddingBottom: '15px' }}
+												>
+													<Paper className={classes.chat} elevation={3}>
+														{message.text}
+														<p
+															style={{
+																opacity: `0.5`,
+																fontSize: '10px',
+																margin: '0',
+																paddingTop: '10px'
+															}}
+														>
+															{message.time_sent}
+														</p>
+													</Paper>
+													<Avatar
+														className={classes.chatLeftAvatar}
+														src={message.avatar}
+													/>
+												</Box>
+											)}
+										</div>
+									)
+							)}
+						</ScrollableFeed>
 					</Box>
 				</CardContent>
 				<CardActions disableSpacing>
 					<TextField
-						id="filled-full-width"
 						style={{ margin: 8 }}
 						placeholder="Send a message here"
 						fullWidth
@@ -177,39 +280,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
-const useStyles = makeStyles(theme => ({
-	root: {
-		maxWidth: 900
-	},
-	media: {
-		height: '500px'
-	},
-	expand: {
-		transform: 'rotate(0deg)',
-		marginLeft: 'auto',
-		transition: theme.transitions.create('transform', {
-			duration: theme.transitions.duration.shortest
-		})
-	},
-	expandOpen: {
-		transform: 'rotate(360deg)'
-	},
-	avatar: {
-		backgroundColor: purple[300]
-	},
-	chatAvatar: {
-		marginRight: '10px'
-	},
-	chatLeftAvatar: {
-		marginLeft: '10px'
-	},
-	chat: {
-		// paddingBottom: "15px",
-		padding: '10px',
-		margin: '0',
-		width: 'auto',
-		backgroundColor: 'lightgrey',
-		borderRadius: '50px'
-	}
-}));

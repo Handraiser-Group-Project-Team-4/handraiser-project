@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Axios from 'axios';
+import jwtToken from '../tools/assets/jwtToken';
 import { UserContext } from './CohortPage';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -13,13 +14,21 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Typography from '@material-ui/core/Typography';
+import io from 'socket.io-client';
 
+let socket;
 export default function Students(props) {
 	const classes = useStyles();
-	const { id, index, status, student_id, text } = props;
+	const userObj = jwtToken();
+	const ENDPOINT = '172.60.63.82:3001';
+	const { room_id, id, status, student_id, index, text } = props;
 	const [student, setStudent] = useState([]);
 
-	const { data, user, socket } = useContext(UserContext);
+	const { chatHandler } = useContext(UserContext);
+
+	useEffect(() => {
+		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+	}, [ENDPOINT]);
 
 	useEffect(() => {
 		Axios({
@@ -30,73 +39,35 @@ export default function Students(props) {
 			}
 		})
 			.then(res => {
+				// console.log(res.data);
 				setStudent(res.data);
 			})
 			.catch(err => console.log(err));
 	}, [student_id]);
 
-	const handleUpdate = value => {
-		let mentor_id = value === 'onprocess' ? user.user_id : null;
-		Axios({
-			method: 'patch',
-			url: `/api/concern/${id}`,
-			data: { concern_status: value, mentor_id },
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				let arr = [];
-				data.filter((student, n) => {
-					if (index === n) {
-						student.concern_status = value;
-					}
-					return arr.push(student);
-				});
-				socket.emit('concern', arr, () => {});
-			})
-			.catch(err => console.log(err));
+	const handleUpdate = (event, value) => {
+		event.stopPropagation();
+		const obj = {
+			concern_status: value,
+			mentor_id: userObj.user_id
+		};
+		socket.emit(
+			'updateConcern',
+			{ id: room_id, concern_id: id, updateData: obj },
+			() => {}
+		);
 	};
 
-	const handleDelete = () => {
-		Axios({
-			method: 'delete',
-			url: `/api/concern/${id}`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				let arr = [];
-				data.filter((student, n) => {
-					if (index !== n) {
-						return arr.push(data[n]);
-					}
-					return arr;
-				});
-				socket.emit('concern', arr, () => {});
-			})
-			.catch(err => console.log(err));
+	const handleDelete = event => {
+		event.stopPropagation();
+		socket.emit('deleteConcern', { id: room_id, concern_id: id }, () => {});
 	};
-	if (!user) {
-		return null;
-	}
+
 	return (
 		<>
 			<ListItem
 				alignItems="flex-start"
-				onClick={() => {
-					socket.emit(
-						'chatRoom',
-						{
-							chat: true,
-							concern_id: id,
-							mentor_id: user.user_id,
-							student_id: student_id
-						},
-						() => {}
-					);
-				}}
+				// onClick={e => chatHandler(e, { room: id, concern: text })}
 			>
 				<ListItemAvatar>
 					<Avatar alt={student.firstname} src={student.avatar} />
@@ -114,29 +85,29 @@ export default function Students(props) {
 						</React.Fragment>
 					}
 				/>
-				{status === 'pending' && user.user_role_id === 2 ? (
+				{status === 'pending' && userObj.user_role_id === 2 ? (
 					<HelpIcon
-						onClick={() => {
-							handleUpdate('onprocess');
+						onClick={e => {
+							handleUpdate(e, 'onprocess');
 						}}
 					/>
-				) : status === 'onprocess' && user.user_role_id === 2 ? (
+				) : status === 'onprocess' && userObj.user_role_id === 2 ? (
 					<>
 						<CheckCircleIcon style={{ marginLeft: 10 }} />
 
 						<RemoveCircleIcon
 							style={{ marginLeft: 10 }}
-							onClick={() => {
-								handleUpdate('pending');
+							onClick={e => {
+								handleUpdate(e, 'pending');
 							}}
 						/>
 					</>
 				) : status === 'pending' &&
-				  user.user_role_id === 3 &&
-				  user.user_id === student.user_id ? (
+				  userObj.user_role_id === 3 &&
+				  userObj.user_id === student_id ? (
 					<DeleteIcon
-						onClick={() => {
-							handleDelete();
+						onClick={e => {
+							handleDelete(e);
 						}}
 					/>
 				) : null}
