@@ -1,7 +1,16 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
+
+// COMPONENTS
 import jwtToken from '../tools/assets/jwtToken';
+import handraise from '../../images/handraise.png';
+import Team from './Team';
+// import Unnamed from "./unnamed.jpg";
+// import Handraiser from "./Handraiser";
+// import ListOfCohorts from "./ListOfCohorts";
+
+// MATERIAL-UI
 import {
 	AppBar,
 	CssBaseline,
@@ -15,19 +24,17 @@ import {
 	Typography,
 	Tab,
 	Box,
-	Tabs
+	Tabs,
+	makeStyles, 
+	useTheme 
 } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import handraise from '../../images/handraise.png';
-// import Handraiser from "./Handraiser";
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-// import ListOfCohorts from "./ListOfCohorts";
-import Team from './Team';
+
+// ICONS
 import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-// import Unnamed from "./unnamed.jpg";
 import DnsIcon from '@material-ui/icons/Dns';
+import MenuIcon from '@material-ui/icons/Menu';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 export default function MainpageTemplate({
 	children,

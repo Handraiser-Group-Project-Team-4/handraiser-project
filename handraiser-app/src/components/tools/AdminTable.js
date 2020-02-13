@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import AdminModal from './AdminModal';
 
-import { makeStyles } from "@material-ui/core/styles";
+// MATERIAL-UI
 import {
     Table,
     TableBody,
@@ -12,16 +13,16 @@ import {
     TextField,
     Button,
     InputAdornment,
-    Switch
+    Switch,
+    makeStyles
 } from "@material-ui/core"
 
-
-// Material Icons
+// ICONS
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import SearchIcon from "@material-ui/icons/Search";
 import FilterListIcon from '@material-ui/icons/FilterList';
-import PopupModal from './PopupModal';
+
 
 const useStyles = makeStyles({
     root: {
@@ -82,7 +83,7 @@ export default function AdminTable({ columns, setTemp, temp, data, type, approvi
     return (
         <>
             {kickStudBool && (
-                <PopupModal
+                <AdminModal
                     title={`Are you sure you want to kick ${kickStudObj.firstname} ${kickStudObj.lastname}`}
                     open={kickStudBool}
                     handleClose = {closeKickStudFn}

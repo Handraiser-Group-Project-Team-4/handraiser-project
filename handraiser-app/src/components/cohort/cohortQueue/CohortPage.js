@@ -1,15 +1,22 @@
 import React, { createContext, useState, useEffect } from 'react';
-import MainpageTemplate from '../tools/MainpageTemplate';
+import { useSnackbar } from 'notistack';
+import io from 'socket.io-client';
+import json2mq from 'json2mq';
+
+// COMPONENTS
+import MainpageTemplate from '../../tools/MainpageTemplate';
 import Helps from './Help';
 import NeedHelps from './NeedHelp';
 import BeingHelps from './BeingHelp';
-import Chat from '../Chat/Chat';
+import Chat from '../../Chat/Chat';
 import Axios from 'axios';
-import jwtToken from '../tools/assets/jwtToken';
-import io from 'socket.io-client';
-import { makeStyles, useTheme, fade } from '@material-ui/core/styles';
-import json2mq from 'json2mq';
+import jwtToken from '../../tools/assets/jwtToken';
+
+// MATERIAL-UI
 import {
+	makeStyles, 
+	useTheme, 
+	fade,
 	Hidden,
 	Typography,
 	useMediaQuery,
@@ -23,8 +30,10 @@ import {
 	InputAdornment,
 	Chip
 } from '@material-ui/core';
+
+// ICONS
 import SearchIcon from '@material-ui/icons/Search';
-import { useSnackbar } from 'notistack';
+
 
 export const UserContext = createContext(null);
 let socket;

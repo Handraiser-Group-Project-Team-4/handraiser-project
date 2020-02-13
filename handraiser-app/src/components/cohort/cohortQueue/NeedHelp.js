@@ -1,7 +1,19 @@
 import React, { useContext } from 'react';
+
+// COMPONENTS
 import Studentss from './Students';
 import { UserContext } from './CohortPage';
-import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
+
+// MATERIAL-UI
+import { 
+	List, 
+	Typography, 
+	Card, 
+	CardContent, 
+	Chip 
+} from '@material-ui/core';
+
+
 export default function NeedHelps({ classes }) {
 	const { id, data } = useContext(UserContext);
 	// return (

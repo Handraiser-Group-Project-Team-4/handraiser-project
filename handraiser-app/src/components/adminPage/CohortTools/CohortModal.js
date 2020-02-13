@@ -1,18 +1,22 @@
 import React, { useState } from "react";
+
+// MATERIAL-UI
 import MaterialTable from "material-table";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@material-ui/core/";
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-
-// components
+// COMPONENTS
 import KickStud from "./KickStud";
+import AdminModal from '../../tools/AdminModal'
 
-// icons
+// ICONS
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 
-export default function PopupModal({
+export default function CohortModal({
   handleClose,
   open,
   data,
@@ -74,7 +78,14 @@ export default function PopupModal({
   return (
     <>
       {kickbool && (
-        <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
+        // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
+        <AdminModal 
+          title={`Are you sure you want to kick ${kickobj.firstname} ${kickobj.lastname}`}
+          open={kickbool} 
+          handleClose={closeKickModal} 
+          data={kickobj}
+          type="Kick Student"
+        />
       )}
 
       <Dialog

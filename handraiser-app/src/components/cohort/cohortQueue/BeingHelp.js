@@ -1,7 +1,16 @@
 import React, { useContext } from 'react';
+
+// COMPONENTS
 import Students from './Students';
 import { UserContext } from './CohortPage';
-import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
+
+// MATERIAL-UI
+import { List, 
+	Typography, 
+	Card, 
+	CardContent, 
+	Chip 
+} from '@material-ui/core';
 
 export default function BeingHelp({ classes }) {
 	const { id, data, user } = useContext(UserContext);

@@ -1,12 +1,12 @@
 import React, { createContext, useState, useEffect } from "react";
-import MainpageTemplate from "../tools/MainpageTemplate";
+import MainpageTemplate from "../../../tools/MainpageTemplate";
 import { Link } from "react-router-dom";
 import Help from "./HelpOld";
 import NeedHelp from "./NeedHelpOld";
 import BeingHelp from "./BeingHelpOld";
-import Chat from "../Chat/Chat";
+import Chat from "../../../Chat/Chat";
 import Axios from "axios";
-import jwtToken from "../tools/assets/jwtToken";
+import jwtToken from "../../../tools/assets/jwtToken";
 import io from "socket.io-client";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";

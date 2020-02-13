@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
 
+// MATERIAL-UI
+import { AppBar, Tabs, Tab, makeStyles} from "@material-ui/core";
+
+// COMPONENTS
+import jwtToken from "../tools/assets/jwtToken";
 import MainpageTemplate from "../tools/MainpageTemplate";
-import CohortList from "../cohort/CohortListOld";
-import CreateCohort from "../cohort/CreateCohort";
-import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Tabs, Tab } from "@material-ui/core";
-import Unnamed from "../../images/unnamed.jpg";
+import CohortList from "../cohort/CohortList";
 
 let socket;
-export default function MentorPage({ value = 0 }) {
+export default function MentorPage({value = 0}) {
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -42,21 +42,6 @@ export default function MentorPage({ value = 0 }) {
 
   return (
     <MainpageTemplate>
-      {/* <div
-        style={{
-          display: `flex`,
-          flexDirection: `column`,
-          justifyContent: `center`,
-          alignItems: `center`,
-          height: `100vh`
-        }}
-      >
-        <h1>
-          THIS IS WHERE THE COHORT LIST IS LOCATED <i>[Mentor Page]</i>
-        </h1>
-        <CreateCohort />
-        <CohortLists mentor={true} />
-      </div> */}
       <div className={classes.parentDiv}>
         <div className={classes.tabRoot}>
           <AppBar position="static" color="default">

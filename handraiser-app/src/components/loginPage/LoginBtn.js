@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Redirect } from "react-router-dom";
 import GoogleLogin from "react-google-login";
-import googleIcon from "../../images/google-icon.svg";
 import axios from "axios";
+
+// COMPONENTS
+import googleIcon from "../../images/google-icon.svg";
+import {newUserContext} from "../../routes"
 import jwtToken from "../tools/assets/jwtToken";
 
 export default function LoginBtn() {
   const userObj = jwtToken();
+  const {setisNew} = useContext(newUserContext);
   const [user, setUser] = useState({
-    isNew: false,
     loginSuccess: false,
     role: null
   });
@@ -19,6 +22,7 @@ export default function LoginBtn() {
       url: `/api/users?user_id=${response.profileObj.googleId}`
     })
       .then(res => {
+        setisNew(false)
         // console.log(res.data)
         if (res.data[0] !== undefined)
           sessionStorage.setItem("accessToken", res.data.token);
@@ -40,7 +44,8 @@ export default function LoginBtn() {
             .then(res => {
               console.log(res);
               sessionStorage.setItem("accessToken", res.data.token);
-              setUser({ ...user, loginSuccess: true, isNew: true });
+              setUser({ ...user, loginSuccess: true});
+              setisNew(true)
             })
             .catch(err => console.log(err));
         } else {
@@ -61,13 +66,9 @@ export default function LoginBtn() {
     return <Redirect to="/mentor-page" />;
   else if (userObj || user.loginSuccess)
     return (
-      <Redirect
-        to={{
-          pathname: "/student-page",
-          state: user
-        }}
-      />
+      <Redirect to= "/student-page" />
     );
+    
   return (
     <GoogleLogin
       clientId={
