@@ -27,7 +27,8 @@ export default function Students({
 	student_id,
 	index,
 	text,
-	classes
+	classes,
+	darkMode
 }) {
 	const userObj = jwtToken();
 	const ENDPOINT = 'localhost:3001';
@@ -138,6 +139,9 @@ export default function Students({
 					status !== 'pending' &&
 					chatHandler(e, { room: id, concern: text }))
 			}
+			style={{
+				backgroundColor: darkMode ? '#424242' : null
+			}}
 		>
 			<CardHeader
 				key={index}
@@ -157,11 +161,14 @@ export default function Students({
 				}
 				action={
 					<div>
-						{userObj.user_role_id === 3 && status === 'onprocess' ? null : (
+						{(userObj.user_role_id === 3 &&
+							status === 'pending' &&
+							userObj.user_id === student_id) ||
+						userObj.user_role_id === 2 ? (
 							<IconButton aria-label="settings" onClick={handleClick}>
 								<MoreVertIcon />
 							</IconButton>
-						)}
+						) : null}
 
 						<Menu
 							elevation={1}
@@ -172,12 +179,20 @@ export default function Students({
 							onClose={handleClose}
 						>
 							{status === 'pending' && userObj.user_role_id === 2 ? (
-								<MenuItem onClick={e => handleUpdate(e, 'onprocess')}>
-									<ListItemIcon>
-										<HelpIcon />
-									</ListItemIcon>
-									<Typography variant="inherit">Help Mentee!</Typography>
-								</MenuItem>
+								<>
+									<MenuItem onClick={e => handleUpdate(e, 'onprocess')}>
+										<ListItemIcon>
+											<HelpIcon />
+										</ListItemIcon>
+										<Typography variant="inherit">Help Mentee!</Typography>
+									</MenuItem>
+									<MenuItem onClick={e => handleDelete(e)}>
+										<ListItemIcon>
+											<DeleteIcon />
+										</ListItemIcon>
+										<Typography variant="inherit">Remove Handraise</Typography>
+									</MenuItem>
+								</>
 							) : status === 'onprocess' && userObj.user_role_id === 2 ? (
 								<>
 									<MenuItem

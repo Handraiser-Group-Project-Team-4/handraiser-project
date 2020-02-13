@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
+import { DarkModeContext } from '../../App';
 import {
   useTheme,
   TextField,
@@ -24,10 +25,12 @@ import {
   DialogTitle,
 } from "@material-ui/core";
 import Unnamed from "../../images/unnamed.jpg";
+import { height } from "@material-ui/system";
 
 let socket;
 export default function CohortList({ classes, value }) {
   const theme = useTheme();
+	const { darkMode } = useContext(DarkModeContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const history = useHistory();
@@ -73,7 +76,6 @@ export default function CohortList({ classes, value }) {
       }
     })
       .then(res => {
-        console.log(res.data)
         setCohorts(res.data);
       })
       .catch(err => {
@@ -216,6 +218,7 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
+        style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
       // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>

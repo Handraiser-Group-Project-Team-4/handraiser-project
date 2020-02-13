@@ -24,6 +24,7 @@ import { Picker } from 'emoji-mart';
 import ReactHtmlParser from 'react-html-parser';
 import ScrollableFeed from 'react-scrollable-feed';
 import { UserContext } from '../cohort/CohortPage';
+import { DarkModeContext } from '../../App';
 import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
@@ -75,6 +76,7 @@ const Chat = () => {
 	const classes = useStyles();
 	const userObj = jwtToken();
 	const { chatroom } = useContext(UserContext);
+	const { darkMode } = useContext(DarkModeContext);
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
@@ -87,37 +89,36 @@ const Chat = () => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const handleClick = e => setAnchorEl(e.currentTarget);
 
-
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
 		socket.emit(
-		  "join",
-		  { username: userObj.name, chatroom: chatroom.room, userObj },
-		  () => {
-			socket.on("oldChat", data => {
-			  setCurrentChat(data.data.messages);
-			});
-		  }
+			'join',
+			{ username: userObj.name, chatroom: chatroom.room, userObj },
+			() => {
+				socket.on('oldChat', data => {
+					setCurrentChat(data.data.messages);
+				});
+			}
 		);
-	  }, [ENDPOINT, chatroom]);
+	}, [ENDPOINT, chatroom]);
 
 	useEffect(() => {
-		socket.on("message", message => {
+		socket.on('message', message => {
 			setCurrentChat([...currentChat, message]);
 		});
 
-		socket.on("displayTyping", ({ name }) => {
+		socket.on('displayTyping', ({ name }) => {
 			setTyping({ isTyping: true, name });
 		});
 
-		socket.on("displayNotTyping", ({ name }) => {
+		socket.on('displayNotTyping', ({ name }) => {
 			setTyping({ isTyping: false, name });
 		});
 
 		// socket.emit("saveChat", currentChat);
 
 		return () => {
-			socket.emit("disconnect");
+			socket.emit('disconnect');
 			socket.off();
 		};
 	}, [currentChat]);
@@ -125,10 +126,10 @@ const Chat = () => {
 	const sendMessage = event => {
 		event.preventDefault();
 
-		const temp = message.replace(/\n/g, '<br />')
+		const temp = message.replace(/\n/g, '<br />');
 
 		if (message) {
-			socket.emit("sendMessage", { message: temp }, () => setMessage(""));
+			socket.emit('sendMessage', { message: temp }, () => setMessage(''));
 		}
 	};
 	const handleExpandClick = () => {
@@ -144,7 +145,7 @@ const Chat = () => {
 				avatar={
 					<Avatar aria-label="recipe" className={classes.avatar}>
 						R
-          </Avatar>
+					</Avatar>
 				}
 				action={
 					<>
@@ -159,7 +160,7 @@ const Chat = () => {
 							open={Boolean(anchorEl)}
 							onClose={handleClose}
 						>
-							<MenuItem onClick={e => alert("Add Mentor")}>
+							<MenuItem onClick={e => alert('Add Mentor')}>
 								{/* <ListItemIcon>
                       <HelpIcon />
                     </ListItemIcon> */}
@@ -200,7 +201,12 @@ const Chat = () => {
 													className={classes.chatAvatar}
 													src={message.avatar}
 												/>
-												<Container className={classes.chat}>
+												<Container
+													className={classes.chat}
+													style={{
+														backgroundColor: darkMode ? '#303030' : null
+													}}
+												>
 													<Typography variant="body2">
 														{ReactHtmlParser(message.text)}
 													</Typography>
@@ -217,38 +223,43 @@ const Chat = () => {
 												</Container>
 											</Box>
 										) : (
-												<Box
-													display="flex"
-													justifyContent="flex-end"
-													alignContent="flex-start"
+											<Box
+												display="flex"
+												justifyContent="flex-end"
+												alignContent="flex-start"
+												style={{
+													paddingBottom: 15,
+													paddingRight: 12,
+													paddingTop: i === 0 ? 10 : 0,
+													paddingLeft: 12
+												}}
+											>
+												<Container
+													className={classes.chat}
 													style={{
-														paddingBottom: 15,
-														paddingRight: 12,
-														paddingTop: i === 0 ? 10 : 0,
-														paddingLeft: 12
+														backgroundColor: darkMode ? '#303030' : null
 													}}
 												>
-													<Container className={classes.chat}>
-														<Typography variant="body2">
-															{ReactHtmlParser(message.text)}
-														</Typography>
-														<p
-															style={{
-																opacity: `0.5`,
-																fontSize: '10px',
-																margin: '0',
-																paddingTop: '10px'
-															}}
-														>
-															{message.time_sent}
-														</p>
-													</Container>
-													<Avatar
-														className={classes.chatLeftAvatar}
-														src={message.avatar}
-													/>
-												</Box>
-											)}
+													<Typography variant="body2">
+														{ReactHtmlParser(message.text)}
+													</Typography>
+													<p
+														style={{
+															opacity: `0.5`,
+															fontSize: '10px',
+															margin: '0',
+															paddingTop: '10px'
+														}}
+													>
+														{message.time_sent}
+													</p>
+												</Container>
+												<Avatar
+													className={classes.chatLeftAvatar}
+													src={message.avatar}
+												/>
+											</Box>
+										)}
 									</div>
 								)
 						)}
@@ -293,11 +304,11 @@ const Chat = () => {
 					onChange={({ target: { value } }) => setMessage(value)}
 					onKeyDown={event =>
 						message.match(/\s/g) &&
-							message.match(/\s/g).length === message.length
+						message.match(/\s/g).length === message.length
 							? null
 							: event.keyCode === 13 && !event.shiftKey
-								? sendMessage(event)
-								: null
+							? sendMessage(event)
+							: null
 					}
 				/>
 				<IconButton

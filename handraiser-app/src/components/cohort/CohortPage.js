@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import MainpageTemplate from '../tools/MainpageTemplate';
 import Helps from './Help';
 import NeedHelps from './NeedHelp';
@@ -9,6 +9,7 @@ import jwtToken from '../tools/assets/jwtToken';
 import io from 'socket.io-client';
 import { makeStyles, useTheme, fade } from '@material-ui/core/styles';
 import json2mq from 'json2mq';
+import { DarkModeContext } from '../../App';
 import {
 	Hidden,
 	Typography,
@@ -33,6 +34,7 @@ export default function CohortPage(props) {
 	const ENDPOINT = 'localhost:3001';
 	const classes = useStyles();
 	const userObj = jwtToken();
+	const { darkMode } = useContext(DarkModeContext);
 	const { id } = props.match.params;
 	const [data, setData] = useState([]);
 	const [user, setUser] = useState();
@@ -105,6 +107,25 @@ export default function CohortPage(props) {
 		event.stopPropagation();
 		setChatRoom(value);
 	};
+	const handleConcernCount = value => {
+		if (value === 'allConcern') {
+			let concernCount = data.filter(
+				concern =>
+					concern.concern_status !== 'done' && concern.class_id === parseInt(id)
+			);
+			return concernCount.length;
+		} else {
+			let concernCount = data.filter(
+				concern =>
+					concern.concern_status === value && concern.class_id === parseInt(id)
+			);
+			return concernCount.length;
+		}
+	};
+
+	if (Object.keys(data).length === 0) {
+		return null;
+	}
 
 	return (
 		<MainpageTemplate>
@@ -118,16 +139,27 @@ export default function CohortPage(props) {
 						setData,
 						user,
 						setUser,
-						chatHandler
+						chatHandler,
+						handleConcernCount
 					}}
 				>
-					<Paper className={classes.paperr} elevation={2}>
-						<Grid container spacing={0} className={classes.gridContainerr}>
+					<Paper className={classes.paper} elevation={2}>
+						<Grid
+							container
+							spacing={0}
+							className={classes.gridContainerr}
+							style={{
+								backgroundColor: darkMode ? '#333' : null
+							}}
+						>
 							<Grid item md={6} xs={12} className={classes.gridItemm}>
 								<Grid container spacing={0} className={classes.topNavi}>
 									<Typography variant="h4" noWrap className={classes.typoTitle}>
 										Handraiser Queue
-										<Chip className={classes.largeChip} label="10" />
+										<Chip
+											className={classes.largeChip}
+											label={handleConcernCount('allConcern')}
+										/>
 									</Typography>
 									<FormControl
 										variant="outlined"
@@ -218,7 +250,7 @@ const useStyles = makeStyles(theme => ({
 			alignSelf: 'center'
 		}
 	},
-	paperr: {
+	paper: {
 		height: '100%'
 	},
 	gridContainerr: {
@@ -264,8 +296,8 @@ const useStyles = makeStyles(theme => ({
 		height: '85%',
 		'&::-webkit-scrollbar': {
 			width: '5px',
-			height: '8px',
-			backgroundColor: '#FFF'
+			height: '8px'
+			// backgroundColor: '#FFF'
 		},
 		'&::-webkit-scrollbar-thumb': {
 			backgroundColor: '#025279' //'#23232F' //'#0595DD'
