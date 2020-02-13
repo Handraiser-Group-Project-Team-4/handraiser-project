@@ -101,22 +101,24 @@ const Chat = () => {
 			}
 		);
 	}, [ENDPOINT, chatroom]);
-
+	useEffect(() => {
+		const handleTyping = () => {
+			socket.emit('typing', { name: userObj.name });
+		};
+		window.addEventListener('keypress', handleTyping);
+		return () => {
+			window.removeEventListener('keypress', handleTyping);
+		};
+	}, []);
+	useEffect(() => {
+		socket.on('displayTyping', ({ name }) => {
+			setTyping(true);
+		});
+	}, []);
 	useEffect(() => {
 		socket.on('message', message => {
 			setCurrentChat([...currentChat, message]);
 		});
-
-		socket.on('displayTyping', ({ name }) => {
-			setTyping({ isTyping: true, name });
-		});
-
-		socket.on('displayNotTyping', ({ name }) => {
-			setTyping({ isTyping: false, name });
-		});
-
-		// socket.emit("saveChat", currentChat);
-
 		return () => {
 			socket.emit('disconnect');
 			socket.off();
@@ -124,10 +126,10 @@ const Chat = () => {
 	}, [currentChat]);
 
 	const sendMessage = event => {
+		setOpen(true);
+		setMessage('');
 		event.preventDefault();
-
 		const temp = message.replace(/\n/g, '<br />');
-
 		if (message) {
 			socket.emit('sendMessage', { message: temp }, () => setMessage(''));
 		}
@@ -135,6 +137,7 @@ const Chat = () => {
 	const handleExpandClick = () => {
 		setExpanded(!expanded);
 	};
+
 	const toggleEmoji = () => {
 		setShowEmoji(!showEmoji);
 	};
@@ -266,62 +269,66 @@ const Chat = () => {
 					</ScrollableFeed>
 				</Box>
 			</CardContent>
-			<CardActions disableSpacing>
-				<TextField
-					InputProps={{
-						startAdornment: showEmoji && (
-							<Picker
-								set="facebook"
-								title="Pick your emoji…"
-								emoji="point_up"
-								sheetSize={64}
-								onSelect={emoji => setMessage(message + emoji.native)}
-								style={{
-									position: 'absolute',
-									bottom: '45px',
-									right: '20px',
-									zIndex: 2
-								}}
-							/>
-						),
-						endAdornment: (
-							<InputAdornment position="start">
-								<InsertEmoticonIcon
-									style={{ cursor: 'pointer' }}
-									onClick={() => toggleEmoji()}
+			{chatroom.concern_status !== 'done' ? (
+				<CardActions disableSpacing>
+					<TextField
+						InputProps={{
+							startAdornment: showEmoji && (
+								<Picker
+									set="facebook"
+									title="Pick your emoji…"
+									emoji="point_up"
+									sheetSize={64}
+									onSelect={emoji => setMessage(message + emoji.native)}
+									style={{
+										position: 'absolute',
+										bottom: '45px',
+										right: '20px',
+										zIndex: 2
+									}}
 								/>
-							</InputAdornment>
-						)
-					}}
-					multiline
-					rowsMax="5"
-					style={{ margin: 8 }}
-					placeholder="Send a message here"
-					fullWidth
-					margin="normal"
-					variant="outlined"
-					value={message}
-					onChange={({ target: { value } }) => setMessage(value)}
-					onKeyDown={event =>
-						message.match(/\s/g) &&
-						message.match(/\s/g).length === message.length
-							? null
-							: event.keyCode === 13 && !event.shiftKey
-							? sendMessage(event)
-							: null
-					}
-				/>
-				<IconButton
-					className={clsx(classes.expand, {
-						[classes.expandOpen]: expanded
-					})}
-					onClick={handleExpandClick}
-					aria-expanded={expanded}
-					aria-label="show more"
-				>
-					<SendIcon />
-				</IconButton>
-			</CardActions>
+							),
+							endAdornment: (
+								<InputAdornment position="start">
+									<InsertEmoticonIcon
+										style={{ cursor: 'pointer' }}
+										onClick={() => toggleEmoji()}
+									/>
+								</InputAdornment>
+							)
+						}}
+						multiline
+						rowsMax="5"
+						style={{ margin: 8 }}
+						placeholder="Send a message here"
+						fullWidth
+						margin="normal"
+						variant="outlined"
+						value={message}
+						onChange={({ target: { value } }) => setMessage(value)}
+						onKeyDown={event =>
+							message.match(/\s/g) &&
+							message.match(/\s/g).length === message.length
+								? null
+								: event.keyCode === 13 && !event.shiftKey
+								? sendMessage(event)
+								: null
+						}
+					/>
+					<IconButton
+						className={clsx(classes.expand, {
+							[classes.expandOpen]: expanded
+						})}
+						onClick={handleExpandClick}
+						aria-expanded={expanded}
+						aria-label="show more"
+					>
+						<SendIcon />
+					</IconButton>
+				</CardActions>
+			) : (
+				''
+			)}
 		</Card>
 		// </Container>
 	);

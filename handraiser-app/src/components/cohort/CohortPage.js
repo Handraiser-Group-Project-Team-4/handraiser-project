@@ -3,6 +3,7 @@ import MainpageTemplate from '../tools/MainpageTemplate';
 import Helps from './Help';
 import NeedHelps from './NeedHelp';
 import BeingHelps from './BeingHelp';
+import Search from './CohortFilter';
 import Chat from '../Chat/Chat';
 import Axios from 'axios';
 import jwtToken from '../tools/assets/jwtToken';
@@ -34,17 +35,17 @@ export default function CohortPage(props) {
 	const ENDPOINT = 'localhost:3001';
 	const classes = useStyles();
 	const userObj = jwtToken();
-	const { darkMode } = useContext(DarkModeContext);
 	const { id } = props.match.params;
 	const [data, setData] = useState([]);
 	const [user, setUser] = useState();
+	const [search, setSearch] = useState();
+	const [filter, setFilter] = useState();
 	const [chatroom, setChatRoom] = useState();
 	const { enqueueSnackbar } = useSnackbar();
+	const { darkMode } = useContext(DarkModeContext);
 
 	const theme = useTheme();
 	const inputLabel = React.useRef(null);
-	const [filter, setFilter] = React.useState('');
-	const handleChange = event => setFilter(event.target.value);
 	const matches = useMediaQuery(
 		json2mq({
 			minWidth: 960
@@ -103,6 +104,11 @@ export default function CohortPage(props) {
 		};
 	}, [data]);
 
+	const changeHandler = event => {
+		event.target.name === 'search' && setSearch(event.target.value);
+		event.target.name === 'sortBy' && setFilter(event.target.value);
+	};
+
 	const chatHandler = (event, value) => {
 		event.stopPropagation();
 		setChatRoom(value);
@@ -126,7 +132,6 @@ export default function CohortPage(props) {
 	if (Object.keys(data).length === 0) {
 		return null;
 	}
-
 	return (
 		<MainpageTemplate>
 			<div className={classes.parentDiv}>
@@ -140,10 +145,12 @@ export default function CohortPage(props) {
 						user,
 						setUser,
 						chatHandler,
+						search,
+						filter,
 						handleConcernCount
 					}}
 				>
-					<Paper className={classes.paper} elevation={2}>
+					<Paper className={classes.paperr} elevation={2}>
 						<Grid
 							container
 							spacing={0}
@@ -169,21 +176,19 @@ export default function CohortPage(props) {
 											ref={inputLabel}
 											id="demo-simple-select-outlined-label"
 										>
-											Filter
+											Sort By
 										</InputLabel>
 										<Select
 											labelId="demo-simple-select-outlined-label"
 											id="demo-simple-select-outlined"
-											value={filter}
-											onChange={handleChange}
+											name="sortBy"
+											defaultValue={'all'}
+											onChange={changeHandler}
 											labelWidth={20}
 											size="small"
 										>
-											<MenuItem value="">
-												<em>None</em>
-											</MenuItem>
 											<MenuItem value={'all'}>All</MenuItem>
-											<MenuItem value={'closed'}>Closed</MenuItem>
+											<MenuItem value={'done'}>Closed</MenuItem>
 										</Select>
 									</FormControl>
 									<form
@@ -195,7 +200,9 @@ export default function CohortPage(props) {
 											id="outlined-search"
 											label="Search field"
 											type="search"
+											name="search"
 											variant="outlined"
+											onChange={changeHandler}
 											InputProps={{
 												startAdornment: (
 													<InputAdornment position="start">
@@ -207,8 +214,14 @@ export default function CohortPage(props) {
 									</form>
 								</Grid>
 								<div>
-									<NeedHelps classes={classes} />
-									<BeingHelps classes={classes} />
+									{search || filter === 'done' ? (
+										<Search classes={classes} />
+									) : (
+										<div>
+											<NeedHelps classes={classes} />
+											<BeingHelps classes={classes} />
+										</div>
+									)}
 								</div>
 							</Grid>
 							<Hidden mdDown>
@@ -250,7 +263,7 @@ const useStyles = makeStyles(theme => ({
 			alignSelf: 'center'
 		}
 	},
-	paper: {
+	paperr: {
 		height: '100%'
 	},
 	gridContainerr: {
@@ -317,6 +330,9 @@ const useStyles = makeStyles(theme => ({
 		},
 		overflowY: 'auto',
 		maxHeight: 360
+	},
+	searchRootContent: {
+		maxHeight: '680px!important'
 	},
 	cardRootContentTitle: {
 		color: '#673ab7',

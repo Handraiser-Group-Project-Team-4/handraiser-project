@@ -1,7 +1,6 @@
 module.exports = {
 	concernSockets: (socket, io, db) => {
 		socket.on('joinConcern', ({ id }, callback) => {
-			console.log('a user connected to concern');
 			db.concern.find({ class_id: id }).then(res =>
 				io.to(`${id}`).emit('concernData', {
 					concern: res,
@@ -89,6 +88,7 @@ module.exports = {
 						.catch()
 				);
 			});
+
 			callback();
 		});
 		socket.on('disconnectConcern', () => {

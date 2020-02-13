@@ -76,58 +76,6 @@ export default function Students({
 		);
 	};
 
-	// return (
-	//   <>
-	//     <ListItem
-	//       alignItems="flex-start"
-	//       onClick={e => chatHandler(e, { room: id, concern: text })}
-	//     >
-	//       <ListItemAvatar>
-	//         <Avatar alt={student.firstname} src={student.avatar} />
-	//       </ListItemAvatar>
-	//       <ListItemText
-	//         primary={`${student.firstname} ${student.lastname}`}
-	//         secondary={
-	//           <React.Fragment>
-	//             {`Problem: ${text}`}
-	//             <Typography
-	//               component="span"
-	//               variant="body2"
-	//               className={classes.inline}
-	//             ></Typography>
-	//           </React.Fragment>
-	//         }
-	//       />
-	//       {status === "pending" && userObj.user_role_id === 2 ? (
-	//         <HelpIcon
-	//           onClick={e => {
-	//             handleUpdate(e, "onprocess");
-	//           }}
-	//         />
-	//       ) : status === "onprocess" && userObj.user_role_id === 2 ? (
-	//         <>
-	//           <CheckCircleIcon style={{ marginLeft: 10 }} />
-
-	//           <RemoveCircleIcon
-	//             style={{ marginLeft: 10 }}
-	//             onClick={e => {
-	//               handleUpdate(e, "pending");
-	//             }}
-	//           />
-	//         </>
-	//       ) : status === "pending" &&
-	//         userObj.user_role_id === 3 &&
-	//         userObj.user_id === student_id ? (
-	//         <DeleteIcon
-	//           onClick={e => {
-	//             handleDelete(e);
-	//           }}
-	//         />
-	//       ) : null}
-	//     </ListItem>
-	//     <Divider variant="inset" component="li" />
-	//   </>
-	// );
 	return (
 		<ListItem
 			key={index}
@@ -137,7 +85,7 @@ export default function Students({
 				userObj.user_id === student_id ||
 				(userObj.user_role_id === 2 &&
 					status !== 'pending' &&
-					chatHandler(e, { room: id, concern: text }))
+					chatHandler(e, { room: id, concern: text, concern_status: status }))
 			}
 			style={{
 				backgroundColor: darkMode ? '#424242' : null
@@ -149,9 +97,6 @@ export default function Students({
 				style={{
 					border: userObj.user_id === student_id ? '2px solid #673ab7' : 'none'
 				}}
-				// classes={{
-				// 	span: 'una'
-				// }}
 				avatar={
 					<Avatar
 						alt={student.firstname}
@@ -161,14 +106,11 @@ export default function Students({
 				}
 				action={
 					<div>
-						{(userObj.user_role_id === 3 &&
-							status === 'pending' &&
-							userObj.user_id === student_id) ||
-						userObj.user_role_id === 2 ? (
+						{userObj.user_role_id === 3 && status === 'onprocess' ? null : (
 							<IconButton aria-label="settings" onClick={handleClick}>
 								<MoreVertIcon />
 							</IconButton>
-						) : null}
+						)}
 
 						<Menu
 							elevation={1}
@@ -179,7 +121,7 @@ export default function Students({
 							onClose={handleClose}
 						>
 							{status === 'pending' && userObj.user_role_id === 2 ? (
-								<>
+								<div>
 									<MenuItem onClick={e => handleUpdate(e, 'onprocess')}>
 										<ListItemIcon>
 											<HelpIcon />
@@ -192,9 +134,9 @@ export default function Students({
 										</ListItemIcon>
 										<Typography variant="inherit">Remove Handraise</Typography>
 									</MenuItem>
-								</>
+								</div>
 							) : status === 'onprocess' && userObj.user_role_id === 2 ? (
-								<>
+								<div>
 									<MenuItem
 										onClick={e => {
 											handleUpdate(e, 'done');
@@ -213,7 +155,7 @@ export default function Students({
 											Send back to Need Help Queue
 										</Typography>
 									</MenuItem>
-								</>
+								</div>
 							) : status === 'pending' &&
 							  userObj.user_role_id === 3 &&
 							  userObj.user_id === student_id ? (
@@ -227,7 +169,7 @@ export default function Students({
 						</Menu>
 					</div>
 				}
-				title={`Problem: ${text}`}
+				title={`${text}`}
 				subheader={student.firstname + ' ' + student.lastname}
 			/>
 		</ListItem>
