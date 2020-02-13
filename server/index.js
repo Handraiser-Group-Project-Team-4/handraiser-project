@@ -67,6 +67,7 @@ massive({
     app.get("/api/allusers", users.fetchall);
     app.get("/api/asc", users.usersAsc);
     app.get("/api/desc", users.usersDesc);
+    app.get("/api/mentors/:id", users.getMentors);
     app.get("/api/user_approval_fetch", users.user_approval_fetch);
     app.patch("/api/toapprove/:id", users.movingToApprove);
     app.patch("/api/todisapprove/:id", users.movingToDisapprove);
@@ -77,6 +78,7 @@ massive({
     app.patch("/api/toggleCohort/:id", cohorts.toggleCohort);
     app.delete("/api/kickstud/:userId/:classId", cohorts.deleteStud);
     app.delete("/api/deleteClass/:id", cohorts.deleteClass)
+    app.post("/api/assignMentor", cohorts.assignMentor)
 
     //WEBSOCKETS
     io.on("connection", socket => {

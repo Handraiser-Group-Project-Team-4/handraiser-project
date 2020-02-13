@@ -321,5 +321,37 @@ module.exports = {
         console.err(err);
         res.status(500).end();
       });
-  }
+  },
+
+  getMentors: (req, res) => {
+    const db = req.app.get("db");
+
+   
+    // db.query(`select * from classroom_students where class_id = ${req.params.id}`)
+    //   .then(cohort => {
+    //     if(cohort.length > 0){
+    //       cohort.map(x=>{
+    //       console.log('here')
+    //       db.query(`select * from users where user_id != '${x.user_id}' and user_role_id=2`)
+    //       .then(get => res.status(200).json(get))
+    //       .catch(err=>{console.log(err)})
+    //       })
+          
+    //     }
+    //     else{
+    //       db.query(`select * from users where user_role_id=2`)
+    //       .then(get => res.status(200).json(get))
+    //       .catch(err=>{console.log(err)})
+    //     }
+    //   })
+     db.query(`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
+     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+      
+    
+  },
 };

@@ -34,7 +34,8 @@ export default function MaterialTableDemo() {
   });
   const [subject, setSubject] = useState({
     title: "",
-    created: ""
+    created: "",
+    id: ""
   });
   const [table, setTable] = useState({
     columns: [
@@ -71,9 +72,14 @@ export default function MaterialTableDemo() {
           )
         }
       },
-      {
+      { title: "Actions",
         headerStyle : {
-          border: "none"
+          // border: "none",
+          textAlign: "center"
+
+        },
+        cellStyle: {
+          textAlign: "center"
         },
         render: row => (
           <div
@@ -82,7 +88,7 @@ export default function MaterialTableDemo() {
               display: `flex`,
               alignItems: `center`,
               justifyContent: `space-evenly`,
-              marginRight: "100px"
+              marginRight: 50
             }}
           >
             <Tooltip title="Toggle Class Status">
@@ -128,7 +134,7 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        console.log(data.data);
+   
         setTable({
           ...table,
           data: data.data
@@ -138,7 +144,8 @@ export default function MaterialTableDemo() {
   };
 
   const toggleClassFn = data => {
-    console.log(data);
+    console.log(data)
+
     if (data.class_status === "true") {
       axios({
         method: "patch",
@@ -175,7 +182,8 @@ export default function MaterialTableDemo() {
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
-      created: row.class_created
+      created: row.class_created,
+      id: row.class_id
     });
     renderViewStudentsTable(row.class_id);
   };
@@ -229,7 +237,6 @@ export default function MaterialTableDemo() {
       .catch(err => console.log("object"));
   };
 
-  console.log(deleteCohortObj)
   return (
     <>
       {deleteCohortObj.open && (
@@ -272,6 +279,7 @@ export default function MaterialTableDemo() {
           }
           data={viewJoinedModal.data}
           title={subject.title}
+          id={subject.id}
           renderViewStudentsTable={renderViewStudentsTable}
           created={subject.created}
         />
@@ -282,7 +290,10 @@ export default function MaterialTableDemo() {
         data={table.data}
         options={{
           pageSize: 10
-        }}
+          
+        }
+        
+        }
         components={{
           Toolbar: props => (
             <div>

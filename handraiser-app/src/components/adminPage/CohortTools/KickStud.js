@@ -28,7 +28,7 @@ export default function PopupModal({ handleClose, open, row }) {
     <>
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={() => handleClose(row.class_id)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={false}
@@ -41,7 +41,7 @@ export default function PopupModal({ handleClose, open, row }) {
         <DialogContent></DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={() => handleClose(row.class_id)} color="primary">
             Disagree
           </Button>
 
