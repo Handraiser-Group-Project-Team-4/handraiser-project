@@ -76,27 +76,6 @@ module.exports = {
     });
     socket.on("disconnect", () => {
       console.log("user disconnected to chat");
-      // const user = users.find(user => user.id === socket.id);
-      // user
-      //   ? user.room !== undefined
-      //     ? messages.map(conversation => {
-      //         db.query(
-      //           `SELECT message from messages WHERE message = '${JSON.stringify(
-      //             conversation
-      //           )}'`
-      //         )
-      //           .then(res => {
-      //             if (Object.keys(res).length === 0)
-      //               db.query(
-      //                 `INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(
-      //                   conversation
-      //                 )}', ${user.room}) `
-      //               );
-      //           })
-      //           .catch(err => console.log(err));
-      //       })
-      //     : ""
-      //   : "";
     });
   }
 };

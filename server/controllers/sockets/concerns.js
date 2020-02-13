@@ -71,21 +71,24 @@ module.exports = {
     );
 
     socket.on("deleteConcern", ({ id, concern_id, userObj }, callback) => {
-      db.concern.destroy(concern_id).then(() =>
-        db.concern
-          .find({ class_id: id })
-          .then(res =>
-            io.to(`${id}`).emit("concernData", {
-              concern: res,
-              alert: {
-                variant: "error",
-                name: userObj.name,
-                action: "removes request"
-              }
-            })
-          )
-          .catch()
-      );
+      db.messages.destroy({ concern_id }).then(() => {
+        db.concern.destroy(concern_id).then(() =>
+          db.concern
+            .find({ class_id: id })
+            .then(res =>
+              io.to(`${id}`).emit("concernData", {
+                concern: res,
+                alert: {
+                  variant: "error",
+                  name: userObj.name,
+                  action: "removes request"
+                }
+              })
+            )
+            .catch()
+        );
+      });
+
       callback();
     });
     socket.on("disconnectConcern", () => {
