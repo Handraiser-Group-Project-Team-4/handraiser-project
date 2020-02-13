@@ -9,8 +9,8 @@ import Box from '@material-ui/core/Box';
 
 // Components
 import Approval from './Approval';
-import Cohort from './Cohort'
-import Users from './Users'
+import Cohort from './tables/Cohort'
+import Users from './tables/Users'
 
 
 function TabPanel(props) {

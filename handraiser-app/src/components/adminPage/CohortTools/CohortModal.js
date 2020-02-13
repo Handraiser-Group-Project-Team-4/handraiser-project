@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -14,7 +14,7 @@ import AssingMentor from "./AssignMentor";
 
 // icons
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import SchoolIcon from '@material-ui/icons/School';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 export default function PopupModal({
   handleClose,
@@ -38,11 +38,10 @@ export default function PopupModal({
         title: "Avatar",
         field: "avatar",
         render: rowData => (
-          <img
-            style={{ height: 36, borderRadius: "50%" }}
-            src={rowData.avatar}
-            alt="img"
-          />
+          <div style={{display: `flex`}}>
+            <img style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} width="50" height="50" src={rowData.avatar} alt="img" />
+            <p>{rowData.firstname} {rowData.lastname}</p>
+          </div>
         ),
         export: false
       },
@@ -52,8 +51,6 @@ export default function PopupModal({
 
         lookup: { 3: "Student", 2: "Mentor" }
       },
-      { title: "First Name", field: "firstname" },
-      { title: "Last Name", field: "lastname" },
       { title: "Email", field: "email" },
       {
         title: "Status",
@@ -61,24 +58,10 @@ export default function PopupModal({
         export: false,
         lookup: {
           true: (
-            <div
-              style={{
-                height: "15px",
-                width: "15px",
-                backgroundColor: "green",
-                borderRadius: "50%"
-              }}
-            />
+            <status-indicator active pulse positive />
           ),
           false: (
-            <div
-              style={{
-                height: "15px",
-                width: "15px",
-                backgroundColor: "red",
-                borderRadius: "50%"
-              }}
-            />
+            <status-indicator active pulse negative />
           )
         }
       }
@@ -136,9 +119,9 @@ export default function PopupModal({
           open={assign.open}
           handleClose={closeAssignModal} 
           data={assign.data} 
-          title={`Assign a mentor to class ${title}`}
+          title={title}
           id={id}
-          compare={data}
+          
           />
       )}
 
@@ -147,17 +130,27 @@ export default function PopupModal({
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={false}
+        fullWidth={true}
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
-          {title}
-          {created}
+          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
+            <h4 style={{margin: `0`}}>{title}</h4>
+            <h6 style={{margin: `0`}}>Created: {created}</h6>
+          </div>
         </DialogTitle>
 
         <DialogContent>
           <MaterialTable
-            title="Editable Example"
+            title={<Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={e => getMentors(e, id)}
+                  startIcon={<AddCircleIcon />}
+                >
+                  Assign a Mentor
+                </Button>}
             columns={students.columns}
             data={data}
             actions={[
@@ -172,24 +165,7 @@ export default function PopupModal({
               exportButton: true,
               exportFileName: title
             }}
-            components={{
-          Toolbar: props => (
-            <div>
-              <MTableToolbar {...props} />
-              <div style={{ padding: "0px 10px" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={e => getMentors(e, id)}
-                  startIcon={<SchoolIcon />}
-                >
-                  Assign a Mentor
-                </Button>
-              </div>
-            </div>
-          )
-        }}
+           
           />
         </DialogContent>
 

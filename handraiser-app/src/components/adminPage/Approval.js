@@ -7,9 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 
 // Components
-import Pending from './requestTables/Pending';
-import Approved from './requestTables/Approved';
-import Disapproved from './requestTables/Disapproved';
+import Pending from './tables/Pending';
+import Approved from './tables/Approved';
+import Disapproved from './tables/Disapproved';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

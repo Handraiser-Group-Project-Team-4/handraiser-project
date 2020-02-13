@@ -103,87 +103,6 @@ module.exports = {
     );
   },
 
-  pending: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(`select * from users where user_approval_status_id = 2`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-
-  approved: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(`select * from users where user_approval_status_id = 1`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-  request: (req, res) => {
-    const db = req.app.get("db");
-    db.query(
-      `UPDATE users set user_approval_status_id=2 WHERE user_id = '${req.params.id}'`
-    )
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-  disapproved: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(`select * from users where user_approval_status_id = 3`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-  movingToApprove: (req, res) => {
-    const db = req.app.get("db");
-    const { user_approval_status_id } = req.body;
-    db.users
-      .update(
-        {
-          user_id: req.params.id
-        },
-        {
-          user_approval_status_id: user_approval_status_id,
-          user_role_id: 2
-        }
-      )
-      .then(post => res.status(201).send(post))
-      .catch(err => {
-        console.err(err);
-        res.status(500).end();
-      });
-  },
-  movingToDisapprove: (req, res) => {
-    const db = req.app.get("db");
-    const { user_approval_status_id, reason_disapproved } = req.body;
-    db.users
-      .update(
-        {
-          user_id: req.params.id
-        },
-        {
-          user_approval_status_id: user_approval_status_id,
-          reason_disapproved: reason_disapproved
-        }
-      )
-      .then(post => res.status(201).send(post))
-      .catch(err => {
-        console.err(err);
-        res.status(500).end();
-      });
-  },
-
   fetchall: (req, res) => {
     const db = req.app.get("db");
 
@@ -195,40 +114,6 @@ module.exports = {
         console.error(err);
         res.status(500).end();
       });
-  },
-
-  usersAsc: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `select * from users where user_role_id = 2 or user_role_id = 3 order by user_role_id asc`
-    )
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-
-  usersDesc: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `select * from users where user_role_id = 2 or user_role_id = 3 order by user_role_id desc`
-    )
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-
-  logout: (req, res) => {
-    const db = req.app.get("db");
-
-    db.query(
-      `UPDATE users SET user_status=false WHERE user_id='${req.params.id}'`
-    );
   },
 
   request: (req, res) => {
@@ -326,24 +211,6 @@ module.exports = {
   getMentors: (req, res) => {
     const db = req.app.get("db");
 
-   
-    // db.query(`select * from classroom_students where class_id = ${req.params.id}`)
-    //   .then(cohort => {
-    //     if(cohort.length > 0){
-    //       cohort.map(x=>{
-    //       console.log('here')
-    //       db.query(`select * from users where user_id != '${x.user_id}' and user_role_id=2`)
-    //       .then(get => res.status(200).json(get))
-    //       .catch(err=>{console.log(err)})
-    //       })
-          
-    //     }
-    //     else{
-    //       db.query(`select * from users where user_role_id=2`)
-    //       .then(get => res.status(200).json(get))
-    //       .catch(err=>{console.log(err)})
-    //     }
-    //   })
      db.query(`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
      (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`)
       .then(get => res.status(200).json(get))
@@ -351,7 +218,22 @@ module.exports = {
         console.error(err);
         res.status(500).end();
       });
-      
-    
   },
+
+  getAttendingCohorts: (req, res) => {
+    const db = req.app.get("db");
+
+     db.query(`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
+     from users u
+     inner join classroom_students cs
+     on u.user_id = cs.user_id
+     inner join classroom_details cd
+     on cs.class_id = cd.class_id
+     where u.user_id = ${req.params.id}`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  }
 };

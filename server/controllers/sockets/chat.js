@@ -1,7 +1,7 @@
 module.exports = {
   chatSockets: (socket, io, db) => {
     const users = [];
-    socket.on("join", ({ username, chatroom, userObj }, callback) => {
+    socket.on("join", ({ username, chatroom, userObj }, callback) => { 
       console.log("a user connected to chat");
       const user = {
         id: socket.id,
@@ -18,7 +18,7 @@ module.exports = {
         chatUsers.concern = concern[0];
         if (concern.length > 0)
           db.query(
-            `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id}`
+            `SELECT message FROM messages WHERE concern_id = ${concern[0].concern_id} ORDER BY message_id ASC`
           ).then(messages => {
             let temp = [];
             messages.map(x => {
@@ -33,6 +33,19 @@ module.exports = {
       socket.join(`${user.room}`);
       callback();
     });
+
+    socket.on("typing", ({name}) => {
+      const user = users.find(user => user.id === socket.id);
+
+      socket.to(user.room).emit("displayTyping", {name})
+    });
+
+    socket.on("NotTyping", ({name}) => {
+      const user = users.find(user => user.id === socket.id);                                                         
+    
+      socket.to(user.room).emit("displayNotTyping", {name})                  
+    });
+
     socket.on("sendMessage", ({ message }, callback) => {
       const new_date = new Intl.DateTimeFormat("en-US", {
         year: "numeric",
@@ -43,6 +56,7 @@ module.exports = {
         second: "2-digit"
       }).format(new Date());
       const user = users.find(user => user.id === socket.id);
+      socket.to(user.room).emit("displayNotTyping", {name: user.name})
       db.messages
         .insert({
           concern_id: user.room,
@@ -65,7 +79,6 @@ module.exports = {
             concern_id: user.room
           });
         });
-
       callback();
     });
     socket.on("saveChat", currentChat => {
@@ -73,27 +86,6 @@ module.exports = {
     });
     socket.on("disconnect", () => {
       console.log("user disconnected to chat");
-      // const user = users.find(user => user.id === socket.id);
-      // user
-      //   ? user.room !== undefined
-      //     ? messages.map(conversation => {
-      //         db.query(
-      //           `SELECT message from messages WHERE message = '${JSON.stringify(
-      //             conversation
-      //           )}'`
-      //         )
-      //           .then(res => {
-      //             if (Object.keys(res).length === 0)
-      //               db.query(
-      //                 `INSERT INTO messages (message, concern_id) VALUES('${JSON.stringify(
-      //                   conversation
-      //                 )}', ${user.room}) `
-      //               );
-      //           })
-      //           .catch(err => console.log(err));
-      //       })
-      //     : ""
-      //   : "";
     });
   }
 };

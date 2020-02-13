@@ -160,8 +160,8 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
-            fullWidth={false}
-            maxWidth={(type === 'View Joined')? 'md' : 'xs'}
+            fullWidth={true}
+            maxWidth='sm'
         >
             {(type !== 'approving')?
                 <form onSubmit={submitUserData}>
@@ -173,31 +173,38 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
 
                     <DialogContent>
                         {(type === 'disapproving')?
+                        <div style={{display: `flex`, flexDirection: `column`}}>
                             <TextField
-                                id="outlined-multiline-static"
+                                id="outlined-textarea"
                                 label="Reason"
                                 multiline
                                 name="reason_disapproved"
-                                rows="4"
+                                rows="3"
                                 onChange={handleReason}
                                 variant="outlined"
                             />
+                              </div>
                          :(type === 'Create Cohort')?
-                            <>
+                            <div style={{display: `flex`, flexDirection: `column`}}>
+                               
                                 <TextField
-                                    id="standard-basic1"
+                                    id="outlined-textarea"
                                     name="class_title"
-                                    label="title"
+                                    label="Title"
+                                    variant="outlined"
                                     onChange={handleInputs}
                                 />
-                            
+                                <br/>
                                 <TextField
-                                    id="standard-basic2"
+                                    id="outlined-textarea"
                                     name="class_description"
-                                    label="class_description"
+                                    label="Class Description"
                                     onChange={handleInputs}
+                                    variant="outlined"
+                                    multiline
+                                    rows="3"
                                 />
-                            </>
+                            </div>
                          : (type === 'Change Key')?
                             <>
                                 <TextField

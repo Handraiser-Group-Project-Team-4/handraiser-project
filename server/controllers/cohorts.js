@@ -3,21 +3,32 @@ const keyGenerator = require("../keyGenerator");
 module.exports = {
   list: (req, res) => {
     const db = req.app.get("db");
+    const {value, user_id} = req.query;
 
-    db.query(
-      `select classroom_details.class_id, classroom_details.class_title, classroom_details.class_description, 
-    classroom_details.class_created, 
-    classroom_details.class_ended, classroom_details.class_status, classroom.classroom_id, classroom.class_id, 
-    classroom.class_key
-    from classroom_details
-    inner join classroom
-    on classroom_details.class_id = classroom.class_id`
-    )
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
+    if(value != 1)
+      db.query(
+        `select cd.class_id, cd.class_title, cd.class_description, cd.class_created, cd.class_ended, cd.class_status,
+        c.classroom_id, c.class_id, c.class_key
+        from classroom_details cd
+        inner join classroom c
+        on cd.class_id = c.class_id order by cd.class_id asc`
+      )
+        .then(get => res.status(200).json(get))
+        .catch(err => {
+          console.error(err);
+          res.status(500).end();
+        });
+    else{
+      db.query(`SELECT * FROM classroom_students, classroom, classroom_details WHERE classroom_students.user_id = '${user_id}' 
+              AND classroom_students.class_id = classroom.class_id 
+              AND classroom_students.class_id = classroom_details.class_id 
+              AND classroom.class_id = classroom_details.class_id `)
+        .then(get => res.status(200).json(get))
+        .catch(err => {
+          console.error(err);
+          res.status(500).end();
+        });
+    }
   },
 
   viewCohort: (req, res) => {

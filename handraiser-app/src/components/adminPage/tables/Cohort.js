@@ -1,20 +1,52 @@
 import React, { useEffect, useState } from "react";
+import copy from "clipboard-copy";
 import axios from "axios";
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import Switch from "@material-ui/core/Switch";
-
-// components
-import PopupModal from "../tools/PopupModal";
-import CohortModal from "../adminPage/CohortTools/CohortModal";
 import Tooltip from "@material-ui/core/Tooltip";
 import Button from '@material-ui/core/Button';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
+// components
+import PopupModal from "../../tools/PopupModal";
+import CohortModal from "../CohortTools/CohortModal";
 
 // icons
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from '@material-ui/icons/School';
 import DeleteIcon from '@material-ui/icons/Delete';
+
+export function ToolTipCopy({ data }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <ClickAwayListener onClickAway={() => setOpen(false)}>
+      <div>
+        <Tooltip
+          PopperProps={{
+            disablePortal: true,
+          }}
+          onClose={() => setOpen(false)}
+          open={open}
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          title="Copied to Clipboard"
+        >
+          <FileCopyIcon
+            style={{ cursor: `pointer`, width:`20px` }}
+            onClick={() => {
+              copy(data)
+              setOpen(true);
+            }}
+          />
+        </Tooltip>
+      </div>
+    </ClickAwayListener>
+  )
+}
 
 export default function MaterialTableDemo() {
   const [createCohort, setCreateCohort] = useState(false);
@@ -41,7 +73,15 @@ export default function MaterialTableDemo() {
     columns: [
       { title: "Title", field: "class_title" },
       { title: "Description", field: "class_description" },
-      { title: "Key", field: "class_key" },
+      {
+        title: "Key", field: "class_key",
+        render: (rowData) => (
+          <div style={{ display: `flex`, alignItems:`center` }}>
+            <p style={{ width: `110px` }}>{rowData.class_key}</p>
+            <ToolTipCopy data={rowData.class_key} />
+          </div>
+        )
+      },
       {
         title: "Status",
         field: "class_status",
@@ -122,13 +162,13 @@ export default function MaterialTableDemo() {
 
   useEffect(() => {
     renderCohorts();
-  },[]);
+  }, []);
 
   // GET THE COHORT VALUES
   const renderCohorts = () => {
     axios({
       method: "get",
-      url: `/api/cohorts`,
+      url: `/api/cohorts/`,
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
       }
@@ -140,7 +180,7 @@ export default function MaterialTableDemo() {
           data: data.data
         });
       })
-      .catch(err => console.log("object"));
+      .catch(err => console.log(err));
   };
 
   const toggleClassFn = data => {
@@ -216,23 +256,23 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        if(data.data.length === 0){
+        if (data.data.length === 0) {
           setDeleteCohortObj({
             ...deleteCohortObj,
             open: true,
-            title : `Are you you want to delete ${row.class_title}`,
+            title: `Are you you want to delete ${row.class_title}`,
             id: row.class_id,
             canDelete: 'yes'
           })
-        }else{
+        } else {
           setDeleteCohortObj({
             ...deleteCohortObj,
             open: true,
-            title : ` ${row.class_title} still has a users on it.`,
+            title: ` ${row.class_title} still has a users on it.`,
             canDelete: 'no'
           })
         }
-      
+
       })
       .catch(err => console.log("object"));
   };
@@ -241,17 +281,17 @@ export default function MaterialTableDemo() {
     <>
       {deleteCohortObj.open && (
         <PopupModal
-        title={deleteCohortObj.title}
-        open={deleteCohortObj.open}
-        handleClose={(e )=> setDeleteCohortObj({...deleteCohort, open: false})}
-        id={deleteCohortObj.id}
-        render={renderCohorts}
-        type={'Delete Cohort'}
-        canDelete={deleteCohortObj.canDelete}
-      />)}
+          title={deleteCohortObj.title}
+          open={deleteCohortObj.open}
+          handleClose={(e) => setDeleteCohortObj({ ...deleteCohort, open: false })}
+          id={deleteCohortObj.id}
+          render={renderCohorts}
+          type={'Delete Cohort'}
+          canDelete={deleteCohortObj.canDelete}
+        />)}
 
       {createCohort && (
-        <PopupModal 
+        <PopupModal
           title={'Create Cohort'}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
@@ -284,34 +324,24 @@ export default function MaterialTableDemo() {
           created={subject.created}
         />
       )}
+
       <MaterialTable
-        title=""
-        columns={table.columns}
-        data={table.data}
-        options={{
-          pageSize: 10
-          
-        }
-        
-        }
-        components={{
-          Toolbar: props => (
-            <div>
-              <MTableToolbar {...props} />
-              <div style={{ padding: "0px 10px" }}>
-                <Button
+        title={<Button
                   variant="contained"
                   color="primary"
                   size="large"
-                  onClick={() => setCreateCohort(true) }
+                  onClick={() => setCreateCohort(true)}
                   startIcon={<SchoolIcon />}
                 >
                   New Cohort
-                </Button>
-              </div>
-            </div>
-          )
+                </Button>}
+        columns={table.columns}
+        data={table.data}
+        options={{
+          pageSize: 10,
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}
+    
       />
     </>
   );

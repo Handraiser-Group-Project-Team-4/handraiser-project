@@ -1,18 +1,28 @@
 import React from "react";
 import axios from "axios";
-import MaterialTable from "material-table";
 
+// Material UI
+import MaterialTable from "material-table";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+// Material UI Icons
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
-export default function PopupModal({ handleClose, open, data, title, id, compare }) {
+
+export default function PopupModal({ handleClose, open, data, title, id}) {
     const columns = [
         
-        { title: "First Name", field: "firstname" },
-        { title: "Last Name", field: "lastname" },
+        { title: 'Avatar', field: 'avatar',
+        render: (rowData) => (
+          <div style={{display: `flex`}}>
+            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
+            <p>{rowData.firstname} {rowData.lastname}</p>
+          </div>
+        )
+        },
         { title: "Email", field: "email" },
         
       ]
@@ -51,17 +61,20 @@ export default function PopupModal({ handleClose, open, data, title, id, compare
         onClose={() =>handleClose(id)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={false}
+        fullWidth={true}
         maxWidth="sm"
       >
         <DialogTitle id="alert-dialog-title">
-            {title}
+         <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
+            <h4 style={{margin: `0`}}>{title}</h4>
+            <h6 style={{margin: `0`}}>Assign Mentor</h6>
+          </div>
         </DialogTitle>
 
         <DialogContent>
 
         <MaterialTable
-            title="Editable Example"
+            title="Mentors"
             columns={columns}
             data={data}
             options={{
@@ -70,7 +83,7 @@ export default function PopupModal({ handleClose, open, data, title, id, compare
         actions={[
           {
             tooltip: 'Assign as a Mentor',
-            icon: 'delete',
+            icon: () => <AddCircleIcon/>,
             onClick: (e, data) => assign(data, id)
           }
         ]}
