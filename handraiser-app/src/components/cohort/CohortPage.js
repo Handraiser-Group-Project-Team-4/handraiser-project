@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import MainpageTemplate from "../tools/MainpageTemplate";
 import Helps from "./Help";
 import NeedHelps from "./NeedHelp";
@@ -7,11 +8,10 @@ import Chat from "../Chat/Chat";
 import Axios from "axios";
 import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
-import { makeStyles, useTheme, fade } from "@material-ui/core/styles";
+import { makeStyles, fade } from "@material-ui/core/styles";
 import {
   Hidden,
   Typography,
-  useMediaQuery,
   Paper,
   Grid,
   MenuItem,
@@ -20,29 +20,33 @@ import {
   Select,
   TextField,
   InputAdornment,
-  Chip
+  Chip,
+  Box,
+  useTheme
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import { useSnackbar } from "notistack";
+import { AppBar, Tabs, Tab } from "@material-ui/core";
+import SwipeableViews from "react-swipeable-views";
 
 export const UserContext = createContext(null);
 let socket;
 
-export default function CohortPage(props) {
+export default function CohortPage({ value = 0, match }) {
   const ENDPOINT = "localhost:3001";
+  const history = useHistory();
   const classes = useStyles();
   const userObj = jwtToken();
-  const { id } = props.match.params;
+  const { id } = match.params;
+  const theme = useTheme();
   const [data, setData] = useState([]);
   const [user, setUser] = useState();
   const [chatroom, setChatRoom] = useState();
   const { enqueueSnackbar } = useSnackbar();
-
-  const theme = useTheme();
   const inputLabel = React.useRef(null);
   const [filter, setFilter] = React.useState("");
   const handleChange = event => setFilter(event.target.value);
-
+  console.log(id);
   useEffect(() => {
     Axios({
       method: "get",
@@ -115,77 +119,139 @@ export default function CohortPage(props) {
             chatHandler
           }}
         >
-          <Paper className={classes.paperr} elevation={2}>
-            <Grid container spacing={0} className={classes.gridContainerr}>
-              <Grid item md={6} xs={12} className={classes.gridItemm}>
-                <Grid container spacing={0} className={classes.topNavi}>
-                  <Typography variant="h4" noWrap className={classes.typoTitle}>
-                    Handraiser Queue
-                    <Chip className={classes.largeChip} label="10" />
-                  </Typography>
-                  <FormControl
-                    variant="outlined"
-                    className={classes.formControl}
+          <div className={classes.tabRoot}>
+            <AppBar position="static" color="default">
+              <Tabs
+                value={value}
+                // onChange={handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+                centered
+              >
+                <Tab
+                  label="Handraiser"
+                  onClick={() => history.push(`/cohort/${id}`)}
+                />
+                <Tab
+                  label="Cohort Details"
+                  onClick={() => history.push(`/cohort/details/${id}`)}
+                />
+                <Tab
+                  label="Logs"
+                  onClick={() => history.push(`/cohort/log/${id}`)}
+                />
+              </Tabs>
+            </AppBar>
+            <SwipeableViews
+              axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+              index={value}
+              // onChangeIndex={handleChangeIndex}
+            >
+              <TabPanel
+                value={value}
+                index={0}
+                dir={theme.direction}
+                className={classes.TabPanelpaperr}
+              >
+                <Paper className={classes.paperr} elevation={0}>
+                  <Grid
+                    container
+                    spacing={0}
+                    className={classes.gridContainerr}
                   >
-                    <InputLabel
-                      ref={inputLabel}
-                      id="demo-simple-select-outlined-label"
+                    <Grid
+                      item
+                      sm={12}
+                      md={12}
+                      xs={12}
+                      lg={6}
+                      className={classes.gridItemm}
                     >
-                      Filter
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-outlined-label"
-                      id="demo-simple-select-outlined"
-                      value={filter}
-                      onChange={handleChange}
-                      labelWidth={20}
-                      size="small"
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      <MenuItem value={"all"}>All</MenuItem>
-                      <MenuItem value={"closed"}>Closed</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <form
-                    noValidate
-                    autoComplete="off"
-                    className={classes.searchform}
-                  >
-                    <TextField
-                      id="outlined-search"
-                      label="Search field"
-                      type="search"
-                      variant="outlined"
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        )
-                      }}
-                    />
-                  </form>
-                </Grid>
-                <div>
-                  <NeedHelps classes={classes} />
-                  <BeingHelps classes={classes} />
-                </div>
-              </Grid>
-              <Hidden mdDown>
-                <Grid item xs={12} md={6} className={classes.gridItemm}>
-                  <section className={classes.rootq}>
-                    {chatroom ? (
-                      <Chat />
-                    ) : (
-                      userObj.user_role_id === 3 && <Helps />
-                    )}
-                  </section>
-                </Grid>
-              </Hidden>
-            </Grid>
-          </Paper>
+                      <Grid container spacing={0} className={classes.topNavi}>
+                        <Typography
+                          variant="h4"
+                          noWrap
+                          className={classes.typoTitle}
+                        >
+                          Handraiser Queue
+                          <Chip className={classes.largeChip} label="10" />
+                        </Typography>
+                        <FormControl
+                          variant="outlined"
+                          className={classes.formControl}
+                        >
+                          <InputLabel
+                            ref={inputLabel}
+                            id="demo-simple-select-outlined-label"
+                          >
+                            Filter
+                          </InputLabel>
+                          <Select
+                            labelId="demo-simple-select-outlined-label"
+                            id="demo-simple-select-outlined"
+                            value={filter}
+                            onChange={handleChange}
+                            labelWidth={20}
+                            size="small"
+                          >
+                            <MenuItem value="">
+                              <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={"all"}>All</MenuItem>
+                            <MenuItem value={"closed"}>Closed</MenuItem>
+                          </Select>
+                        </FormControl>
+                        <form
+                          noValidate
+                          autoComplete="off"
+                          className={classes.searchform}
+                        >
+                          <TextField
+                            id="outlined-search"
+                            label="Search field"
+                            type="search"
+                            variant="outlined"
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <SearchIcon />
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        </form>
+                      </Grid>
+                      <div>
+                        <NeedHelps classes={classes} />
+                        <BeingHelps classes={classes} />
+                      </div>
+                    </Grid>
+                    <Hidden mdDown>
+                      <Grid
+                        item
+                        sm={12}
+                        xs={12}
+                        md={12}
+                        lg={6}
+                        className={classes.gridItemm}
+                      >
+                        <section className={classes.rootq}>
+                          {chatroom ? (
+                            <Chat />
+                          ) : (
+                            userObj.user_role_id === 3 && <Helps />
+                          )}
+                        </section>
+                      </Grid>
+                    </Hidden>
+                  </Grid>
+                  <Hidden lgUp>
+                    <Helps fab={true} classes={classes} />
+                  </Hidden>
+                </Paper>
+              </TabPanel>
+            </SwipeableViews>
+          </div>
         </UserContext.Provider>
       </div>
     </MainpageTemplate>
@@ -200,10 +266,12 @@ const useStyles = makeStyles(theme => ({
   },
   cardHeaderRoot: {
     width: "100%",
-    // border: "2px solid #673ab7",
     borderRadius: 10,
+    display: "flex",
+    alignItems: "flex-start",
     "& > div > span:first-of-type": {
-      fontSize: 25
+      fontSize: 25,
+      wordBreak: "break-all"
     },
     "& > div > span:last-of-type": {
       fontSize: 15
@@ -216,11 +284,14 @@ const useStyles = makeStyles(theme => ({
     height: "100%"
   },
   gridContainerr: {
-    // minHeight: "100vh",
     paddingBottom: 20,
     backgroundColor: "#F5F5F5",
     [theme.breakpoints.up("md")]: {
-      height: "100%"
+      height: "100vh"
+    },
+    [theme.breakpoints.down("md")]: {
+      height: "calc(130vh - 64px)",
+      width: "100vw"
     },
     height: "calc(100vh - 64px)"
   },
@@ -228,15 +299,36 @@ const useStyles = makeStyles(theme => ({
     fontFamily: "'Rubik', sans-serif",
     marginBottom: "1rem",
     fontSize: 26,
-    order: 2,
-    "@media (max-width:960px)": {
+    [theme.breakpoints.down("md")]: {
       order: 3
+    },
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "10vw",
+      order: 3
+    }
+  },
+  formControl: {
+    marginRight: 10,
+    minWidth: 120,
+    [theme.breakpoints.down("md")]: {
+      marginBottom: 10
+    }
+  },
+  searchform: {
+    [theme.breakpoints.down("md")]: {
+      marginBottom: 10,
+      marginRight: 10
     }
   },
   gridItemm: {
     height: "100%",
     "&:first-of-type": {
       padding: "3rem 3rem 0"
+    },
+    [theme.breakpoints.down("md")]: {
+      "&:first-of-type": {
+        padding: "1rem 1rem 0"
+      }
     }
   },
   "@global": {
@@ -273,10 +365,13 @@ const useStyles = makeStyles(theme => ({
     "&::-webkit-scrollbar": {
       width: "5px",
       height: "8px",
-      backgroundColor: "#FFF"
+      backgroundColor: "#FFF",
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10
     },
     "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#673ab7" //'#23232F' //'#0595DD'
+      backgroundColor: "#673ab7" //'#23232F' //'#0595DD',
+      // borderTopRightRadius: 10
     }
   },
   cardRootContentTitle: {
@@ -313,14 +408,6 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 10,
     alignItems: "center"
   },
-  formControl: {
-    marginRight: 10,
-    minWidth: 120,
-    [theme.breakpoints.down("md")]: {
-      order: 2,
-      marginBottom: 10
-    }
-  },
   search: {
     height: 32,
     position: "relative",
@@ -334,16 +421,6 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up("sm")]: {
       marginLeft: theme.spacing(1),
       width: "auto"
-    }
-  },
-  searchform: {
-    [theme.breakpoints.down("md")]: {
-      marginBottom: 10,
-      marginRight: 10,
-      order: 1,
-      "@media (max-width:960px)": {
-        order: 3
-      }
     }
   },
   searchIcon: {
@@ -376,5 +453,33 @@ const useStyles = makeStyles(theme => ({
   },
   cardRootContentContent: {
     position: "relative"
+  },
+  fab: {
+    position: "fixed",
+    bottom: theme.spacing(7),
+    right: theme.spacing(5),
+    zIndex: 10,
+    boxShadow: "none",
+    backgroundColor: "transparent"
+  },
+  TabPanelpaperr: {
+    "& > div": {
+      padding: 0
+    }
   }
 }));
+
+function TabPanel({ children, value, index, ...other }) {
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </Typography>
+  );
+}

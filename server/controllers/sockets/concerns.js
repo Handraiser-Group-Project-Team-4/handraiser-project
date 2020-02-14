@@ -32,7 +32,7 @@ module.exports = {
             alert: {
               variant: "success",
               name: userObj.name,
-              action: "request for help"
+              action: "requested for help"
             }
           })
         )

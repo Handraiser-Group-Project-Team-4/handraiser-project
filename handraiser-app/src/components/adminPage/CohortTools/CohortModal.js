@@ -50,12 +50,8 @@ export default function PopupModal({
         field: "user_status",
         export: false,
         lookup: {
-          true: (
-            <status-indicator active pulse positive />
-          ),
-          false: (
-            <status-indicator active pulse negative />
-          )
+          true: <status-indicator active pulse positive />,
+          false: <status-indicator active pulse negative />
         }
       }
     ]

@@ -9,7 +9,6 @@ import CohortList from "../cohort/CohortListOld";
 
 import { makeStyles } from "@material-ui/core/styles";
 import { AppBar, Tabs, Tab } from "@material-ui/core";
-import Unnamed from "../../images/unnamed.jpg";
 
 let socket;
 export default function StudentPage({ location, value }) {

@@ -37,6 +37,16 @@ const Routes = props => {
         render={() => <StudentPage value={1} location={props} />}
       />
       <Route exact path="/cohort/:id" component={CohortPage} />
+      <Route
+        exact
+        path="/cohort/details/:id"
+        render={({ match }) => <CohortPage value={1} match={match} />}
+      />
+      <Route
+        exact
+        path="/cohort/log/:id"
+        render={({ match }) => <CohortPage value={2} match={match} />}
+      />
       <Route exact path="/team" component={Team} />
       <Route path="/design" render={() => <Design />} />
       <Route component={NotFound} />

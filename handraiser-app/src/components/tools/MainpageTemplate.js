@@ -28,6 +28,8 @@ import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 // import Unnamed from "./unnamed.jpg";
 import DnsIcon from "@material-ui/icons/Dns";
+import Chip from "@material-ui/core/Chip";
+import Skeleton from "@material-ui/lab/Skeleton";
 
 export default function MainpageTemplate({
   children,
@@ -122,14 +124,50 @@ export default function MainpageTemplate({
 
   const drawer = (
     <div>
-      {user && (
-        <div className={classes.firstToolbar}>
-          <img src={user.avatar} className={classes.studentImg} alt="" />
-          <Typography className={classes.studentImgButton}>
-            {user.firstname} {user.lastname}
-          </Typography>
-        </div>
-      )}
+      <div className={classes.firstToolbar}>
+        {user ? (
+          <>
+            <img src={user.avatar} className={classes.studentImg} alt="" />
+            <Typography className={classes.studentImgButton}>
+              {user.firstname} {user.lastname}
+            </Typography>
+            <Chip
+              // icon={<FaceIcon />}
+              label="*Student"
+              color="black"
+              style={{ backgroundColor: "white" }}
+            />
+          </>
+        ) : (
+          <>
+            <Skeleton
+              variant="circle"
+              width={85}
+              height={85}
+              style={{
+                backgroundColor: "#8154D1"
+              }}
+            />
+            <Skeleton
+              variant="text"
+              width={180}
+              height={45}
+              style={{
+                backgroundColor: "#8154D1"
+              }}
+            />
+            <Skeleton
+              variant="rect"
+              width={80}
+              height={30}
+              style={{
+                borderRadius: 90,
+                backgroundColor: "#8154D1"
+              }}
+            />
+          </>
+        )}
+      </div>
       <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
         {/* <Tab
           label={
@@ -327,20 +365,13 @@ const useStyles = makeStyles(theme => ({
     }
   },
   toolbar: theme.mixins.toolbar,
-  firstToolbar: {
-    ...theme.mixins.toolbar,
-    minHeight: "12rem!important",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center"
-  },
   drawerPaper: {
     width: drawerWidth,
     backgroundColor: "#673ab7"
   },
   content: {
-    flexGrow: 1
+    flexGrow: 1,
+    maxWidth: "calc(100% - 240px)"
   },
   "@global": {
     body: {
@@ -367,12 +398,23 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 500,
     color: "#9ea0b8"
   },
+  firstToolbar: {
+    ...theme.mixins.toolbar,
+    minHeight: "12rem!important",
+    padding: "30px 0",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
+  },
   studentImg: {
     borderRadius: "50%",
     border: "5px solid white",
-    width: "85px!important",
-    height: "85px",
-    cursor: "pointer"
+    width: 90,
+    height: 90,
+    cursor: "pointer",
+    border: "5px solid transparent",
+    boxShadow: "0 0 0 4px #fff"
   },
   studentImgButton: {
     fontFamily: "'Rubik', sans-serif",

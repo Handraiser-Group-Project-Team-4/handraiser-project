@@ -21,7 +21,7 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle
 } from "@material-ui/core";
 import Unnamed from "../../images/unnamed.jpg";
 
@@ -61,7 +61,7 @@ export default function CohortList({ classes, value }) {
 
   useEffect(() => {
     renderCohorts(value);
-    return () => { };
+    return () => {};
   }, [value]);
 
   const renderCohorts = () => {
@@ -73,7 +73,7 @@ export default function CohortList({ classes, value }) {
       }
     })
       .then(res => {
-        console.log(res.data)
+        console.log(res.data);
         setCohorts(res.data);
       })
       .catch(err => {
@@ -216,7 +216,7 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-      // onChangeIndex={handleChangeIndex}
+        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           <Container className={classes.paperr} maxWidth="xl">
@@ -269,15 +269,15 @@ export default function CohortList({ classes, value }) {
                                     }}
                                   />
                                 ) : (
-                                    <Chip
-                                      label="Close"
-                                      style={{
-                                        backgroundColor: "red",
-                                        color: `white`,
-                                        marginTop: -5
-                                      }}
-                                    />
-                                  )}
+                                  <Chip
+                                    label="Close"
+                                    style={{
+                                      backgroundColor: "red",
+                                      color: `white`,
+                                      marginTop: -5
+                                    }}
+                                  />
+                                )}
                               </h5>
                             </span>
                           </div>
@@ -353,15 +353,15 @@ export default function CohortList({ classes, value }) {
                                     }}
                                   />
                                 ) : (
-                                    <Chip
-                                      label="Close"
-                                      style={{
-                                        backgroundColor: "red",
-                                        color: `white`,
-                                        marginTop: -5
-                                      }}
-                                    />
-                                  )}
+                                  <Chip
+                                    label="Close"
+                                    style={{
+                                      backgroundColor: "red",
+                                      color: `white`,
+                                      marginTop: -5
+                                    }}
+                                  />
+                                )}
                               </h5>
                             </span>
                           </div>

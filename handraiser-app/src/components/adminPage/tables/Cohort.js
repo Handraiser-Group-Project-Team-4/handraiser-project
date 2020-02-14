@@ -4,19 +4,19 @@ import axios from "axios";
 import MaterialTable, { MTableToolbar } from "material-table";
 import Switch from "@material-ui/core/Switch";
 import Tooltip from "@material-ui/core/Tooltip";
-import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Button from "@material-ui/core/Button";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
 // components
 import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
 
 // icons
-import FileCopyIcon from '@material-ui/icons/FileCopy';
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import SchoolIcon from '@material-ui/icons/School';
-import DeleteIcon from '@material-ui/icons/Delete';
+import SchoolIcon from "@material-ui/icons/School";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 export function ToolTipCopy({ data }) {
   const [open, setOpen] = useState(false);
@@ -26,7 +26,7 @@ export function ToolTipCopy({ data }) {
       <div>
         <Tooltip
           PopperProps={{
-            disablePortal: true,
+            disablePortal: true
           }}
           onClose={() => setOpen(false)}
           open={open}
@@ -36,27 +36,27 @@ export function ToolTipCopy({ data }) {
           title="Copied to Clipboard"
         >
           <FileCopyIcon
-            style={{ cursor: `pointer`, width:`20px` }}
+            style={{ cursor: `pointer`, width: `20px` }}
             onClick={() => {
-              copy(data)
+              copy(data);
               setOpen(true);
             }}
           />
         </Tooltip>
       </div>
     </ClickAwayListener>
-  )
+  );
 }
 
 export default function MaterialTableDemo() {
   const [createCohort, setCreateCohort] = useState(false);
-  const [isCopy, setIsCopy] = useState(false)
+  const [isCopy, setIsCopy] = useState(false);
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
     title: "",
     id: "",
     canDelete: ""
-  })
+  });
   const [changeKey, setChangeKey] = useState({
     open: false,
     data: ""
@@ -74,9 +74,10 @@ export default function MaterialTableDemo() {
       { title: "Title", field: "class_title" },
       { title: "Description", field: "class_description" },
       {
-        title: "Key", field: "class_key",
-        render: (rowData) => (
-          <div style={{ display: `flex`, alignItems:`center` }}>
+        title: "Key",
+        field: "class_key",
+        render: rowData => (
+          <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
             <ToolTipCopy data={rowData.class_key} />
           </div>
@@ -255,17 +256,16 @@ export default function MaterialTableDemo() {
             open: true,
             title: `Are you you want to delete ${row.class_title}`,
             id: row.class_id,
-            canDelete: 'yes'
-          })
+            canDelete: "yes"
+          });
         } else {
           setDeleteCohortObj({
             ...deleteCohortObj,
             open: true,
             title: ` ${row.class_title} still has a users on it.`,
-            canDelete: 'no'
-          })
+            canDelete: "no"
+          });
         }
-
       })
       .catch(err => console.log("object"));
   };
@@ -276,20 +276,23 @@ export default function MaterialTableDemo() {
         <PopupModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
-          handleClose={(e) => setDeleteCohortObj({ ...deleteCohort, open: false })}
+          handleClose={e =>
+            setDeleteCohortObj({ ...deleteCohort, open: false })
+          }
           id={deleteCohortObj.id}
           render={renderCohorts}
-          type={'Delete Cohort'}
+          type={"Delete Cohort"}
           canDelete={deleteCohortObj.canDelete}
-        />)}
+        />
+      )}
 
       {createCohort && (
         <PopupModal
-          title={'Create Cohort'}
+          title={"Create Cohort"}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
           render={renderCohorts}
-          type={'Create Cohort'}
+          type={"Create Cohort"}
         />
       )}
 
