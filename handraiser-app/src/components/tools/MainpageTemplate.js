@@ -1,7 +1,18 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useContext } from "react";
 import { Redirect, Link, useHistory } from "react-router-dom";
 import axios from "axios";
+
+// COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
+import handraise from "../../images/handraise.png";
+import { DarkModeContext } from "../../App";
+import Team from "./Team";
+// import Unnamed from "./unnamed.jpg";
+// import Handraiser from "./Handraiser";
+// import ListOfCohorts from "./ListOfCohorts";
+
+// MATERIAL-UI
+
 import {
   AppBar,
   CssBaseline,
@@ -15,21 +26,22 @@ import {
   Typography,
   Tab,
   Box,
-  Tabs
+  Tabs,
+  Switch,
+  makeStyles,
+  useTheme,
+  Chip
 } from "@material-ui/core";
-import MenuIcon from "@material-ui/icons/Menu";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import handraise from "../../images/handraise.png";
-// import Handraiser from "./Handraiser";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-// import ListOfCohorts from "./ListOfCohorts";
-import Team from "./Team";
+import Skeleton from "@material-ui/lab/Skeleton";
+
+// ICONS
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
-// import Unnamed from "./unnamed.jpg";
 import DnsIcon from "@material-ui/icons/Dns";
-import Chip from "@material-ui/core/Chip";
-import Skeleton from "@material-ui/lab/Skeleton";
+import MenuIcon from "@material-ui/icons/Menu";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import Brightness4Icon from "@material-ui/icons/Brightness4";
+import Brightness7Icon from "@material-ui/icons/Brightness7";
 
 export default function MainpageTemplate({
   children,
@@ -43,6 +55,8 @@ export default function MainpageTemplate({
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const history = useHistory();
+
+  const { darkMode, setDarkMode } = useContext(DarkModeContext);
 
   const handleLogout = () => {
     axios({
@@ -83,44 +97,19 @@ export default function MainpageTemplate({
     };
   }, []);
 
+  const handleDarkMode = async () => {
+    let res = await axios({
+      method: "patch",
+      url: `/api/darkmode/${user.user_id}`,
+      data: { dark_mode: !darkMode },
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    });
+    setDarkMode(!darkMode);
+  };
+
   if (!userObj) return <Redirect to="/" />;
-
-  //////////////////////////////////Old return/////////////////////////////////////////////////
-  // return (
-  //   <div style={{ backgroundColor: `lightgrey` }}>
-  //     <header
-  //       style={{
-  //         background: `grey`,
-  //         color: `white`,
-  //         padding: `20px`,
-  //         display: `flex`,
-  //         justifyContent: `space-between`
-  //       }}
-  //     >
-  //       <h3>This is a header</h3>
-
-  //       {user && (
-  //         <div style={{ display: `flex`, alignItems: `center` }}>
-  //           {user.firstname} {user.lastname}
-  //           <img
-  //             src={user.avatar}
-  //             alt="profile_pic"
-  //             width="50"
-  //             style={{ borderRadius: `50%`, margin: `0 20px` }}
-  //           />
-  //           <Link to="/" onClick={handleLogout}>
-  //             Log out
-  //           </Link>
-  //           {/* <h2>{user.firstname} {user.lastname}</h2> */}
-  //           {/* <p>{user.email}</p> */}
-  //         </div>
-  //       )}
-  //     </header>
-  //     {children}
-  //     {/* <footer style={{background:`grey`, color:`white`, padding:`20px`, textAlign:`center`}}>This is a footer</footer> */}
-  //   </div>
-  // );
-  //////////////////////////////////Old return End/////////////////////////////////////////////////
 
   const drawer = (
     <div>
@@ -135,7 +124,10 @@ export default function MainpageTemplate({
               // icon={<FaceIcon />}
               label="*Student"
               color="black"
-              style={{ backgroundColor: "white" }}
+              style={{
+                backgroundColor: "white",
+                color: darkMode ? "#000" : null
+              }}
             />
           </>
         ) : (
@@ -169,21 +161,6 @@ export default function MainpageTemplate({
         )}
       </div>
       <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
-        {/* <Tab
-          label={
-            <ListItem button>
-              <ListItemIcon>
-                <img src={handraise} className={classes.listItemImg} alt="" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Handraiser"
-                className={classes.listItemText}
-              />
-            </ListItem>
-          }
-          {...a11yPropss(0)}
-        /> */}
-        {/* <Divider className={classes.divider} /> */}
         <Tab
           label={
             <ListItem
@@ -204,7 +181,6 @@ export default function MainpageTemplate({
               />
             </ListItem>
           }
-          // {...a11yPropss(0)}
         />
         <Tab
           label={
@@ -223,8 +199,8 @@ export default function MainpageTemplate({
               <ListItemText primary="Team" className={classes.listItemText} />
             </ListItem>
           }
-          // {...a11yPropss(1)}
         />
+        {/* <Divider className={classes.divider} /> */}
         <Tab
           label={
             <ListItem
@@ -245,24 +221,26 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        {/* <Tab
+        <Tab
           label={
-            <ListItem button className={classes.listItemButton}>
+            <ListItem className={classes.listItemButton}>
               <ListItemIcon
                 style={{
                   color: "white"
                 }}
               >
-                <PersonOutlineIcon />
+                {darkMode ? <Brightness4Icon /> : <Brightness7Icon />}
               </ListItemIcon>
-              <ListItemText
-                primary="View Profile"
-                className={classes.listItemText}
+              <ListItemText primary={darkMode ? "Dark" : "Light"} />
+              <Switch
+                checked={darkMode}
+                onChange={handleDarkMode}
+                value="checkedB"
+                color="default"
               />
             </ListItem>
           }
-          {...a11yPropss(4)}
-        /> */}
+        />
       </Tabs>
     </div>
   );
@@ -324,11 +302,6 @@ export default function MainpageTemplate({
             <div className={classes.toolbar} />
           </Hidden>
           <div className={classes.tabPanel}>{children}</div>
-          {/* <TabPanel value={value} index={0} className={classes.tabPanel}> */}
-          {/* <ListOfCohorts /> */}
-          {/* <Handraiser /> */}
-          {/* <Team /> */}
-          {/* </TabPanel> */}
         </main>
       </div>
     </Fragment>
@@ -371,7 +344,9 @@ const useStyles = makeStyles(theme => ({
   },
   content: {
     flexGrow: 1,
-    maxWidth: "calc(100% - 240px)"
+    [theme.breakpoints.up("md")]: {
+      maxWidth: "calc(100% - 240px)"
+    }
   },
   "@global": {
     body: {

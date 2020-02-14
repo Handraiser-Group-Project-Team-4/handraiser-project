@@ -1,17 +1,28 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { useSnackbar } from "notistack";
+import io from "socket.io-client";
+import Axios from "axios";
+import SwipeableViews from "react-swipeable-views";
 import { useHistory } from "react-router-dom";
-import MainpageTemplate from "../tools/MainpageTemplate";
+
+// COMPONENTS
+import MainpageTemplate from "../../tools/MainpageTemplate";
 import Helps from "./Help";
 import NeedHelps from "./NeedHelp";
 import BeingHelps from "./BeingHelp";
-import Chat from "../Chat/Chat";
-import Axios from "axios";
-import jwtToken from "../tools/assets/jwtToken";
-import io from "socket.io-client";
-import { makeStyles, fade } from "@material-ui/core/styles";
+import Chat from "../../Chat/Chat";
+import jwtToken from "../../tools/assets/jwtToken";
+import { DarkModeContext } from "../../../App";
+import Search from "./CohortFilter";
+
+// MATERIAL-UI
 import {
+  makeStyles,
+  useTheme,
+  fade,
   Hidden,
   Typography,
+  useMediaQuery,
   Paper,
   Grid,
   MenuItem,
@@ -21,32 +32,35 @@ import {
   TextField,
   InputAdornment,
   Chip,
-  Box,
-  useTheme
+  AppBar,
+  Tabs,
+  Tab,
+  Box
 } from "@material-ui/core";
+
+// ICONS
 import SearchIcon from "@material-ui/icons/Search";
-import { useSnackbar } from "notistack";
-import { AppBar, Tabs, Tab } from "@material-ui/core";
-import SwipeableViews from "react-swipeable-views";
 
 export const UserContext = createContext(null);
 let socket;
 
 export default function CohortPage({ value = 0, match }) {
   const ENDPOINT = "localhost:3001";
-  const history = useHistory();
   const classes = useStyles();
+  const history = useHistory();
   const userObj = jwtToken();
   const { id } = match.params;
-  const theme = useTheme();
   const [data, setData] = useState([]);
   const [user, setUser] = useState();
+  const [search, setSearch] = useState();
+  const [filter, setFilter] = useState();
   const [chatroom, setChatRoom] = useState();
   const { enqueueSnackbar } = useSnackbar();
+  const { darkMode } = useContext(DarkModeContext);
+
+  const theme = useTheme();
   const inputLabel = React.useRef(null);
-  const [filter, setFilter] = React.useState("");
-  const handleChange = event => setFilter(event.target.value);
-  console.log(id);
+
   useEffect(() => {
     Axios({
       method: "get",
@@ -99,11 +113,34 @@ export default function CohortPage({ value = 0, match }) {
     };
   }, [data]);
 
+  const changeHandler = event => {
+    event.target.name === "search" && setSearch(event.target.value);
+    event.target.name === "sortBy" && setFilter(event.target.value);
+  };
+
   const chatHandler = (event, value) => {
     event.stopPropagation();
     setChatRoom(value);
   };
+  const handleConcernCount = value => {
+    if (value === "allConcern") {
+      let concernCount = data.filter(
+        concern =>
+          concern.concern_status !== "done" && concern.class_id === parseInt(id)
+      );
+      return concernCount.length;
+    } else {
+      let concernCount = data.filter(
+        concern =>
+          concern.concern_status === value && concern.class_id === parseInt(id)
+      );
+      return concernCount.length;
+    }
+  };
 
+  if (Object.keys(data).length === 0) {
+    return null;
+  }
   return (
     <MainpageTemplate>
       <div className={classes.parentDiv}>
@@ -116,7 +153,10 @@ export default function CohortPage({ value = 0, match }) {
             setData,
             user,
             setUser,
-            chatHandler
+            chatHandler,
+            search,
+            filter,
+            handleConcernCount
           }}
         >
           <div className={classes.tabRoot}>
@@ -153,11 +193,14 @@ export default function CohortPage({ value = 0, match }) {
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
               >
-                <Paper className={classes.paperr} elevation={0}>
+                <Paper className={classes.paperr} elevation={2}>
                   <Grid
                     container
                     spacing={0}
                     className={classes.gridContainerr}
+                    style={{
+                      backgroundColor: darkMode ? "#333" : null
+                    }}
                   >
                     <Grid
                       item
@@ -174,7 +217,10 @@ export default function CohortPage({ value = 0, match }) {
                           className={classes.typoTitle}
                         >
                           Handraiser Queue
-                          <Chip className={classes.largeChip} label="10" />
+                          <Chip
+                            className={classes.largeChip}
+                            label={handleConcernCount("allConcern")}
+                          />
                         </Typography>
                         <FormControl
                           variant="outlined"
@@ -184,21 +230,19 @@ export default function CohortPage({ value = 0, match }) {
                             ref={inputLabel}
                             id="demo-simple-select-outlined-label"
                           >
-                            Filter
+                            Sort By
                           </InputLabel>
                           <Select
                             labelId="demo-simple-select-outlined-label"
                             id="demo-simple-select-outlined"
-                            value={filter}
-                            onChange={handleChange}
+                            name="sortBy"
+                            defaultValue={"all"}
+                            onChange={changeHandler}
                             labelWidth={20}
                             size="small"
                           >
-                            <MenuItem value="">
-                              <em>None</em>
-                            </MenuItem>
                             <MenuItem value={"all"}>All</MenuItem>
-                            <MenuItem value={"closed"}>Closed</MenuItem>
+                            <MenuItem value={"done"}>Closed</MenuItem>
                           </Select>
                         </FormControl>
                         <form
@@ -210,7 +254,9 @@ export default function CohortPage({ value = 0, match }) {
                             id="outlined-search"
                             label="Search field"
                             type="search"
+                            name="search"
                             variant="outlined"
+                            onChange={changeHandler}
                             InputProps={{
                               startAdornment: (
                                 <InputAdornment position="start">
@@ -222,8 +268,14 @@ export default function CohortPage({ value = 0, match }) {
                         </form>
                       </Grid>
                       <div>
-                        <NeedHelps classes={classes} />
-                        <BeingHelps classes={classes} />
+                        {search || filter === "done" ? (
+                          <Search classes={classes} />
+                        ) : (
+                          <div>
+                            <NeedHelps classes={classes} />
+                            <BeingHelps classes={classes} />
+                          </div>
+                        )}
                       </div>
                     </Grid>
                     <Hidden mdDown>
@@ -290,7 +342,7 @@ const useStyles = makeStyles(theme => ({
       height: "100vh"
     },
     [theme.breakpoints.down("md")]: {
-      height: "calc(130vh - 64px)",
+      height: "calc(110vh - 64px)",
       width: "100vw"
     },
     height: "calc(100vh - 64px)"
@@ -466,6 +518,9 @@ const useStyles = makeStyles(theme => ({
     "& > div": {
       padding: 0
     }
+  },
+  chatTitle: {
+    margin: "0 auto"
   }
 }));
 

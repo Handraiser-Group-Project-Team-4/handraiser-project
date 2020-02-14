@@ -1,4 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
+import io from "socket.io-client";
+import clsx from "clsx";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
+import ReactHtmlParser from "react-html-parser";
+import ScrollableFeed from "react-scrollable-feed";
+
+// MATERIAL-UI
 import {
   makeStyles,
   Card,
@@ -17,17 +25,17 @@ import {
   Menu
 } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
-import io from "socket.io-client";
-import clsx from "clsx";
-import "emoji-mart/css/emoji-mart.css";
-import { Picker } from "emoji-mart";
-import ReactHtmlParser from "react-html-parser";
-import ScrollableFeed from "react-scrollable-feed";
-import { UserContext } from "../cohort/CohortPage";
+
+// COMPONENTS
+import { UserContext } from "../cohort/cohortQueue/CohortPage";
+import jwtToken from "../tools/assets/jwtToken";
+import { DarkModeContext } from "../../App";
+
+// ICONS
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import jwtToken from "../tools/assets/jwtToken";
+
 const useStyles = makeStyles(theme => ({
   root: {
     borderRadius: 10,
@@ -86,16 +94,20 @@ const Chat = () => {
   const classes = useStyles();
   const userObj = jwtToken();
   const { chatroom } = useContext(UserContext);
+  const { darkMode } = useContext(DarkModeContext);
   const [showEmoji, setShowEmoji] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
   const [message, setMessage] = useState("");
-  const [typing, setTyping] = useState(false);
+  const [typing, setTyping] = useState({
+    isTyping: false,
+    name: ""
+  });
   const ENDPOINT = "localhost:3001";
 
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const handleClose = () => setAnchorEl(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
 
   useEffect(() => {
@@ -110,22 +122,24 @@ const Chat = () => {
       }
     );
   }, [ENDPOINT, chatroom]);
-
+  useEffect(() => {
+    const handleTyping = () => {
+      socket.emit("typing", { name: userObj.name });
+    };
+    window.addEventListener("keypress", handleTyping);
+    return () => {
+      window.removeEventListener("keypress", handleTyping);
+    };
+  }, []);
+  useEffect(() => {
+    socket.on("displayTyping", ({ name }) => {
+      setTyping(true);
+    });
+  }, []);
   useEffect(() => {
     socket.on("message", message => {
       setCurrentChat([...currentChat, message]);
     });
-
-    socket.on("displayTyping", ({ name }) => {
-      setTyping({ isTyping: true, name });
-    });
-
-    socket.on("displayNotTyping", ({ name }) => {
-      setTyping({ isTyping: false, name });
-    });
-
-    // socket.emit("saveChat", currentChat);
-
     return () => {
       socket.emit("disconnect");
       socket.off();
@@ -133,10 +147,10 @@ const Chat = () => {
   }, [currentChat]);
 
   const sendMessage = event => {
+    setOpen(true);
+    setMessage("");
     event.preventDefault();
-
     const temp = message.replace(/\n/g, "<br />");
-
     if (message) {
       socket.emit("sendMessage", { message: temp }, () => setMessage(""));
     }
@@ -144,6 +158,7 @@ const Chat = () => {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
+
   const toggleEmoji = () => {
     setShowEmoji(!showEmoji);
   };
@@ -210,7 +225,12 @@ const Chat = () => {
                           className={classes.chatAvatar}
                           src={message.avatar}
                         />
-                        <Container className={classes.chat}>
+                        <Container
+                          className={classes.chat}
+                          style={{
+                            backgroundColor: darkMode ? "#303030" : null
+                          }}
+                        >
                           <Typography variant="body2">
                             {ReactHtmlParser(message.text)}
                           </Typography>
@@ -238,7 +258,12 @@ const Chat = () => {
                           paddingLeft: 12
                         }}
                       >
-                        <Container className={classes.chat}>
+                        <Container
+                          className={classes.chat}
+                          style={{
+                            backgroundColor: darkMode ? "#303030" : null
+                          }}
+                        >
                           <Typography variant="body2">
                             {ReactHtmlParser(message.text)}
                           </Typography>
@@ -265,62 +290,71 @@ const Chat = () => {
           </ScrollableFeed>
         </Box>
       </CardContent>
-      <CardActions disableSpacing>
-        <TextField
-          InputProps={{
-            startAdornment: showEmoji && (
-              <Picker
-                set="facebook"
-                title="Pick your emoji…"
-                emoji="point_up"
-                sheetSize={64}
-                onSelect={emoji => setMessage(message + emoji.native)}
-                style={{
-                  position: "absolute",
-                  bottom: "45px",
-                  right: "20px",
-                  zIndex: 2
-                }}
-              />
-            ),
-            endAdornment: (
-              <InputAdornment position="start">
-                <InsertEmoticonIcon
-                  style={{ cursor: "pointer" }}
-                  onClick={() => toggleEmoji()}
+      {chatroom.concern_status !== "done" ? (
+        <CardActions disableSpacing>
+          <TextField
+            InputProps={{
+              startAdornment: showEmoji && (
+                <Picker
+                  set="facebook"
+                  title="Pick your emoji…"
+                  emoji="point_up"
+                  sheetSize={64}
+                  onSelect={emoji => setMessage(message + emoji.native)}
+                  style={{
+                    position: "absolute",
+                    bottom: "45px",
+                    right: "20px",
+                    zIndex: 2
+                  }}
                 />
-              </InputAdornment>
-            )
-          }}
-          multiline
-          rowsMax="5"
-          style={{ margin: 8 }}
-          placeholder="Send a message here"
-          fullWidth
-          margin="normal"
-          variant="outlined"
-          value={message}
-          onChange={({ target: { value } }) => setMessage(value)}
-          onKeyDown={event =>
-            message.match(/\s/g) &&
-            message.match(/\s/g).length === message.length
-              ? null
-              : event.keyCode === 13 && !event.shiftKey
-              ? sendMessage(event)
-              : null
-          }
-        />
-        <IconButton
-          className={clsx(classes.expand, {
-            [classes.expandOpen]: expanded
-          })}
-          onClick={handleExpandClick}
-          aria-expanded={expanded}
-          aria-label="show more"
-        >
-          <SendIcon />
-        </IconButton>
-      </CardActions>
+              ),
+              endAdornment: (
+                <InputAdornment position="start">
+                  <InsertEmoticonIcon
+                    style={{ cursor: "pointer" }}
+                    onClick={() => toggleEmoji()}
+                  />
+                </InputAdornment>
+              )
+            }}
+            multiline
+            rowsMax="5"
+            style={{ margin: 8 }}
+            placeholder="Send a message here"
+            fullWidth
+            margin="normal"
+            variant="outlined"
+            value={message}
+            value={message}
+            onChange={({ target: { value } }) => {
+              setMessage(value);
+              socket.emit("typing", { name: userObj.name });
+            }}
+            onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
+            onKeyDown={event =>
+              message.match(/\s/g) &&
+              message.match(/\s/g).length === message.length
+                ? null
+                : event.keyCode === 13 && !event.shiftKey
+                ? sendMessage(event)
+                : null
+            }
+          />
+          <IconButton
+            className={clsx(classes.expand, {
+              [classes.expandOpen]: expanded
+            })}
+            onClick={handleExpandClick}
+            aria-expanded={expanded}
+            aria-label="show more"
+          >
+            <SendIcon />
+          </IconButton>
+        </CardActions>
+      ) : (
+        ""
+      )}
     </Card>
     // </Container>
   );

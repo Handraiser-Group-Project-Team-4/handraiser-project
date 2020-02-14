@@ -1,182 +1,230 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useHistory } from 'react-router-dom';
-import jwtToken from '../tools/assets/jwtToken';
-import io from 'socket.io-client';
+import React, { useState, useEffect, useContext } from "react";
+import SwipeableViews from "react-swipeable-views";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import io from "socket.io-client";
+import { DarkModeContext } from "../../App";
+
+// COMPONENTS
+import jwtToken from "../tools/assets/jwtToken";
+import CohortContainer from "./CohortContainer";
+import UsersModal from "../tools/UsersModal";
+
+// MATERIAL-UI
+import {
+  useTheme,
+  TextField,
+  useMediaQuery,
+  Typography,
+  Box
+} from "@material-ui/core";
 
 let socket;
-export default function CohortList({ mentor }) {
-	const ENDPOINT = 'localhost:3001';
-	const userObj = jwtToken();
-	const history = useHistory();
-	const [cohorts, setCohorts] = useState([]);
-	const [isKey, setIsKey] = useState({
-		key: '',
-		open: false,
-		classroomObj: {},
-		error: false
-	});
+export default function CohortList({ classes, value }) {
+  const theme = useTheme();
+  const ENDPOINT = "localhost:3001";
+  const userObj = jwtToken();
+  const history = useHistory();
+  const [cohorts, setCohorts] = useState([]);
+  const [isKey, setIsKey] = useState({
+    key: "",
+    open: false,
+    classroomObj: {},
+    error: false
+  });
+  const { darkMode } = useContext(DarkModeContext);
 
-	useEffect(() => {
-		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-	}, [ENDPOINT]);
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const handleClose = () => {
+    setIsKey({ key: "", open: false, classroomObj: {}, error: false });
+  };
 
-	useEffect(() => {
-		socket.on('fetchCohort', data => {
-			// console.log(data)
-			// setCohorts([...cohorts, data])
-			renderCohorts();
-		});
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
 
-		return () => {
-			socket.emit('disconnect');
-			socket.off();
-		};
-	});
+  useEffect(() => {
+    socket.on("fetchCohort", data => {
+      renderCohorts();
+    });
 
-	useEffect(() => {
-		renderCohorts();
-		return () => {};
-	}, []);
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  });
 
-	const renderCohorts = () => {
-		axios({
-			method: `get`,
-			url: '/api/cohorts',
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				// console.log(res)
-				setCohorts(res.data);
-			})
-			.catch(err => {
-				console.log(err);
-			});
-	};
+  useEffect(() => {
+    renderCohorts(value);
+    return () => {};
+  }, [value]);
 
-	const handleCohort = x => {
-		// console.log(`clicked`, x)
-		axios({
-			method: `get`,
-			url: `/api/cohort-check/${x.class_id}?user_id=${userObj.user_id}`,
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				// console.log(res)
-				if (res.data.length === 0)
-					setIsKey({ ...isKey, open: true, classroomObj: x });
-				else {
-					history.push(`/cohort/${x.class_id}`);
-				}
-			})
-			.catch(err => {
-				console.log(err);
-			});
-	};
+  const renderCohorts = () => {
+    axios({
+      method: `get`,
+      url: `/api/cohorts?user_id=${userObj.user_id}&&value=${value}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(res => {
+        // console.log(res.data)
+        setCohorts(res.data);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
-	const handleSubmitKey = isKey => {
-		const input_key = isKey.key;
-		const class_id = isKey.classroomObj.class_id;
+  const handleCohort = x => {
+    axios({
+      method: `get`,
+      url: `/api/cohort-check/${x.class_id}?user_id=${userObj.user_id}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(res => {
+        if (res.data.length === 0) {
+          setIsKey({ ...isKey, open: true, classroomObj: x });
+        } else {
+          history.push(`/cohort/${x.class_id}`);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
 
-		let date = new Date();
-		let newDate = date.toLocaleString();
+  const handleSubmitKey = isKey => {
+    const input_key = isKey.key;
+    const class_id = isKey.classroomObj.class_id;
 
-		axios({
-			method: 'post',
-			url: `/api/submit-key`,
-			data: {
-				class_id,
-				user_id: userObj.user_id,
-				date_joined: newDate,
-				input_key
-			},
-			headers: {
-				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-			}
-		})
-			.then(res => {
-				// console.log(res)
-				alert('Congrats you enter the correct Key!');
-				history.push(`/cohort/${class_id}`);
-			})
-			.catch(err => {
-				console.log(err);
-				setIsKey({ ...isKey, error: true });
-			});
-	};
+    let date = new Date();
+    let newDate = date.toLocaleString();
 
+    axios({
+      method: "post",
+      url: `/api/submit-key`,
+      data: {
+        class_id,
+        user_id: userObj.user_id,
+        date_joined: newDate,
+        input_key
+      },
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(res => {
+        setIsKey({ ...isKey, open: false });
+        alert("Congrats you enter the correct Key!");
+        history.push(`/cohort/${class_id}`);
+      })
+      .catch(err => {
+        console.log(err);
+        setIsKey({ ...isKey, error: true });
+      });
+  };
   return (
     <>
-      {isKey.open && (
-        <>
-          <h3>{isKey.classroomObj.class_title}</h3>
-          <input
-            type="text"
-            placeholder="Enter Class key here..."
-            value={isKey.key}
-            onChange={e => setIsKey({ ...isKey, key: e.target.value })}
+      <SwipeableViews
+        axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+        index={value}
+        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        // onChangeIndex={handleChangeIndex}
+      >
+        <TabPanel value={value} index={0} dir={theme.direction}>
+          <CohortContainer
+            classes={classes}
+            handleCohort={handleCohort}
+            cohorts={cohorts}
           />
-          {isKey.error && (
-            <h5 style={{ color: `red`, margin: `0` }}>Invalid Key!</h5>
-          )}
-          <div style={{ display: `flex` }}>
-            <button onClick={() => handleSubmitKey(isKey)}>Submit</button>
-            <button onClick={() => setIsKey({ ...isKey, open: false })}>
-              Cancel
-            </button>
-          </div>
-        </>
+        </TabPanel>
+        <TabPanel value={value} index={1} dir={theme.direction}>
+          <CohortContainer
+            classes={classes}
+            handleCohort={handleCohort}
+            cohorts={cohorts}
+          />
+        </TabPanel>
+      </SwipeableViews>
+      {/* Dialog for creation of Cohort. Do Not delete */}
+      {/* <Dialog
+        fullScreen={fullScreen}
+        open={open}
+        onClose={handleClose}
+        maxWidth="sm"
+        aria-labelledby="max-width-dialog-title"
+      >
+        <DialogTitle id="max-width-dialog-title">Join Cohort</DialogTitle>
+        <DialogContent>
+          <form noValidate autoComplete="off">
+            <TextField
+              id="outlined-full-width"
+              label="Label"
+              helperText=""
+              fullWidth
+              margin="normal"
+              InputLabelProps={{
+                shrink: true
+              }}
+              variant="outlined"
+            />
+            <TextField
+              id="outlined-multiline-static"
+              label="Multiline"
+              multiline
+              rows="4"
+              variant="outlined"
+              helperText=""
+              fullWidth
+              multiline
+              margin="normal"
+              InputLabelProps={{
+                shrink: true
+              }}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Subscribe
+          </Button>
+        </DialogActions>
+      </Dialog> */}
+      {isKey.open && (
+        <UsersModal
+          fullScreen={fullScreen}
+          open={isKey.open}
+          data={isKey}
+          setData={e => setIsKey({ ...isKey, key: e.target.value })}
+          title={`Join ${isKey.classroomObj.class_title}`}
+          modalTextContent="To join to this cohort, please enter the cohort key given by your Mentor."
+          handleClose={handleClose}
+          handleSubmit={() => handleSubmitKey(isKey)}
+          type="Enter Key"
+          buttonText="Join"
+        />
       )}
-      <div style={{ display: `flex` }}>
-        {cohorts.map((x, i) => (
-          <div
-            onClick={() =>
-              x.class_status === "true"
-                ? handleCohort(x)
-                : alert("Sorry This class is closed")
-            }
-            key={i}
-            style={{
-              background: `white`,
-              padding: `20px`,
-              margin: `10px`,
-              borderRadius: `5px`,
-              cursor: `pointer`,
-              width: `100%`
-            }}
-          >
-            <h3>{x.class_title}</h3>
-            <p>{x.class_description}</p>
-            {x.class_status === "true" ? (
-              <span
-                style={{
-                  background: `green`,
-                  color: `white`,
-                  padding: `2px 4px`,
-                  borderRadius: `3px`
-                }}
-              >
-                active
-              </span>
-            ) : (
-              <span
-                style={{
-                  background: `red`,
-                  color: `white`,
-                  padding: `2px 4px`,
-                  borderRadius: `3px`
-                }}
-              >
-                close
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
     </>
+  );
+}
+
+function TabPanel({ children, value, index, ...other }) {
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </Typography>
   );
 }

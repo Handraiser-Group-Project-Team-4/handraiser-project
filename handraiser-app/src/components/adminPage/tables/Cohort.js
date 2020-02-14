@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import copy from "clipboard-copy";
 import axios from "axios";
-import MaterialTable, { MTableToolbar } from "material-table";
-import Switch from "@material-ui/core/Switch";
-import Tooltip from "@material-ui/core/Tooltip";
-import Button from "@material-ui/core/Button";
-import ClickAwayListener from "@material-ui/core/ClickAwayListener";
 
-// components
-import PopupModal from "../../tools/PopupModal";
+// MATERIAL-UI
+import MaterialTable, { MTableToolbar } from "material-table";
+import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
+
+// COMPONENTS
+import AdminModal from "../../tools/AdminModal";
 import CohortModal from "../CohortTools/CohortModal";
 
-// icons
+// ICONS
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -50,7 +49,6 @@ export function ToolTipCopy({ data }) {
 
 export default function MaterialTableDemo() {
   const [createCohort, setCreateCohort] = useState(false);
-  const [isCopy, setIsCopy] = useState(false);
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
     title: "",
@@ -67,7 +65,8 @@ export default function MaterialTableDemo() {
   });
   const [subject, setSubject] = useState({
     title: "",
-    created: ""
+    created: "",
+    id: ""
   });
   const [table, setTable] = useState({
     columns: [
@@ -114,8 +113,13 @@ export default function MaterialTableDemo() {
         }
       },
       {
+        title: "Actions",
         headerStyle: {
-          border: "none"
+          // border: "none",
+          textAlign: "center"
+        },
+        cellStyle: {
+          textAlign: "center"
         },
         render: row => (
           <div
@@ -124,7 +128,7 @@ export default function MaterialTableDemo() {
               display: `flex`,
               alignItems: `center`,
               justifyContent: `space-evenly`,
-              marginRight: "100px"
+              marginRight: 50
             }}
           >
             <Tooltip title="Toggle Class Status">
@@ -170,7 +174,6 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        console.log(data.data);
         setTable({
           ...table,
           data: data.data
@@ -181,6 +184,7 @@ export default function MaterialTableDemo() {
 
   const toggleClassFn = data => {
     console.log(data);
+
     if (data.class_status === "true") {
       axios({
         method: "patch",
@@ -217,7 +221,8 @@ export default function MaterialTableDemo() {
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
-      created: row.class_created
+      created: row.class_created,
+      id: row.class_id
     });
     renderViewStudentsTable(row.class_id);
   };
@@ -273,7 +278,7 @@ export default function MaterialTableDemo() {
   return (
     <>
       {deleteCohortObj.open && (
-        <PopupModal
+        <AdminModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
           handleClose={e =>
@@ -287,7 +292,7 @@ export default function MaterialTableDemo() {
       )}
 
       {createCohort && (
-        <PopupModal
+        <AdminModal
           title={"Create Cohort"}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
@@ -297,7 +302,7 @@ export default function MaterialTableDemo() {
       )}
 
       {changeKey.open && (
-        <PopupModal
+        <AdminModal
           title={"Change Key"}
           data={changeKey.data}
           open={changeKey.open}
@@ -315,36 +320,29 @@ export default function MaterialTableDemo() {
           }
           data={viewJoinedModal.data}
           title={subject.title}
+          id={subject.id}
           renderViewStudentsTable={renderViewStudentsTable}
           created={subject.created}
         />
       )}
 
       <MaterialTable
-        title=""
+        title={
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={() => setCreateCohort(true)}
+            startIcon={<SchoolIcon />}
+          >
+            New Cohort
+          </Button>
+        }
         columns={table.columns}
         data={table.data}
         options={{
           pageSize: 10,
           headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
-        }}
-        components={{
-          Toolbar: props => (
-            <div>
-              <MTableToolbar {...props} />
-              <div style={{ padding: "0px 10px" }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={() => setCreateCohort(true)}
-                  startIcon={<SchoolIcon />}
-                >
-                  New Cohort
-                </Button>
-              </div>
-            </div>
-          )
         }}
       />
     </>
