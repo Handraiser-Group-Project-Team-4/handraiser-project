@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import copy from "clipboard-copy";
 import axios from "axios";
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import Switch from "@material-ui/core/Switch";
 import Tooltip from "@material-ui/core/Tooltip";
 import Button from '@material-ui/core/Button';
@@ -50,7 +50,6 @@ export function ToolTipCopy({ data }) {
 
 export default function MaterialTableDemo() {
   const [createCohort, setCreateCohort] = useState(false);
-  const [isCopy, setIsCopy] = useState(false)
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
     title: "",
@@ -67,7 +66,8 @@ export default function MaterialTableDemo() {
   });
   const [subject, setSubject] = useState({
     title: "",
-    created: ""
+    created: "",
+    id: ""
   });
   const [table, setTable] = useState({
     columns: [
@@ -112,9 +112,14 @@ export default function MaterialTableDemo() {
           )
         }
       },
-      {
-        headerStyle: {
-          border: "none"
+      { title: "Actions",
+        headerStyle : {
+          // border: "none",
+          textAlign: "center"
+
+        },
+        cellStyle: {
+          textAlign: "center"
         },
         render: row => (
           <div
@@ -123,7 +128,7 @@ export default function MaterialTableDemo() {
               display: `flex`,
               alignItems: `center`,
               justifyContent: `space-evenly`,
-              marginRight: "100px"
+              marginRight: 50
             }}
           >
             <Tooltip title="Toggle Class Status">
@@ -169,7 +174,7 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        console.log(data.data);
+   
         setTable({
           ...table,
           data: data.data
@@ -179,7 +184,8 @@ export default function MaterialTableDemo() {
   };
 
   const toggleClassFn = data => {
-    console.log(data);
+    console.log(data)
+
     if (data.class_status === "true") {
       axios({
         method: "patch",
@@ -216,7 +222,8 @@ export default function MaterialTableDemo() {
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
-      created: row.class_created
+      created: row.class_created,
+      id: row.class_id
     });
     renderViewStudentsTable(row.class_id);
   };
@@ -312,25 +319,14 @@ export default function MaterialTableDemo() {
           }
           data={viewJoinedModal.data}
           title={subject.title}
+          id={subject.id}
           renderViewStudentsTable={renderViewStudentsTable}
           created={subject.created}
         />
       )}
 
       <MaterialTable
-        title=""
-        columns={table.columns}
-        data={table.data}
-        options={{
-          pageSize: 10,
-          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
-        }}
-        components={{
-          Toolbar: props => (
-            <div>
-              <MTableToolbar {...props} />
-              <div style={{ padding: "0px 10px" }}>
-                <Button
+        title={<Button
                   variant="contained"
                   color="primary"
                   size="large"
@@ -338,11 +334,14 @@ export default function MaterialTableDemo() {
                   startIcon={<SchoolIcon />}
                 >
                   New Cohort
-                </Button>
-              </div>
-            </div>
-          )
+                </Button>}
+        columns={table.columns}
+        data={table.data}
+        options={{
+          pageSize: 10,
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}
+    
       />
     </>
   );
