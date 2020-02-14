@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-import {  Button } from "@material-ui/core"
-
+// MATERIAL-UI
 import MaterialTable from 'material-table';
 import Tooltip from "@material-ui/core/Tooltip";
 
-// Components
-import PopupModal from '../../tools/PopupModal'
+// COMPONENTS
+import AdminModal from '../../tools/AdminModal'
+
+// ICONS
+import EditIcon from "@material-ui/icons/Edit";
 
 // Icons
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
@@ -126,7 +128,8 @@ export default function Pending() {
   return (
     <React.Fragment>
       {approving.open && (
-        <PopupModal
+        <AdminModal
+          title={`Are you sure you want to assign ${approving.data.firstname} ${approving.data.lastname} as a mentor?`}
           data={approving.data}
           open={approving.open}
           handleClose={() => setApproving({ ...approving, open: false })}
@@ -136,7 +139,7 @@ export default function Pending() {
       )}
 
       {disapproving.open && (
-        <PopupModal
+        <AdminModal
           title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
           data={disapproving.data}
           open={disapproving.open}

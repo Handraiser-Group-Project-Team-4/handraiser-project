@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from "react";
 import copy from "clipboard-copy";
 import axios from "axios";
-import MaterialTable from "material-table";
-import Switch from "@material-ui/core/Switch";
-import Tooltip from "@material-ui/core/Tooltip";
-import Button from '@material-ui/core/Button';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 
-// components
-import PopupModal from "../../tools/PopupModal";
+// MATERIAL-UI
+import MaterialTable, { MTableToolbar } from "material-table";
+import {
+  Switch, 
+  Tooltip,
+  Button,
+  ClickAwayListener,
+} from "@material-ui/core/";
+
+// COMPONENTS
+import AdminModal from "../../tools/AdminModal";
 import CohortModal from "../CohortTools/CohortModal";
 
-// icons
+// ICONS
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -280,7 +284,7 @@ export default function MaterialTableDemo() {
   return (
     <>
       {deleteCohortObj.open && (
-        <PopupModal
+        <AdminModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
           handleClose={(e) => setDeleteCohortObj({ ...deleteCohort, open: false })}
@@ -291,7 +295,7 @@ export default function MaterialTableDemo() {
         />)}
 
       {createCohort && (
-        <PopupModal
+        <AdminModal
           title={'Create Cohort'}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
@@ -301,7 +305,7 @@ export default function MaterialTableDemo() {
       )}
 
       {changeKey.open && (
-        <PopupModal
+        <AdminModal
           title={"Change Key"}
           data={changeKey.data}
           open={changeKey.open}

@@ -1,8 +1,20 @@
 import React, { useContext } from 'react';
+
+// COMPONENTS
 import Students from './Students';
 import { UserContext } from './CohortPage';
-import { DarkModeContext } from '../../App';
-import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
+import { DarkModeContext } from '../../../App';
+
+// MATERIAL-UI
+import { 
+	List, 
+	Typography, 
+	Card, 
+	CardContent, 
+	Chip 
+} from '@material-ui/core';
+
+
 export default function NeedHelps({ classes }) {
 	const { id, data, handleConcernCount } = useContext(UserContext);
 	const { darkMode } = useContext(DarkModeContext);

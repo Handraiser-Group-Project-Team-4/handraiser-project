@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 import axios from 'axios';
+
+// MATERIAL-UI
 import MaterialTable from "material-table";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button
+} from "@material-ui/core/";
 
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Button from '@material-ui/core/Button';
+// COMPONENTS
 
-// components
-import KickStud from "./KickStud";
+import AdminModal from "../../tools/AdminModal";
 import AssingMentor from "./AssignMentor";
 
-// icons
+// ICONS
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
-export default function PopupModal({
+export default function CohortModal({
   handleClose,
   open,
   data,
@@ -111,7 +115,14 @@ export default function PopupModal({
   return (
     <>
       {kickbool && (
-        <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
+        // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
+        <AdminModal 
+          title={`Are you sure you want to kick ${kickobj.firstname} ${kickobj.lastname}`}
+          open={kickbool} 
+          handleClose={closeKickModal} 
+          data={kickobj}
+          type="Kick Student"
+        />
       )}
 
       {assign.open && (
@@ -121,7 +132,6 @@ export default function PopupModal({
           data={assign.data} 
           title={title}
           id={id}
-          
           />
       )}
 

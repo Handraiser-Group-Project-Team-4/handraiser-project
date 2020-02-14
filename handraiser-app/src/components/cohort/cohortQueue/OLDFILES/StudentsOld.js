@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import Axios from "axios";
-import jwtToken from "../tools/assets/jwtToken";
+import jwtToken from "../../../tools/assets/jwtToken";
 import { UserContext } from "./CohortPageOld";
 
 import { makeStyles } from "@material-ui/core/styles";

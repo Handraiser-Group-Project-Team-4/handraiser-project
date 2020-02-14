@@ -1,15 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Axios from 'axios';
-import jwtToken from '../tools/assets/jwtToken';
-import { UserContext } from './CohortPage';
-import HelpIcon from '@material-ui/icons/Help';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
-import DeleteIcon from '@material-ui/icons/Delete';
 import io from 'socket.io-client';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 
+// COMPONENTS
+import jwtToken from '../../tools/assets/jwtToken';
+import { UserContext } from './CohortPage';
+
+// MATERIAL-UI
 import {
+	ListItemIcon,
 	IconButton,
 	ListItem,
 	Typography,
@@ -18,7 +17,15 @@ import {
 	Menu,
 	MenuItem
 } from '@material-ui/core';
+
+// ICONS
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import HelpIcon from '@material-ui/icons/Help';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
+import DeleteIcon from '@material-ui/icons/Delete';
+
+
 let socket;
 export default function Students({
 	room_id,

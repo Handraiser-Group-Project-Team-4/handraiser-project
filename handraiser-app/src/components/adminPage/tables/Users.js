@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import {  Button } from "@material-ui/core"
-import EditIcon from "@material-ui/icons/Edit";
+// MATERIAL-UI
 import MaterialTable from 'material-table';
 import Avatar from '@material-ui/core/Avatar';
 import Chip from '@material-ui/core/Chip';
 import Tooltip from "@material-ui/core/Tooltip";
 
 // Components
-import PopupModal from '../../tools/PopupModal'
+import AdminModal from '../../tools/AdminModal'
 import Attending from '../CohortTools/Attending'
 
 // Icons
@@ -146,13 +145,13 @@ export default function StickyHeadTable() {
   return (
     <React.Fragment>
       {assignModal && (
-        <PopupModal
+        <AdminModal
           title={`Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3 ? 'student' : 'mentor'}?`}
           data={assignObj}
           open={assignModal}
           render={renderUsers}
           handleClose={ () => setAssignModal(false)}
-          type={'users'}
+          type={'Change User Role'}
         />
       )}
 

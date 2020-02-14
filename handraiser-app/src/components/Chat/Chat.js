@@ -1,4 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
+import io from 'socket.io-client';
+import clsx from 'clsx';
+import 'emoji-mart/css/emoji-mart.css';
+import { Picker } from 'emoji-mart';
+import ReactHtmlParser from 'react-html-parser';
+import ScrollableFeed from 'react-scrollable-feed';
+
+// MATERIAL-UI
 import {
 	makeStyles,
 	Card,
@@ -17,18 +25,17 @@ import {
 	Menu
 } from '@material-ui/core';
 import { purple } from '@material-ui/core/colors';
-import io from 'socket.io-client';
-import clsx from 'clsx';
-import 'emoji-mart/css/emoji-mart.css';
-import { Picker } from 'emoji-mart';
-import ReactHtmlParser from 'react-html-parser';
-import ScrollableFeed from 'react-scrollable-feed';
-import { UserContext } from '../cohort/CohortPage';
+
+// COMPONENTS
+import { UserContext } from '../cohort/cohortQueue/CohortPage';
+import jwtToken from '../tools/assets/jwtToken';
 import { DarkModeContext } from '../../App';
+
+// ICONS
 import SendIcon from '@material-ui/icons/Send';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import InsertEmoticonIcon from '@material-ui/icons/InsertEmoticon';
-import jwtToken from '../tools/assets/jwtToken';
+
 const useStyles = makeStyles(theme => ({
 	root: {
 		borderRadius: 10,
@@ -80,13 +87,16 @@ const Chat = () => {
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [currentChat, setCurrentChat] = useState([]);
 	const [message, setMessage] = useState('');
-	const [typing, setTyping] = useState(false);
+	const [typing, setTyping] = useState({
+		isTyping: false,
+		name:""
+	});
 	const ENDPOINT = 'localhost:3001';
 
 	const [open, setOpen] = useState(false);
 	const [expanded, setExpanded] = useState(false);
 	const handleClose = () => setAnchorEl(null);
-	const [anchorEl, setAnchorEl] = React.useState(null);
+	const [anchorEl, setAnchorEl] = useState(null);
 	const handleClick = e => setAnchorEl(e.currentTarget);
 
 	useEffect(() => {
@@ -305,7 +315,12 @@ const Chat = () => {
 						margin="normal"
 						variant="outlined"
 						value={message}
-						onChange={({ target: { value } }) => setMessage(value)}
+						value={message}
+						onChange={({ target: { value } }) => {
+							setMessage(value)
+							socket.emit("typing", { name: userObj.name });
+						}}
+					  onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
 						onKeyDown={event =>
 							message.match(/\s/g) &&
 							message.match(/\s/g).length === message.length
