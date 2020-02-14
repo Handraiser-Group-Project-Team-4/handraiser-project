@@ -4,7 +4,6 @@ import io from "socket.io-client";
 
 // COMPONENTS
 import keyGenerator from './assets/keyGenerator'
-import AdminTable from "./AdminTable"
 
 // MATERIAL-UI
 import {
@@ -160,8 +159,8 @@ export default function AdminModal({ title, setTemp, temp, data, open, handleClo
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
-            fullWidth={false}
-            maxWidth={(type === 'View Joined') ? 'md' : 'xs'}
+            fullWidth={true}
+            maxWidth='sm'
         >
             {(type === 'approving' || type === 'Kick Student') ?
                 <>
@@ -236,10 +235,6 @@ export default function AdminModal({ title, setTemp, temp, data, open, handleClo
                                         >
                                             Generate New Key
                                         </Button>
-                                    </>
-                                : (type === 'View Joined') ?
-                                    <>
-                                        <AdminTable data={data} temp={temp} type={'View Joined'} setTemp={(filteredContacts) => setTemp(filteredContacts)} />
                                     </>
                                 : null
                             }
