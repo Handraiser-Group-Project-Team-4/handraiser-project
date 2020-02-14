@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import io from "socket.io-client";
+import { DarkModeContext } from "../../App";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
-import CohortContainer from './CohortContainer'
-import UsersModal from '../tools/UsersModal'
+import CohortContainer from "./CohortContainer";
+import UsersModal from "../tools/UsersModal";
 
 // MATERIAL-UI
 import {
@@ -15,7 +16,7 @@ import {
   TextField,
   useMediaQuery,
   Typography,
-  Box,
+  Box
 } from "@material-ui/core";
 
 let socket;
@@ -31,6 +32,7 @@ export default function CohortList({ classes, value }) {
     classroomObj: {},
     error: false
   });
+  const { darkMode } = useContext(DarkModeContext);
 
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const handleClose = () => {
@@ -54,7 +56,7 @@ export default function CohortList({ classes, value }) {
 
   useEffect(() => {
     renderCohorts(value);
-    return () => { };
+    return () => {};
   }, [value]);
 
   const renderCohorts = () => {
@@ -129,14 +131,22 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-      // onChangeIndex={handleChangeIndex}
+        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          <CohortContainer classes={classes} handleCohort={handleCohort} cohorts={cohorts}/>
-
+          <CohortContainer
+            classes={classes}
+            handleCohort={handleCohort}
+            cohorts={cohorts}
+          />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-          <CohortContainer classes={classes} handleCohort={handleCohort} cohorts={cohorts}/>
+          <CohortContainer
+            classes={classes}
+            handleCohort={handleCohort}
+            cohorts={cohorts}
+          />
         </TabPanel>
       </SwipeableViews>
       {/* Dialog for creation of Cohort. Do Not delete */}
@@ -187,17 +197,17 @@ export default function CohortList({ classes, value }) {
         </DialogActions>
       </Dialog> */}
       {isKey.open && (
-        <UsersModal 
+        <UsersModal
           fullScreen={fullScreen}
           open={isKey.open}
           data={isKey}
-          setData = {(e) => setIsKey({ ...isKey, key: e.target.value })}
+          setData={e => setIsKey({ ...isKey, key: e.target.value })}
           title={`Join ${isKey.classroomObj.class_title}`}
-          modalTextContent = "To join to this cohort, please enter the cohort key given by your Mentor."
+          modalTextContent="To join to this cohort, please enter the cohort key given by your Mentor."
           handleClose={handleClose}
           handleSubmit={() => handleSubmitKey(isKey)}
           type="Enter Key"
-          buttonText = "Join"
+          buttonText="Join"
         />
       )}
     </>
