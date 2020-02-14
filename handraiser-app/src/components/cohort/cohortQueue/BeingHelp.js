@@ -3,6 +3,7 @@ import React, { useContext } from 'react';
 // COMPONENTS
 import Students from './Students';
 import { UserContext } from './CohortPage';
+import { DarkModeContext } from '../../../App';
 
 // MATERIAL-UI
 import { List, 
@@ -13,7 +14,8 @@ import { List,
 } from '@material-ui/core';
 
 export default function BeingHelp({ classes }) {
-	const { id, data, user } = useContext(UserContext);
+	const { id, data, user, handleConcernCount } = useContext(UserContext);
+	const { darkMode } = useContext(DarkModeContext);
 	return (
 		<Card className={classes.cardRootContent}>
 			<CardContent className={classes.cardRootContentContent}>
@@ -22,9 +24,13 @@ export default function BeingHelp({ classes }) {
 					variant="h5"
 					component="h2"
 					className={classes.cardRootContentTitle}
+					style={{
+						backgroundColor: darkMode ? '#424242' : null,
+						color: darkMode ? '#fff' : null
+					}}
 				>
 					Being Helped
-					<Chip label="*5" />
+					<Chip label={handleConcernCount('onprocess')} />
 				</Typography>
 				{data &&
 				data.some(concern => concern.concern_status === 'onprocess') ? (
@@ -43,6 +49,7 @@ export default function BeingHelp({ classes }) {
 									text={concern.concern_title}
 									index={index}
 									classes={classes}
+									darkMode={darkMode}
 								/>
 							) : null
 						)}

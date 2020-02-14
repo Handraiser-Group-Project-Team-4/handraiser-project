@@ -2,36 +2,48 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // MATERIAL-UI
-import {  Button, makeStyles } from "@material-ui/core"
 import MaterialTable from 'material-table';
+import Avatar from '@material-ui/core/Avatar';
+import Chip from '@material-ui/core/Chip';
+import Tooltip from "@material-ui/core/Tooltip";
 
-// COMPONENTS
+// Components
 import AdminModal from '../../tools/AdminModal'
+import Attending from '../CohortTools/Attending'
 
-// ICONS
-import EditIcon from "@material-ui/icons/Edit";
+// Icons
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import WorkIcon from '@material-ui/icons/Work';
+import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%"
-  },
-  container: {
-    maxHeight: 740
-  }
-});
 
 export default function StickyHeadTable() {
-  const classes = useStyles();
+  
   const [users, setUsers] = useState({
     columns: [
-      { title: 'Avatar', field: 'avatar',
+      { title: 'Avatar', field: 'firstname',
         render: (rowData) => (
-          <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`,}} />
+          <div style={{display: `flex`}}>
+            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
+            <p>{rowData.firstname} {rowData.lastname}</p>
+          </div>
         )
       },
-      { title: "Role", field: 'user_role_id', lookup: {3: "Student", 2:"Mentor"} },
-      { title: 'Firstname', field: 'firstname' },
-      { title: 'Lastname', field: 'lastname' },
+      { title: 'Role', field: 'user_role_id', headerStyle:{display:`none`}, cellStyle:{display:`none`},
+        lookup: { 3:"Student",
+                  2:"Mentor"
+        }
+      },
+      { title: "Role", field: 'user_role_id', 
+        render: (rowData) =>(
+          (rowData.user_role_id === 3) 
+           ? <Chip variant="outlined" label="Student" color="primary" avatar={<Avatar>S</Avatar>} />
+           : <Chip variant="outlined" label="Mentor" color="secondary" avatar={<Avatar>M</Avatar>} />
+          
+        ),
+        export: false
+
+      },
       { title: 'Email', field: 'email' },
       { title: "Status", field: "user_status",
         render: (rowData) => (
@@ -43,35 +55,55 @@ export default function StickyHeadTable() {
         export: false
       },     
       { title: "Actions",
+        headerStyle : {
+          // border: "none",
+          textAlign: "center"
+
+        },
         render: (rowData) => (
-        (rowData.user_role_id===2 )? 
-          <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
-              onClick={e => openAssignModal(rowData, 3)}
-          >
-              Assign as Student
-          </Button> 
+        <div style={{
+          // backgroundColor: "red",
+          display: `flex`,
+          alignItems: `center`,
+          justifyContent: `space-evenly`,
+          // marginRight: 50
+        }}>
+        <>
+         { (rowData.user_role_id===2 )? 
+         
+          <Tooltip title="Assign as Student">
+              <WorkIcon
+               onClick={e => openAssignModal(rowData, 3)}
+              />
+            </Tooltip>
         
         : 
-          <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
-              onClick={e => openAssignModal(rowData, 2)}
-          >
-              Assign as Mentor
-          </Button>
+          
+          <Tooltip title="Assign as Mentor">
+              <WorkOutlineIcon
+                onClick={e => openAssignModal(rowData, 2)}
+              />
+            </Tooltip>
+         }</>
+
+            <Tooltip title="View Enrolled Cohorts" style={{margin: `0 0 0 5px`}}>
+              <VisibilityIcon
+                onClick={e => setAttending({ open: true, data: rowData })}
+              />
+            </Tooltip>
+          </div>  
         )
+        
       }
     ],
     data: []
   });
   const [assignModal, setAssignModal] = useState(false)
   const [assignObj, setAssignObj] = useState({})
+  const [attending, setAttending] = useState({
+    open: false,
+    data: ''
+  })
 
   const openAssignModal = (row, role) => {
     setAssignModal(true);
@@ -103,6 +135,13 @@ export default function StickyHeadTable() {
       .catch(err => console.log("err"));
   };
 
+  const closeAttending = () => {
+    setAttending({
+      ...attending,
+      open: false
+    })
+  }
+
   return (
     <React.Fragment>
       {assignModal && (
@@ -113,6 +152,14 @@ export default function StickyHeadTable() {
           render={renderUsers}
           handleClose={ () => setAssignModal(false)}
           type={'Change User Role'}
+        />
+      )}
+
+      {attending.open && (
+        <Attending
+          open={attending.open}
+          handleClose={closeAttending}
+          data={attending.data} 
         />
       )}
 

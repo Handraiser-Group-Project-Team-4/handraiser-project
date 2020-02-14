@@ -48,7 +48,7 @@ function a11yProps(index) {
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
+    backgroundColor: 'transparent',
     display: 'flex',
     height: 224,
   },
@@ -66,14 +66,16 @@ export default function VerticalTabs() {
   };
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} >
       <Tabs
+  
         orientation="vertical"
         variant="scrollable"
         value={value}
         onChange={handleChange}
         aria-label="Vertical tabs example"
         className={classes.tabs}
+        
       >
         <Tab label="For Approval" {...a11yProps(0)} />
         <Tab label="Approved" {...a11yProps(1)} />

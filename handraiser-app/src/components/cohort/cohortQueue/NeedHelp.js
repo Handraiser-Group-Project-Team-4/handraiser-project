@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 
 // COMPONENTS
-import Studentss from './Students';
+import Students from './Students';
 import { UserContext } from './CohortPage';
+import { DarkModeContext } from '../../../App';
 
 // MATERIAL-UI
 import { 
@@ -15,34 +16,8 @@ import {
 
 
 export default function NeedHelps({ classes }) {
-	const { id, data } = useContext(UserContext);
-	// return (
-	//   <Paper className={classes.paper}>
-	//     <Typography variant="h5" style={{ padding: 10 }}>
-	//       Need Help
-	//     </Typography>
-	//     <Divider />
-	//     <List className={classes.list}>
-	//       {data
-	//         ? data.map((concern, index) => {
-	//             if (concern.concern_status === "pending") {
-	//               return (
-	//                 <Students
-	//                   key={index}
-	//                   room_id={id}
-	//                   id={concern.concern_id}
-	//                   student_id={concern.student_id}
-	//                   status={concern.concern_status}
-	//                   text={concern.concern_title}
-	//                   index={index}
-	//                 />
-	//               );
-	//             } else return null;
-	//           })
-	//         : ""}
-	//     </List>
-	//   </Paper>
-	// );
+	const { id, data, handleConcernCount } = useContext(UserContext);
+	const { darkMode } = useContext(DarkModeContext);
 	return (
 		<Card className={classes.cardRootContent}>
 			<CardContent className={classes.cardRootContentContent}>
@@ -51,16 +26,20 @@ export default function NeedHelps({ classes }) {
 					variant="h5"
 					component="h2"
 					className={classes.cardRootContentTitle}
+					style={{
+						backgroundColor: darkMode ? '#424242' : null,
+						color: darkMode ? '#fff' : null
+					}}
 				>
 					Need Help
-					<Chip label="*5" />
+					<Chip label={handleConcernCount('pending')} />
 				</Typography>
 				{data && data.some(concern => concern.concern_status === 'pending') ? (
 					<List className={classes.roots}>
 						{data.map(
 							(concern, index) =>
 								concern.concern_status === 'pending' && (
-									<Studentss
+									<Students
 										key={index}
 										room_id={id}
 										id={concern.concern_id}
@@ -69,6 +48,7 @@ export default function NeedHelps({ classes }) {
 										text={concern.concern_title}
 										index={index}
 										classes={classes}
+										darkMode={darkMode}
 									/>
 								)
 						)}

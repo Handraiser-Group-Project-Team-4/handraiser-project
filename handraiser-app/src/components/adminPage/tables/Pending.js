@@ -3,8 +3,8 @@ import axios from "axios";
 import io from "socket.io-client";
 
 // MATERIAL-UI
-import {  Button, makeStyles } from "@material-ui/core"
 import MaterialTable from 'material-table';
+import Tooltip from "@material-ui/core/Tooltip";
 
 // COMPONENTS
 import AdminModal from '../../tools/AdminModal'
@@ -12,19 +12,16 @@ import AdminModal from '../../tools/AdminModal'
 // ICONS
 import EditIcon from "@material-ui/icons/Edit";
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%"
-  },
-  container: {
-    maxHeight: 740
-  }
-});
+// Icons
+import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+
+
 
 let socket;
 export default function Pending() {
   const ENDPOINT = "localhost:3001";
-  const classes = useStyles();
+
 
   const [pending, setPending] = useState({
     columns: [
@@ -41,27 +38,36 @@ export default function Pending() {
       { title: 'Email', field: 'email' },
       {
         title: "Actions",
+        headerStyle : {
+          // border: "none",
+          textAlign: "center"
+
+        },
         render: (rowData) => (
-          <>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
-              onClick={e => setApproving({ open: true, data: rowData })}
-            >
-              Approve
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
+
+          <div style={{
+            // backgroundColor: "red",
+            display: `flex`,
+            alignItems: `center`,
+            justifyContent: `space-evenly`,
+            // marginRight: 50
+          }}>
+            <Tooltip title="Approve">
+              <ThumbUpIcon
+                  onClick={e => setApproving({ open: true, data: rowData })}
+              />
+            </Tooltip>
+            <Tooltip title="Disapprove">
+              <ThumbDownIcon
               onClick={e => setDisapproving({ open: true, data: rowData })}
-            >
-              Disapprove
-            </Button>
-          </>
+              />
+            </Tooltip>
+          </div>
+          
+            
+           
+              
+           
         )
       }
     ],

@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import { makeStyles } from "@material-ui/core/styles";
+
 import MaterialTable from 'material-table';
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%"
-  },
-  container: {
-    maxHeight: 440
-  }
-});
+
 
 export default function Approved() {
-  const classes = useStyles();
+
 
   const [approved, setApproved] = useState({
     columns: [

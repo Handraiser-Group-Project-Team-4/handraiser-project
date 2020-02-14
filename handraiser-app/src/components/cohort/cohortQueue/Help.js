@@ -19,6 +19,7 @@ let socket;
 export default function Helps() {
 	const [value, setValue] = useState('');
 	const [isTrue, setIsTrue] = useState(false);
+	const [isEmpty, setIsEmpty] = useState(false);
 	const { id, data, user } = useContext(UserContext);
 	const userObj = jwtToken();
 	const ENDPOINT = 'localhost:3001';
@@ -73,15 +74,21 @@ export default function Helps() {
 
 	const sendConcern = e => {
 		e.preventDefault();
-		const concern = {
-			class_id: id,
-			mentor_id: null,
-			student_id: userObj.user_id,
-			concern_title: value,
-			concern_status: 'pending'
-		};
-		socket.emit('sendConcern', { concern, userObj }, () => { });
-		handleClose();
+
+		if (value) {
+			setIsEmpty(false);
+			const concern = {
+				class_id: id,
+				mentor_id: null,
+				student_id: userObj.user_id,
+				concern_title: value,
+				concern_status: 'pending'
+			};
+			socket.emit('sendConcern', { concern, userObj }, () => {});
+			handleClose();
+		} else {
+			setIsEmpty(true);
+		}
 	};
 
 	useEffect(() => {
