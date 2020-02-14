@@ -56,7 +56,7 @@ export default function AttendingModal({open, data, handleClose}) {
             },
             export: false
           },
-          { title: 'Date Class Created', field: 'class_created' },  
+          { title: 'Date Cohort Created', field: 'class_created' },  
           
          
         ],

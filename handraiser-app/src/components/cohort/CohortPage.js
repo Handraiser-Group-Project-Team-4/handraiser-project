@@ -1,14 +1,16 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import MainpageTemplate from '../tools/MainpageTemplate';
 import Helps from './Help';
 import NeedHelps from './NeedHelp';
 import BeingHelps from './BeingHelp';
+import Search from './CohortFilter';
 import Chat from '../Chat/Chat';
 import Axios from 'axios';
 import jwtToken from '../tools/assets/jwtToken';
 import io from 'socket.io-client';
 import { makeStyles, useTheme, fade } from '@material-ui/core/styles';
 import json2mq from 'json2mq';
+import { DarkModeContext } from '../../App';
 import {
 	Hidden,
 	Typography,
@@ -36,13 +38,14 @@ export default function CohortPage(props) {
 	const { id } = props.match.params;
 	const [data, setData] = useState([]);
 	const [user, setUser] = useState();
+	const [search, setSearch] = useState();
+	const [filter, setFilter] = useState();
 	const [chatroom, setChatRoom] = useState();
 	const { enqueueSnackbar } = useSnackbar();
+	const { darkMode } = useContext(DarkModeContext);
 
 	const theme = useTheme();
 	const inputLabel = React.useRef(null);
-	const [filter, setFilter] = React.useState('');
-	const handleChange = event => setFilter(event.target.value);
 	const matches = useMediaQuery(
 		json2mq({
 			minWidth: 960
@@ -101,11 +104,34 @@ export default function CohortPage(props) {
 		};
 	}, [data]);
 
+	const changeHandler = event => {
+		event.target.name === 'search' && setSearch(event.target.value);
+		event.target.name === 'sortBy' && setFilter(event.target.value);
+	};
+
 	const chatHandler = (event, value) => {
 		event.stopPropagation();
 		setChatRoom(value);
 	};
+	const handleConcernCount = value => {
+		if (value === 'allConcern') {
+			let concernCount = data.filter(
+				concern =>
+					concern.concern_status !== 'done' && concern.class_id === parseInt(id)
+			);
+			return concernCount.length;
+		} else {
+			let concernCount = data.filter(
+				concern =>
+					concern.concern_status === value && concern.class_id === parseInt(id)
+			);
+			return concernCount.length;
+		}
+	};
 
+	if (Object.keys(data).length === 0) {
+		return null;
+	}
 	return (
 		<MainpageTemplate>
 			<div className={classes.parentDiv}>
@@ -118,16 +144,29 @@ export default function CohortPage(props) {
 						setData,
 						user,
 						setUser,
-						chatHandler
+						chatHandler,
+						search,
+						filter,
+						handleConcernCount
 					}}
 				>
 					<Paper className={classes.paperr} elevation={2}>
-						<Grid container spacing={0} className={classes.gridContainerr}>
+						<Grid
+							container
+							spacing={0}
+							className={classes.gridContainerr}
+							style={{
+								backgroundColor: darkMode ? '#333' : null
+							}}
+						>
 							<Grid item md={6} xs={12} className={classes.gridItemm}>
 								<Grid container spacing={0} className={classes.topNavi}>
 									<Typography variant="h4" noWrap className={classes.typoTitle}>
 										Handraiser Queue
-										<Chip className={classes.largeChip} label="10" />
+										<Chip
+											className={classes.largeChip}
+											label={handleConcernCount('allConcern')}
+										/>
 									</Typography>
 									<FormControl
 										variant="outlined"
@@ -137,21 +176,19 @@ export default function CohortPage(props) {
 											ref={inputLabel}
 											id="demo-simple-select-outlined-label"
 										>
-											Filter
+											Sort By
 										</InputLabel>
 										<Select
 											labelId="demo-simple-select-outlined-label"
 											id="demo-simple-select-outlined"
-											value={filter}
-											onChange={handleChange}
+											name="sortBy"
+											defaultValue={'all'}
+											onChange={changeHandler}
 											labelWidth={20}
 											size="small"
 										>
-											<MenuItem value="">
-												<em>None</em>
-											</MenuItem>
 											<MenuItem value={'all'}>All</MenuItem>
-											<MenuItem value={'closed'}>Closed</MenuItem>
+											<MenuItem value={'done'}>Closed</MenuItem>
 										</Select>
 									</FormControl>
 									<form
@@ -163,7 +200,9 @@ export default function CohortPage(props) {
 											id="outlined-search"
 											label="Search field"
 											type="search"
+											name="search"
 											variant="outlined"
+											onChange={changeHandler}
 											InputProps={{
 												startAdornment: (
 													<InputAdornment position="start">
@@ -175,8 +214,14 @@ export default function CohortPage(props) {
 									</form>
 								</Grid>
 								<div>
-									<NeedHelps classes={classes} />
-									<BeingHelps classes={classes} />
+									{search || filter === 'done' ? (
+										<Search classes={classes} />
+									) : (
+										<div>
+											<NeedHelps classes={classes} />
+											<BeingHelps classes={classes} />
+										</div>
+									)}
 								</div>
 							</Grid>
 							<Hidden mdDown>
@@ -264,8 +309,8 @@ const useStyles = makeStyles(theme => ({
 		height: '85%',
 		'&::-webkit-scrollbar': {
 			width: '5px',
-			height: '8px',
-			backgroundColor: '#FFF'
+			height: '8px'
+			// backgroundColor: '#FFF'
 		},
 		'&::-webkit-scrollbar-thumb': {
 			backgroundColor: '#025279' //'#23232F' //'#0595DD'
@@ -285,6 +330,9 @@ const useStyles = makeStyles(theme => ({
 		},
 		overflowY: 'auto',
 		maxHeight: 360
+	},
+	searchRootContent: {
+		maxHeight: '680px!important'
 	},
 	cardRootContentTitle: {
 		color: '#673ab7',

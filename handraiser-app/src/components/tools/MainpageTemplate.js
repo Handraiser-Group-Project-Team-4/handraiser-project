@@ -1,7 +1,8 @@
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect, Fragment, useContext } from 'react';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import jwtToken from '../tools/assets/jwtToken';
+import { DarkModeContext } from '../../App';
 import {
 	AppBar,
 	CssBaseline,
@@ -15,9 +16,12 @@ import {
 	Typography,
 	Tab,
 	Box,
-	Tabs
+	Tabs,
+	Switch
 } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import Brightness7Icon from '@material-ui/icons/Brightness7';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import handraise from '../../images/handraise.png';
 // import Handraiser from "./Handraiser";
@@ -43,6 +47,8 @@ export default function MainpageTemplate({
 	const [value, setValue] = React.useState(0);
 	const handleChanges = (e, newValue) => setValue(newValue);
 	const history = useHistory();
+
+	const { darkMode, setDarkMode } = useContext(DarkModeContext);
 
 	const handleLogout = () => {
 		axios({
@@ -83,44 +89,19 @@ export default function MainpageTemplate({
 		};
 	}, []);
 
+	const handleDarkMode = async () => {
+		let res = await axios({
+			method: 'patch',
+			url: `/api/darkmode/${user.user_id}`,
+			data: { dark_mode: !darkMode },
+			headers: {
+				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+			}
+		});
+		setDarkMode(!darkMode);
+	};
+
 	if (!userObj) return <Redirect to="/" />;
-
-	//////////////////////////////////Old return/////////////////////////////////////////////////
-	// return (
-	//   <div style={{ backgroundColor: `lightgrey` }}>
-	//     <header
-	//       style={{
-	//         background: `grey`,
-	//         color: `white`,
-	//         padding: `20px`,
-	//         display: `flex`,
-	//         justifyContent: `space-between`
-	//       }}
-	//     >
-	//       <h3>This is a header</h3>
-
-	//       {user && (
-	//         <div style={{ display: `flex`, alignItems: `center` }}>
-	//           {user.firstname} {user.lastname}
-	//           <img
-	//             src={user.avatar}
-	//             alt="profile_pic"
-	//             width="50"
-	//             style={{ borderRadius: `50%`, margin: `0 20px` }}
-	//           />
-	//           <Link to="/" onClick={handleLogout}>
-	//             Log out
-	//           </Link>
-	//           {/* <h2>{user.firstname} {user.lastname}</h2> */}
-	//           {/* <p>{user.email}</p> */}
-	//         </div>
-	//       )}
-	//     </header>
-	//     {children}
-	//     {/* <footer style={{background:`grey`, color:`white`, padding:`20px`, textAlign:`center`}}>This is a footer</footer> */}
-	//   </div>
-	// );
-	//////////////////////////////////Old return End/////////////////////////////////////////////////
 
 	const drawer = (
 		<div>
@@ -138,21 +119,6 @@ export default function MainpageTemplate({
 				onChange={handleChanges}
 				className={classes.tabs}
 			>
-				{/* <Tab
-          label={
-            <ListItem button>
-              <ListItemIcon>
-                <img src={handraise} className={classes.listItemImg} alt="" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Handraiser"
-                className={classes.listItemText}
-              />
-            </ListItem>
-          }
-          {...a11yPropss(0)}
-        /> */}
-				{/* <Divider className={classes.divider} /> */}
 				<Tab
 					label={
 						<ListItem
@@ -192,7 +158,6 @@ export default function MainpageTemplate({
 							<ListItemText primary="Team" className={classes.listItemText} />
 						</ListItem>
 					}
-					// {...a11yPropss(1)}
 				/>
 				<Tab
 					label={
@@ -214,24 +179,26 @@ export default function MainpageTemplate({
 						</ListItem>
 					}
 				/>
-				{/* <Tab
-          label={
-            <ListItem button className={classes.listItemButton}>
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <PersonOutlineIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="View Profile"
-                className={classes.listItemText}
-              />
-            </ListItem>
-          }
-          {...a11yPropss(4)}
-        /> */}
+				<Tab
+					label={
+						<ListItem className={classes.listItemButton}>
+							<ListItemIcon
+								style={{
+									color: 'white'
+								}}
+							>
+								{darkMode ? <Brightness4Icon /> : <Brightness7Icon />}
+							</ListItemIcon>
+							<ListItemText primary={darkMode ? 'Dark' : 'Light'} />
+							<Switch
+								checked={darkMode}
+								onChange={handleDarkMode}
+								value="checkedB"
+								color="default"
+							/>
+						</ListItem>
+					}
+				/>
 			</Tabs>
 		</div>
 	);
@@ -293,11 +260,6 @@ export default function MainpageTemplate({
 						<div className={classes.toolbar} />
 					</Hidden>
 					<div className={classes.tabPanel}>{children}</div>
-					{/* <TabPanel value={value} index={0} className={classes.tabPanel}> */}
-					{/* <ListOfCohorts /> */}
-					{/* <Handraiser /> */}
-					{/* <Team /> */}
-					{/* </TabPanel> */}
 				</main>
 			</div>
 		</Fragment>

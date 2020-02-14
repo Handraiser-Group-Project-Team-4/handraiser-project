@@ -18,6 +18,7 @@ let socket;
 export default function Helps() {
 	const [value, setValue] = useState('');
 	const [isTrue, setIsTrue] = useState(false);
+	const [isEmpty, setIsEmpty] = useState(false);
 	const { id, data, user } = useContext(UserContext);
 	const userObj = jwtToken();
 	const ENDPOINT = 'localhost:3001';
@@ -72,39 +73,22 @@ export default function Helps() {
 
 	const sendConcern = e => {
 		e.preventDefault();
-		const concern = {
-			class_id: id,
-			mentor_id: null,
-			student_id: userObj.user_id,
-			concern_title: value,
-			concern_status: 'pending'
-		};
-		socket.emit('sendConcern', { concern, userObj }, () => {});
-		handleClose();
-	};
 
-	// const handleClick = () => {
-	//   Axios({
-	//     method: "post",
-	//     url: `/api/concern`,
-	//     data: {
-	//       class_id: id,
-	//       mentor_id: null,
-	//       student_id: user.user_id,
-	//       concern_title: value,
-	//       concern_status: "pending"
-	//     },
-	//     headers: {
-	//       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-	//     }
-	//   })
-	//     .then(res => {
-	//       setData([...data, res.data]);
-	//       setValue("");
-	//       setIsTrue(true);
-	//     })
-	//     .catch(err => console.log(err));
-	// };
+		if (value) {
+			setIsEmpty(false);
+			const concern = {
+				class_id: id,
+				mentor_id: null,
+				student_id: userObj.user_id,
+				concern_title: value,
+				concern_status: 'pending'
+			};
+			socket.emit('sendConcern', { concern, userObj }, () => {});
+			handleClose();
+		} else {
+			setIsEmpty(true);
+		}
+	};
 
 	useEffect(() => {
 		if (user) {
@@ -154,10 +138,8 @@ export default function Helps() {
 							style={{ width: '25vw' }}
 							value={value}
 							onChange={e => setValue(e.target.value)}
-							// helperText={
-							//   isKey.error ? "The Cohort Key you entered is invalid." : ""
-							// }
-							// error={isKey.error}
+							error={isEmpty}
+							helperText={isEmpty ? 'Required input field.' : null}
 						/>
 					</DialogContent>
 					<DialogActions>
