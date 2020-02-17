@@ -188,25 +188,55 @@ module.exports = {
 			});
 	},
 
-	movingToDisapprove: (req, res) => {
-		const db = req.app.get('db');
-		const { user_approval_status_id, reason_disapproved } = req.body;
-		db.users
-			.update(
-				{
-					user_id: req.params.id
-				},
-				{
-					user_approval_status_id: user_approval_status_id,
-					reason_disapproved: reason_disapproved
-				}
-			)
-			.then(post => res.status(201).send(post))
-			.catch(err => {
-				console.err(err);
-				res.status(500).end();
-			});
-	},
+  movingToDisapprove: (req, res) => {
+    const db = req.app.get("db");
+    const { user_approval_status_id, reason_disapproved } = req.body;
+    db.users
+      .update(
+        {
+          user_id: req.params.id
+        },
+        {
+          user_approval_status_id: user_approval_status_id,
+          reason_disapproved: reason_disapproved
+        }
+      )
+      .then(post => res.status(201).send(post))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
+  },
+
+  getMentors: (req, res) => {
+    const db = req.app.get("db");
+
+     db.query(`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
+     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
+  getAttendingCohorts: (req, res) => {
+    const db = req.app.get("db");
+
+     db.query(`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
+     from users u
+     inner join classroom_students cs
+     on u.user_id = cs.user_id
+     inner join classroom_details cd
+     on cs.class_id = cd.class_id
+     where u.user_id = ${req.params.id}`)
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+	
 	darkmode: (req, res) => {
 		const db = req.app.get('db');
 		const { dark_mode } = req.body;

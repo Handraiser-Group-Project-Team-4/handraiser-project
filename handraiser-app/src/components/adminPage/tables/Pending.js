@@ -2,27 +2,26 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-import {  Button } from "@material-ui/core"
-import EditIcon from "@material-ui/icons/Edit";
-import { makeStyles } from "@material-ui/core/styles";
+// MATERIAL-UI
 import MaterialTable from 'material-table';
+import Tooltip from "@material-ui/core/Tooltip";
 
-// Components
-import PopupModal from '../../tools/PopupModal'
+// COMPONENTS
+import AdminModal from '../../tools/AdminModal'
 
-const useStyles = makeStyles({
-  root: {
-    width: "100%"
-  },
-  container: {
-    maxHeight: 740
-  }
-});
+// ICONS
+import EditIcon from "@material-ui/icons/Edit";
+
+// Icons
+import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+
+
 
 let socket;
 export default function Pending() {
   const ENDPOINT = "localhost:3001";
-  const classes = useStyles();
+
 
   const [pending, setPending] = useState({
     columns: [
@@ -39,27 +38,36 @@ export default function Pending() {
       { title: 'Email', field: 'email' },
       {
         title: "Actions",
+        headerStyle : {
+          // border: "none",
+          textAlign: "center"
+
+        },
         render: (rowData) => (
-          <>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
-              onClick={e => setApproving({ open: true, data: rowData })}
-            >
-              Approve
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<EditIcon />}
+
+          <div style={{
+            // backgroundColor: "red",
+            display: `flex`,
+            alignItems: `center`,
+            justifyContent: `space-evenly`,
+            // marginRight: 50
+          }}>
+            <Tooltip title="Approve">
+              <ThumbUpIcon
+                  onClick={e => setApproving({ open: true, data: rowData })}
+              />
+            </Tooltip>
+            <Tooltip title="Disapprove">
+              <ThumbDownIcon
               onClick={e => setDisapproving({ open: true, data: rowData })}
-            >
-              Disapprove
-            </Button>
-          </>
+              />
+            </Tooltip>
+          </div>
+          
+            
+           
+              
+           
         )
       }
     ],
@@ -120,7 +128,8 @@ export default function Pending() {
   return (
     <React.Fragment>
       {approving.open && (
-        <PopupModal
+        <AdminModal
+          title={`Are you sure you want to assign ${approving.data.firstname} ${approving.data.lastname} as a mentor?`}
           data={approving.data}
           open={approving.open}
           handleClose={() => setApproving({ ...approving, open: false })}
@@ -130,7 +139,7 @@ export default function Pending() {
       )}
 
       {disapproving.open && (
-        <PopupModal
+        <AdminModal
           title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
           data={disapproving.data}
           open={disapproving.open}

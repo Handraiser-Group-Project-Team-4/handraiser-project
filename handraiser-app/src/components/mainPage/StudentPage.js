@@ -1,28 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+
 import axios from "axios";
 import { Redirect, useHistory } from "react-router-dom";
-import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
 
+// COMPONENTS
+import {newUserContext} from "../../routes"
+import jwtToken from "../tools/assets/jwtToken";
 import MainpageTemplate from "../tools/MainpageTemplate";
-import CohortList from "../cohort/CohortListOld";
+import CohortList from "../cohort/CohortList";
+import UsersModal from '../tools/UsersModal'
 
-import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Tabs, Tab } from "@material-ui/core";
-import Unnamed from "../../images/unnamed.jpg";
+// MATERIAL-UI
+import { 
+  makeStyles,
+  AppBar, 
+  Tabs, 
+  Tab,
+} from "@material-ui/core";
 
 let socket;
-export default function StudentPage({ location, value }) {
+export default function StudentPage({ value }) {
+  console.log(value)
   const [request, setRequest] = useState();
+  const [open, setOpen] = useState(true);
+  const {isNew} = useContext(newUserContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
   const history = useHistory();
-  // const [value, setValue] = React.useState(0);
-  // const handleChange = (e, newValue) => setValue(newValue);
-  // const handleChangeIndex = index => setValue(index);
-  if (location.state)
-    if (location.state.isNew) sessionStorage.setItem("newUser", "true");
+
+  sessionStorage.setItem("newUser", isNew);
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -30,7 +38,6 @@ export default function StudentPage({ location, value }) {
 
   useEffect(() => {
     socket.on("studentToMentor", user_id => {
-      // console.log(user_id, userObj.user_id);
       if (userObj.user_id === user_id)
         alert(
           `Your role has been change to Mentor. Please Logout to see the changes!`
@@ -40,7 +47,6 @@ export default function StudentPage({ location, value }) {
 
   useEffect(() => {
     socket.on("notifyUser", ({ user_id, approval_status }) => {
-      // console.log(user_id, approval_status)
       if (userObj.user_id === user_id) {
         if (approval_status.user_approval_status_id === 1)
           alert(
@@ -90,27 +96,19 @@ export default function StudentPage({ location, value }) {
 
   return (
     <MainpageTemplate>
-      {/* //////////////////////////////////Old Code///////////////////////////////////////////////// */}
-      {/* <div
-        style={{
-          display: `flex`,
-          flexDirection: `column`,
-          justifyContent: `center`,
-          alignItems: `center`,
-          height: `100vh`
-        }}
-      >
-        <h1>THIS IS WHERE THE COHORT LIST IS LOCATED</h1>
-        <CohortList />
-        {sessionStorage.getItem("newUser") === "pending" ||
-        request === "pending" ||
-        userObj.user_approval_status_id === 2 ? (
+      {sessionStorage.getItem("newUser") === "pending" || request === "pending" || userObj.user_approval_status_id === 2 ? 
           <h3>Request Sent. Waiting for Confirmation!</h3>
-        ) : sessionStorage.getItem("newUser") === "true" ? (
-          <button onClick={handleMentor}>I'am a Mentor</button>
-        ) : null}
-      </div> */}
-      {/* //////////////////////////////////Old Code End///////////////////////////////////////////////// */}
+       :
+        sessionStorage.getItem("newUser") === "true" && (
+        <UsersModal 
+          open={open}
+          handleClose={() => setOpen(false)}
+          handleSubmit={handleMentor}
+          type="New User"
+          buttonText = "I'am a Mentor"
+        />
+      )}
+
       <div className={classes.parentDiv}>
         <div className={classes.tabRoot}>
           <AppBar position="static" color="default">

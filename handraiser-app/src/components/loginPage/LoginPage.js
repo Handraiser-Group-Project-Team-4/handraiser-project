@@ -1,17 +1,20 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Typography from "@material-ui/core/Typography";
-import Container from "@material-ui/core/Container";
-import CardMedia from "@material-ui/core/CardMedia";
-import Box from "@material-ui/core/Box";
-import Grid from "@material-ui/core/Grid";
+
+import { 
+  makeStyles,
+  CssBaseline,
+  Typography,
+  Container,
+  CardMedia,
+  Box,
+  Grid,
+  Hidden ,
+} from "@material-ui/core/";
+
+// COMPONENTS
 import classroom from "../../images/classroom.png";
 import handraise from "../../images/handraise.png";
 import bg from "../../images/bg.jpg";
-// import googleIcon from "../../images/google-icon.svg";
-// import Fab from "@material-ui/core/Fab";
-import Hidden from "@material-ui/core/Hidden";
 import LoginBtn from './LoginBtn'
 
 export default function LoginPage() {

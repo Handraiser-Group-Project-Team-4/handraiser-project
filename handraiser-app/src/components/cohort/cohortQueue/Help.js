@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
-import { UserContext } from './CohortPage';
-import jwtToken from '../tools/assets/jwtToken';
 import styled, { keyframes } from 'styled-components';
-import Handraise from '../../images/handraise.png';
-import disabledHandraise from '../../images/disabledHandraise.png';
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import { useTheme } from '@material-ui/core/styles';
+// COMPONENTS
+import { UserContext } from './CohortPage';
+import jwtToken from '../../tools/assets/jwtToken';
+import Handraise from '../../../images/handraise.png';
+import disabledHandraise from '../../../images/disabledHandraise.png';
+import UsersModal from '../../tools/UsersModal'
 
-import { useMediaQuery, TextField, Button } from '@material-ui/core';
+// Material-UI
+import {
+	useMediaQuery,
+	useTheme,
+} from '@material-ui/core';
+
 let socket;
 export default function Helps() {
 	const [value, setValue] = useState('');
@@ -110,47 +111,18 @@ export default function Helps() {
 		!isTrue && user.user_role_id === 3 ? (
 			<>
 				<HelpingHand button onClick={e => setOpen(true)} disabled={isTrue} />
-				<Dialog
+				<UsersModal 
 					fullScreen={fullScreen}
 					open={open}
-					onClose={handleClose}
-					maxWidth="sm"
-					aria-labelledby="max-width-dialog-title"
-				>
-					<DialogTitle id="form-dialog-title">Handraiser Concern</DialogTitle>
-					<DialogContent>
-						<DialogContentText>
-							Please type your concern below.
-						</DialogContentText>
-						<TextField
-							id="outlined-multiline-static"
-							label="Concern"
-							multiline
-							rows="4"
-							variant="outlined"
-							helperText=""
-							fullWidth
-							multiline
-							margin="normal"
-							InputLabelProps={{
-								shrink: true
-							}}
-							style={{ width: '25vw' }}
-							value={value}
-							onChange={e => setValue(e.target.value)}
-							error={isEmpty}
-							helperText={isEmpty ? 'Required input field.' : null}
-						/>
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={() => handleClose()} color="primary">
-							Cancel
-						</Button>
-						<Button onClick={e => sendConcern(e)} color="primary">
-							Raise Concern
-						</Button>
-					</DialogActions>
-				</Dialog>
+					data={value}
+					setData = {e => setValue(e.target.value)}
+					title="Handraiser Concern"
+					modalTextContent = "Please type your concern below."
+					handleClose={handleClose}
+					handleSubmit={e => sendConcern(e)}
+					type="Create Concern"
+					buttonText = "Raise Concern"
+				/>
 			</>
 		) : null
 	) : null;

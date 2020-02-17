@@ -237,4 +237,22 @@ module.exports = {
         res.status(500).end();
       });
   },
+
+  assignMentor: (req, res) => {
+    const db = req.app.get("db");
+    const { class_id, user_id, date_joined } = req.body;
+    db.classroom_students
+      .save(
+        {
+          class_id,
+          user_id,
+          date_joined,
+        }
+      )
+      .then(post => res.status(201).json(post))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  }
 };
