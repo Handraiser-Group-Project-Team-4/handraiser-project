@@ -26,6 +26,7 @@ import {
   IconButton,
   Button,
   Paper,
+  Avatar,
   Grid,
   MenuItem,
   InputLabel,
@@ -47,6 +48,7 @@ import FaceIcon from "@material-ui/icons/Face";
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
 import cohort from "../../../images/cohort.png";
+import log from "../../../images/log.png";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 export const UserContext = createContext(null);
@@ -389,6 +391,72 @@ export default function CohortPage({ value = 0, match }) {
                         {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
                         <Lest>
                           <ul className={classes.lestUl}>
+                            <li
+                              className="list"
+                              style={{
+                                padding: 10,
+                                textTransform: "uppercase"
+                              }}
+                            >
+                              <div
+                                className="list__profile"
+                                style={{ width: "71%" }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    width: "17%",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  Avatar
+                                </div>
+                                <div>
+                                  <img style={{ width: 50 }} src=""></img>
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "40%"
+                                  }}
+                                >
+                                  Role
+                                </div>
+                                <div>
+                                  <img style={{ width: 50 }} />
+                                </div>
+                                <div className="list__label">
+                                  <div className="list__label--value">Name</div>
+                                </div>
+                              </div>
+                              <div className="list__photos">
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "53%"
+                                  }}
+                                >
+                                  Date Joined
+                                </span>
+                                <span></span>
+                                <span></span>
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "45%"
+                                  }}
+                                >
+                                  Actions
+                                </span>
+                              </div>
+                            </li>
                             <li className="list">
                               <div className="list__profile">
                                 <div>
@@ -447,7 +515,8 @@ export default function CohortPage({ value = 0, match }) {
                                   style={{
                                     display: "flex",
                                     justifyContent: "center",
-                                    alignItems: "center"
+                                    alignItems: "center",
+                                    width: "45%"
                                   }}
                                 >
                                   <IconButton
@@ -537,7 +606,8 @@ export default function CohortPage({ value = 0, match }) {
                                   style={{
                                     display: "flex",
                                     justifyContent: "center",
-                                    alignItems: "center"
+                                    alignItems: "center",
+                                    width: "45%"
                                   }}
                                 >
                                   <IconButton
@@ -572,6 +642,98 @@ export default function CohortPage({ value = 0, match }) {
                           </ul>
                         </Lest>
                       </Grid>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </TabPanel>
+              <TabPanel
+                value={value}
+                index={2}
+                dir={theme.direction}
+                className={classes.TabPanelpaperr}
+              >
+                <Paper className={classes.paperr} elevation={2}>
+                  <Grid
+                    container
+                    spacing={0}
+                    className={classes.gridContainerr + " " + classes.banner}
+                    style={{
+                      backgroundColor: darkMode ? "#333" : null
+                    }}
+                  >
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      sm={12}
+                      md={8}
+                      lg={8}
+                      className={classes.logs}
+                    >
+                      <Timeline>
+                        <ul className={classes.timeline}>
+                          <li className="timeline-item">
+                            <div className="timeline-info">
+                              <span>March 12, 2016</span>
+                            </div>
+                            <div className="timeline-marker"></div>
+                            <div className="timeline-content">
+                              <Avatar
+                                alt="Remy Sharp"
+                                src="/static/images/avatar/1.jpg"
+                              />
+                              <h3 className="timeline-title">
+                                <b>Jhon Michael Bolima</b> updated the cohort
+                                details.
+                              </h3>
+                            </div>
+                          </li>
+                          <li className="timeline-item">
+                            <div className="timeline-info">
+                              <span>March 23, 2016</span>
+                            </div>
+                            <div className="timeline-marker"></div>
+                            <div className="timeline-content">
+                              <Avatar
+                                alt="Remy Sharp"
+                                src="/static/images/avatar/1.jpg"
+                              />
+                              <h3 className="timeline-title">
+                                <b>Noe Restum</b> joined the cohort.
+                              </h3>
+                            </div>
+                          </li>
+                          <li className="timeline-item period">
+                            <div className="timeline-info"></div>
+                            <div className="timeline-marker"></div>
+                            <div className="timeline-content">
+                              <h2 className="timeline-title">April 2016</h2>
+                            </div>
+                          </li>
+                          <li className="timeline-item">
+                            <div className="timeline-info">
+                              <span>April 02, 2016</span>
+                            </div>
+                            <div className="timeline-marker"></div>
+                            <div className="timeline-content">
+                              <h3 className="timeline-title">
+                                Jake Balbedina left the cohort.
+                              </h3>
+                            </div>
+                          </li>
+                          <li className="timeline-item">
+                            <div className="timeline-info">
+                              <span>April 28, 2016</span>
+                            </div>
+                            <div className="timeline-marker"></div>
+                            <div className="timeline-content">
+                              <h3 className="timeline-title">
+                                Joven Bandagosa raised a concern
+                              </h3>
+                            </div>
+                          </li>
+                        </ul>
+                      </Timeline>
                     </Grid>
                   </Grid>
                 </Paper>
@@ -812,7 +974,7 @@ const useStyles = makeStyles(theme => ({
       }
     },
     [theme.breakpoints.up("md")]: {
-      height: 215
+      height: "auto"
     }
   },
   loginBoxGridTwo: {
@@ -858,11 +1020,24 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column"
   },
+  logs: {
+    marginTop: 50
+  },
   lestUl: {
     padding: 0
   },
   listChip: {
     fontSize: "1rem!important"
+  },
+  timeline: {
+    lineHeight: "1.4em",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    width: "100%",
+    "& h3": {
+      lineHeight: "inherit"
+    }
   }
 }));
 
@@ -880,81 +1055,113 @@ function TabPanel({ children, value, index, ...other }) {
     </Typography>
   );
 }
-
-const Lest = styled.div`
-  body {
-    margin: 0;
-    font-family: "Open Sans", sans-serif;
-    background-color: #e0e0e0;
+const Timeline = styled.div`
+  h2,
+  h3 {
+    color: #3d4351;
+    margin-top: 0;
   }
-  body ul {
+  .timeline-item {
+    padding-left: 40px;
+    position: relative;
+  }
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  .timeline-info {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin: 0 0 0.5em 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .timeline-marker {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 5px;
+    width: 15px;
+  }
+  .timeline-marker:before {
+    background: #ff6b6b;
+    border: 3px solid transparent;
+    border-radius: 100%;
+    content: "";
+    display: block;
+    height: 15px;
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 15px;
+    transition: background 0.3s ease-in-out, border 0.3s ease-in-out;
+  }
+  .timeline-marker:after {
+    content: "";
+    width: 3px;
+    background: #ccd5db;
+    display: block;
+    position: absolute;
+    top: 24px;
+    bottom: 0;
+    left: 6px;
+  }
+  .timeline-item:last-child .timeline-marker:after {
+    content: none;
+  }
+  .timeline-item:not(.period):hover .timeline-marker:before {
+    background: transparent;
+    border: 3px solid #ff6b6b;
+  }
+  .timeline-content {
+    padding-bottom: 5px;
+    display: flex;
+    align-items: baseline;
+  }
+  .timeline-content p:last-child {
+    margin-bottom: 0;
+  }
+  .period {
     padding: 0;
-    list-style-type: none;
   }
-
+  .period .timeline-info {
+    display: none;
+  }
+  .period .timeline-marker:before {
+    background: transparent;
+    content: "";
+    width: 15px;
+    height: auto;
+    border: none;
+    border-radius: 0;
+    top: 0;
+    bottom: 30px;
+    position: absolute;
+    border-top: 3px solid #ccd5db;
+    border-bottom: 3px solid #ccd5db;
+  }
+  .period .timeline-marker:after {
+    content: "";
+    height: 32px;
+    top: auto;
+  }
+  .period .timeline-content {
+    padding: 40px 0 70px;
+  }
+  .period .timeline-title {
+    margin: 0;
+  }
+  .timeline-title {
+    font-weight: 300;
+    padding-left: 10px;
+  }
+`;
+const Lest = styled.div`
   img {
     width: 75px;
     margin: 7px 5px 5px 5px;
     border-radius: 5px;
   }
-
-  button {
-    border: none;
-    font-size: 1em;
-    -webkit-transition: all 0.5s ease;
-    transition: all 0.5s ease;
-    cursor: pointer;
-  }
-  button:focus {
-    outline: 0;
-  }
-
-  /* LAYOUT ==================== */
-  .l-nav {
-    display: -webkit-box;
-    display: flex;
-    position: fixed;
-    width: 100%;
-    height: 100px;
-    background-color: #242d33;
-  }
-  .l-nav__container,
-  .l-container {
-    display: -webkit-box;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    -webkit-box-align: center;
-    align-items: center;
-    width: 100%;
-    max-width: 980px;
-    margin: 0 auto;
-  }
-  @media screen and (max-width: 1050px) {
-    .l-nav__container,
-    .l-container {
-      width: 95%;
-    }
-  }
-  .l-nav__button {
-    color: #e0e0e0;
-    background-color: #3392cc;
-    padding: 10px;
-    text-align: center;
-    width: 30%;
-    border-radius: 5px;
-  }
-  .l-nav__button:hover {
-    background-color: #2e83b8;
-    color: white;
-  }
-
-  .l-container {
-    display: block;
-    padding-top: 115px;
-  }
-
-  /* MODULE ==================== */
   .list {
     display: -webkit-box;
     display: flex;
@@ -982,9 +1189,7 @@ const Lest = styled.div`
   .list__photos {
     display: -webkit-box;
     display: flex;
-    text-align: right;
-    -webkit-box-pack: end;
-    justify-content: flex-end;
+    width: 30%;
   }
   .list__photos img {
     width: 100px;
@@ -1008,9 +1213,6 @@ const Lest = styled.div`
   .list__label--header {
     color: #9a9a9a;
   }
-  .list__label--value {
-    font-size: 2em;
-  }
   @media screen and (max-width: 650px) {
     .list {
       -webkit-box-orient: vertical;
@@ -1029,20 +1231,5 @@ const Lest = styled.div`
       -webkit-box-pack: center;
       justify-content: center;
     }
-  }
-
-  /* STATE ==================== */
-  .is-list-selected {
-    background: #cb2d3e;
-    /* fallback for old browsers */
-    background: -webkit-gradient(
-      linear,
-      left top,
-      right top,
-      from(#cb2d3e),
-      to(#ef473a)
-    );
-    background: linear-gradient(to right, #cb2d3e, #ef473a);
-    color: white;
   }
 `;
