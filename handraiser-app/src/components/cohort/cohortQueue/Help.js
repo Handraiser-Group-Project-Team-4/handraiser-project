@@ -40,6 +40,7 @@ export default function Helps({ fab, classes }) {
     -moz-backface-visibility: hidden;
     -ms-backface-visibility: hidden;
     backface-visibility: hidden;
+    ${open && `animation: none; transform: scale(1.2);`}
     &:hover {
       animation: none;
       transform: scale(1.2);
@@ -74,6 +75,7 @@ export default function Helps({ fab, classes }) {
     -moz-backface-visibility: hidden;
     -ms-backface-visibility: hidden;
     backface-visibility: hidden;
+    ${open && `animation: none; transform: scale(1.2);`}
     &:hover {
       animation: none;
       transform: scale(1.2);
