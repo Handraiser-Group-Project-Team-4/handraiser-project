@@ -15,6 +15,7 @@ export default function UsersModal({fullScreen, open, title, data, handleClose, 
             fullScreen={fullScreen}
             open={open}
             onClose={handleClose}
+            disableBackdropClick={(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove")?true:false}
             maxWidth="sm"
             aria-labelledby="max-width-dialog-title"
         >
@@ -69,9 +70,12 @@ export default function UsersModal({fullScreen, open, title, data, handleClose, 
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
+          {(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove")?null:
+            <Button onClick={handleClose} color="primary">
+             Cancel
+            </Button>
+          }
+       
           <Button onClick={handleSubmit} color="primary">
             {buttonText}
           </Button>

@@ -1,5 +1,9 @@
-import React from 'react'
-import Unnamed from "../../images/unnamed.jpg";
+import React, {useState, useEffect} from 'react'
+import axios from 'axios'
+import io from "socket.io-client";
+
+// COMPONENTS
+import jwtToken from "../tools/assets/jwtToken";
 
 // MATERIAL-UI
 import {
@@ -10,13 +14,81 @@ import {
     CardContent,
     Button,
     Chip,
+    Avatar,
+    Badge,
+    Tooltip
   } from "@material-ui/core";
 
-export default function CohortContainer({classes, handleCohort, cohorts}) {
+let socket;
+export default function CohortContainer({classes, handleCohort, value}) {
+    const userObj = jwtToken();
+    const ENDPOINT = "localhost:3001";
+    const [classroom, setClassroom] = useState([]);
+
+    useEffect(() => {
+        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+    }, [ENDPOINT]);
+    
+    useEffect(() => {
+        socket.on("fetchCohort", () => {
+            renderCohorts();
+        });
+
+        return () => {
+            socket.emit("disconnect");
+            socket.off();
+        };
+    });
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        if(!isCancelled)
+            renderCohorts();
+        return () => { 
+            isCancelled = true
+        };
+    }, [value]);
+      
+    const renderCohorts = (updateFromAdmin) => {
+        axios({
+            method: `get`,
+            url: `/api/cohorts?user_id=${userObj.user_id}&&value=${value}`,
+            headers: {
+              Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+            }
+          })
+        .then(res => {
+            res.data.map(x => {                                                  
+                axios({
+                    method:'get',
+                    url:`/api/viewJoinedStudents/${x.class_id}`,
+                    headers: {
+                        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+                    }
+                })
+                .then(users => {
+                    let currentUser, mentor=[];
+
+                    users.data.map(user => {
+                        if(user.user_id === userObj.user_id)
+                            currentUser = user
+
+                        if(user.user_role_id === 2)
+                            mentor.push(user)
+                    })
+
+                    setClassroom(prevState => {return [...prevState, {currentUser, mentor, class_details: x}] })
+                })
+                .catch(err => console.log(err))
+            })
+        });
+    }
+
     return (
         <Container className={classes.paperr} maxWidth="xl">
             <Grid container spacing={0} className={classes.gridContainerrr}>
-                {cohorts.map((x, i) => (
+                {classroom.map((x, i) => (
                     <Grid
                         key={i}
                         item
@@ -35,17 +107,32 @@ export default function CohortContainer({classes, handleCohort, cohorts}) {
                                     className={classes.gridCardContainer}
                                 >
                                     <Grid item xs={4} className={classes.profile__image}>
-                                        <img src={Unnamed} alt="Pic" />
+                                        {/* <img src={Unnamed} alt="Pic" /> */}
+                                        <Badge
+                                            overlap="circle"
+                                            anchorOrigin={{
+                                            vertical: 'bottom',
+                                            horizontal: 'right',
+                                            }}
+                                            badgeContent={
+                                                (x.mentor.length>1)&&
+                                                <Tooltip title={x.mentor.map((mentor, i) => (i>0)&&`${mentor.firstname}, `)}>
+                                                    <h2 className={classes.num_of_mentor}>+{x.mentor.length-1}</h2>
+                                                </Tooltip>
+                                            }
+                                        >
+                                            <Avatar alt="Mentor's Name" src={(x.mentor[0])&&x.mentor[0].avatar} className={classes.avatar} />
+                                        </Badge>
                                     </Grid>
                                     <Grid item xs={8} className={classes.cardDesc}>
                                         <div>
-                                            <h3>{x.class_title}</h3>
-                                            <p>{x.class_description}</p>
+                                            <h3>{x.class_details.class_title}</h3>
+                                            <p>{x.class_details.class_description}</p>
                                         </div>
                                         <div>
                                             <span>
-                                                <p>Head Mentor</p>
-                                                <h5>*Aodhan Hayter</h5>
+                                                {/* <p>Head Mentor</p>
+                                                <h5>*Aodhan Hayter</h5> */}
                                             </span>
                                             <span>
                                                 <p>Students</p>
@@ -54,7 +141,7 @@ export default function CohortContainer({classes, handleCohort, cohorts}) {
                                             <span>
                                                 <p>Cohort Status</p>
                                                 <h5>
-                                                    {x.class_status === "true" ? (
+                                                    {x.class_details.class_status === "true" ? (
                                                         <Chip
                                                             label="Open"
                                                             style={{
@@ -83,12 +170,13 @@ export default function CohortContainer({classes, handleCohort, cohorts}) {
                                 <Button
                                     size="small"
                                     onClick={() =>
-                                        x.class_status === "true"
-                                            ? handleCohort(x)
+                                        x.class_details.class_status === "true"
+                                            ? handleCohort(x.class_details)
                                             : alert("Sorry This class is closed")
                                     }
                                 >
-                                    Join Cohort
+                                    {(x.currentUser)?`Enter Cohort`:`Join Cohort`}
+                                    {/* Join Cohort */}
                       </Button>
                             </CardActions>
                         </Card>

@@ -5,12 +5,13 @@ import googleIcon from '../../images/google-icon.svg';
 import axios from 'axios';
 import jwtToken from '../tools/assets/jwtToken';
 import { DarkModeContext } from '../../App';
+import {newUserContext} from "../../routes"
 
 export default function LoginBtn() {
 	const userObj = jwtToken();
+	const {setisNew} = useContext(newUserContext);
 	const { setDarkMode } = useContext(DarkModeContext);
 	const [user, setUser] = useState({
-		isNew: false,
 		loginSuccess: false,
 		role: null
 	});
@@ -42,7 +43,8 @@ export default function LoginBtn() {
 						.then(res => {
 							console.log(res);
 							sessionStorage.setItem('accessToken', res.data.token);
-							setUser({ ...user, loginSuccess: true, isNew: true });
+							setUser({ ...user, loginSuccess: true});
+							setisNew(true)
 						})
 						.catch(err => console.log(err));
 				} else {
@@ -63,14 +65,8 @@ export default function LoginBtn() {
 	else if ((userObj || user.loginSuccess) && user.role === 2)
 		return <Redirect to="/mentor-page" />;
 	else if (userObj || user.loginSuccess)
-		return (
-			<Redirect
-				to={{
-					pathname: '/student-page',
-					state: user
-				}}
-			/>
-		);
+		return (<Redirect to= "/student-page" />);
+		
 	return (
 		<GoogleLogin
 			clientId={

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import copy from "clipboard-copy";
 import axios from "axios";
+import io from "socket.io-client";
 
 // MATERIAL-UI
 import MaterialTable, { MTableToolbar } from "material-table";
@@ -8,51 +8,22 @@ import {
   Switch, 
   Tooltip,
   Button,
-  ClickAwayListener,
 } from "@material-ui/core/";
 
 // COMPONENTS
 import AdminModal from "../../tools/AdminModal";
 import CohortModal from "../CohortTools/CohortModal";
+import CopyToClipBoard from '../../tools/CopyToClipBoard'
 
 // ICONS
-import FileCopyIcon from '@material-ui/icons/FileCopy';
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from '@material-ui/icons/School';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-export function ToolTipCopy({ data }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <div>
-        <Tooltip
-          PopperProps={{
-            disablePortal: true,
-          }}
-          onClose={() => setOpen(false)}
-          open={open}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          title="Copied to Clipboard"
-        >
-          <FileCopyIcon
-            style={{ cursor: `pointer`, width:`20px` }}
-            onClick={() => {
-              copy(data)
-              setOpen(true);
-            }}
-          />
-        </Tooltip>
-      </div>
-    </ClickAwayListener>
-  )
-}
-
-export default function MaterialTableDemo() {
+let socket;
+export default function Cohort() {
+  const ENDPOINT = "localhost:3001";
   const [createCohort, setCreateCohort] = useState(false);
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
@@ -82,7 +53,7 @@ export default function MaterialTableDemo() {
         render: (rowData) => (
           <div style={{ display: `flex`, alignItems:`center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
-            <ToolTipCopy data={rowData.class_key} />
+            <CopyToClipBoard data={rowData.class_key} />
           </div>
         )
       },
@@ -164,6 +135,16 @@ export default function MaterialTableDemo() {
     data: []
   });
 
+
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+
+    return () => {
+        socket.emit("disconnect");
+        socket.off();
+    };
+  }, [ENDPOINT]);
+
   useEffect(() => {
     renderCohorts();
   }, []);
@@ -203,6 +184,7 @@ export default function MaterialTableDemo() {
       })
         .then(() => {
           renderCohorts();
+          socket.emit("renderCohort");
         })
         .catch(err => console.log("object"));
     } else {
@@ -218,6 +200,7 @@ export default function MaterialTableDemo() {
       })
         .then(() => {
           renderCohorts();
+          socket.emit("renderCohort");
         })
         .catch(err => console.log("object"));
     }

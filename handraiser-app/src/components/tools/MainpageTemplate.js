@@ -1,18 +1,19 @@
 import React, { useState, useEffect, Fragment, useContext } from 'react';
 import { Redirect, Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
+import io from "socket.io-client";
 
 // COMPONENTS
 import jwtToken from '../tools/assets/jwtToken';
 import handraise from '../../images/handraise.png';
 import { DarkModeContext } from '../../App';
 import Team from './Team';
+import UsersModal from '../tools/UsersModal'
 // import Unnamed from "./unnamed.jpg";
 // import Handraiser from "./Handraiser";
 // import ListOfCohorts from "./ListOfCohorts";
 
 // MATERIAL-UI
-
 import {
 	AppBar,
 	CssBaseline,
@@ -41,11 +42,13 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 
+let socket;
 export default function MainpageTemplate({
 	children,
 	container,
 	tabIndex = 0
 }) {
+	const ENDPOINT = "localhost:3001";
 	const userObj = jwtToken();
 	const [user, setUser] = useState();
 	const classes = useStyles();
@@ -55,10 +58,11 @@ export default function MainpageTemplate({
 	const [value, setValue] = React.useState(0);
 	const handleChanges = (e, newValue) => setValue(newValue);
 	const history = useHistory();
-
 	const { darkMode, setDarkMode } = useContext(DarkModeContext);
+	const [notify, setNotify] = useState({open: false, title: "", buttonText: "", type: "", modalTextContent: ""});
 
 	const handleLogout = () => {
+		setNotify({...notify, open: false})	
 		axios({
 			method: `patch`,
 			url: `/api/logout/${userObj.user_id}`,
@@ -74,6 +78,74 @@ export default function MainpageTemplate({
 			});
 		sessionStorage.clear();
 	};
+
+	useEffect(() => {
+		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+	  }, [ENDPOINT]);
+	
+	useEffect(() => {
+		socket.on('mentorToStudent', user_id => {
+			if (userObj.user_id === user_id)
+				// alert(`Your role has been change to Student Please Logout to see the changes!`);
+				setNotify({
+					open: true, 
+					title: "Your role has been change to Student Please Logout to see the changes!", 
+					buttonText: "Logout", 
+					type: "mentorToStudent"
+				})
+		});
+
+		return () => {
+			socket.emit('disconnect');
+			socket.off();
+		};
+	});
+	useEffect(() => {
+		socket.on("studentToMentor", user_id => {
+		  if (userObj.user_id === user_id)
+			// alert(`Your role has been change to Mentor. Please Logout to see the changes!`);
+			setNotify({
+				open: true, 
+				title: "Your role has been change to Mentor. Please Logout to see the changes!", 
+				buttonText: "Logout", 
+				type: "studentToMentor"
+			})
+		});
+		return () => {
+			socket.emit('disconnect');
+			socket.off();
+		};
+	});
+	
+	useEffect(() => {
+		socket.on("notifyUser", ({ user_id, approval_status }) => {
+			if (userObj.user_id === user_id) {
+				if (approval_status.user_approval_status_id === 1)
+					// alert(`Your Request has been Approve. Please Logout to see the changes!`);
+					setNotify({
+						open: true, 
+						title: "Your Request to be a Mentor has been Approve. Please Logout to see the changes!", 
+						buttonText: "Logout", 
+						type: "notifyUserApprove"
+					})
+
+				if (approval_status.user_approval_status_id === 3)
+					// alert(`Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`);
+					setNotify({
+						open: true, 
+						title: `Your Request to be a Mentor has been Disapprove.`, 
+						modalTextContent: `Reason: ${approval_status.reason_disapproved}`,
+						buttonText: "Agree", 
+						type: "notifyUserDisapprove"
+					})
+			}
+		});
+
+		return () => {
+			socket.emit("disconnect");
+			socket.off();
+		};
+	});
 
 	useEffect(() => {
 		let isCancelled = false;
@@ -270,6 +342,17 @@ export default function MainpageTemplate({
 					<div className={classes.tabPanel}>{children}</div>
 				</main>
 			</div>
+		{notify.open&& 
+			<UsersModal 
+				open={notify.open}
+				title={notify.title}
+				modalTextContent = {notify.modalTextContent}
+				handleClose={() => setNotify({...notify, open: false})}
+				handleSubmit={handleLogout}
+				type={notify.type}
+				buttonText = {notify.buttonText}
+				/>
+		}
 		</Fragment>
 	);
 }

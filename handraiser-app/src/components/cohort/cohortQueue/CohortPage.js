@@ -13,11 +13,12 @@ import Chat from '../../Chat/Chat';
 import jwtToken from '../../tools/assets/jwtToken';
 import { DarkModeContext } from '../../../App';
 import Search from './CohortFilter';
+import CopyToClipBoard from '../../tools/CopyToClipBoard'
 
 // MATERIAL-UI
 import {
-	makeStyles, 
-	useTheme, 
+	makeStyles,
+	useTheme,
 	fade,
 	Hidden,
 	Typography,
@@ -47,6 +48,7 @@ export default function CohortPage(props) {
 	const { id } = props.match.params;
 	const [data, setData] = useState([]);
 	const [user, setUser] = useState();
+	const [classDetails, setClassDetails] = useState([]);
 	const [search, setSearch] = useState();
 	const [filter, setFilter] = useState();
 	const [chatroom, setChatRoom] = useState();
@@ -75,23 +77,36 @@ export default function CohortPage(props) {
 			.catch(err => {
 				console.log(err);
 			});
+
+		// TEMP CLASS DETAILS
+		Axios({
+			method: `get`,
+			url: `/api/class-details/${id}`,
+			headers: {
+				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+			}
+		})
+			.then(res => {
+				setClassDetails(res.data)
+			})
+			.catch(err => console.log(err))
 	}, []);
 
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-		socket.emit('joinConcern', { id }, () => {});
+		socket.emit('joinConcern', { id }, () => { });
 	}, [ENDPOINT]);
 
 	useEffect(() => {
 		socket.emit('getChatroom', { id }, () => {
 			socket.on('chatroomData', ({ data }) => {
 				data.length &&
-				(data[0].mentor_id === userObj.user_id ||
-					data[0].student_id === userObj.user_id)
+					(data[0].mentor_id === userObj.user_id ||
+						data[0].student_id === userObj.user_id)
 					? setChatRoom({
-							room: data[0].concern_id,
-							concern: data[0].concern_title
-					  })
+						room: data[0].concern_id,
+						concern: data[0].concern_title
+					})
 					: setChatRoom();
 			});
 		});
@@ -108,7 +123,7 @@ export default function CohortPage(props) {
 				});
 		});
 		return () => {
-			socket.emit('disconnectConcern', () => {});
+			socket.emit('disconnectConcern', () => { });
 			socket.off();
 		};
 	}, [data]);
@@ -138,9 +153,10 @@ export default function CohortPage(props) {
 		}
 	};
 
-	if (Object.keys(data).length === 0) {
-		return null;
-	}
+	// if (Object.keys(data).length === 0) {
+	// 	return null;
+	// }
+	// console.log(`object`)
 	return (
 		<MainpageTemplate>
 			<div className={classes.parentDiv}>
@@ -226,11 +242,11 @@ export default function CohortPage(props) {
 									{search || filter === 'done' ? (
 										<Search classes={classes} />
 									) : (
-										<div>
-											<NeedHelps classes={classes} />
-											<BeingHelps classes={classes} />
-										</div>
-									)}
+											<div>
+												<NeedHelps classes={classes} />
+												<BeingHelps classes={classes} />
+											</div>
+										)}
 								</div>
 							</Grid>
 							<Hidden mdDown>
@@ -239,14 +255,62 @@ export default function CohortPage(props) {
 										{chatroom ? (
 											<Chat />
 										) : (
-											userObj.user_role_id === 3 && <Helps />
-										)}
+												userObj.user_role_id === 3 && <Helps />
+											)}
 									</section>
 								</Grid>
 							</Hidden>
 						</Grid>
 					</Paper>
 				</UserContext.Provider>
+			</div>
+			{/* TEMP CLASS DETAILS */}
+			<div>
+				<h1>Class Details</h1>
+				{classDetails.length > 0 &&
+					<div style={{ display: `flex`, justifyContent: `space-around` }}>
+						<fieldset style={{ width: `20%` }}>
+							<legend>Class Details</legend>
+							<h3>Classroom Name: {classDetails[0].class_title}</h3>
+							<h3>Classroom Description: {classDetails[0].class_description}</h3>
+							<div style={{display:`flex`, alignItems:`center`}}>
+								<p>Classroom Code: {classDetails[0].class_key}</p>
+								<CopyToClipBoard data={classDetails[0].class_key} />
+							</div>
+						</fieldset>
+
+						<fieldset style={{ width: `50%` }}>
+							<legend>People</legend>
+							<h2>Mentor/s</h2>
+							{classDetails.map(user => (
+								(user.user_role_id === 2)&&
+								<div key={user.user_id} style={{ display: `flex`, alignItems: `center`, margin: `20px` }}>
+									<img src={user.avatar} style={{ borderRadius: `50%`, width: `50px` }} alt="profile-pic" />
+									<p style={{ margin: `0 10px` }}>{user.firstname} {user.lastname}</p>
+									{(user.user_status)? 
+										<status-indicator active pulse positive />
+									:
+										<status-indicator active pulse negative />}
+								</div>
+							))}
+
+							<hr />
+							
+							<h2>Students</h2>
+							{classDetails.map(user => (
+								(user.user_role_id === 3)&&
+								<div key={user.user_id} style={{ display: `flex`, alignItems: `center`, margin: `20px` }}>
+									<img src={user.avatar} style={{ borderRadius: `50%`, width: `50px` }} alt="profile-pic" />
+									<p style={{ margin: `0 10px` }}>{user.firstname} {user.lastname}</p>
+									{(user.user_status)? 
+										<status-indicator active pulse positive />
+									:
+										<status-indicator active pulse negative />}
+								</div>
+							))}
+						</fieldset>
+					</div>
+				}
 			</div>
 		</MainpageTemplate>
 	);

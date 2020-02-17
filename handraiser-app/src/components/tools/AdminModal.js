@@ -19,7 +19,7 @@ import {
 import EditIcon from "@material-ui/icons/Edit";
 
 let socket;
-export default function AdminModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete }) {
+export default function AdminModal({ title, data, open, handleClose, render, type, id, canDelete }) {
     const ENDPOINT = "localhost:3001";
     const [body, setBody] = useState({
         data:
@@ -135,8 +135,8 @@ export default function AdminModal({ title, setTemp, temp, data, open, handleClo
                     if(type === 'Change User Role')
                         socket.emit("changeUserRole", { user_id: data.id, user_role_id: data.role });
 
-                    if (type === 'Create Cohort' || type === 'Toggle Cohort')
-                        socket.emit("renderCohort", { data: body.data });
+                    // if (type === 'Create Cohort' || type === 'Toggle Cohort')
+                    //     socket.emit("renderCohort", { data: body.data });
                     
                     if (type === 'approving' || type === 'disapproving') 
                         socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
