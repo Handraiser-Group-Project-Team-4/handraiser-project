@@ -231,7 +231,10 @@ export default function MainpageTemplate({
               >
                 {darkMode ? <Brightness4Icon /> : <Brightness7Icon />}
               </ListItemIcon>
-              <ListItemText primary={darkMode ? "Dark" : "Light"} />
+              <ListItemText
+                className={classes.listItemText}
+                primary={darkMode ? "Dark" : "Light"}
+              />
               <Switch
                 checked={darkMode}
                 onChange={handleDarkMode}
