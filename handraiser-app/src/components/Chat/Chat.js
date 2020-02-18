@@ -102,6 +102,7 @@ const Chat = () => {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+    socket.off();
     socket.emit(
       "join",
       { username: userObj.name, chatroom: chatroom.room, userObj },

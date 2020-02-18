@@ -13,10 +13,10 @@ import UsersModal from "../tools/UsersModal";
 // MATERIAL-UI
 import {
   useTheme,
-  TextField,
   useMediaQuery,
   Typography,
   Box,
+  TextField,
   InputAdornment
 } from "@material-ui/core";
 
@@ -140,7 +140,10 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        style={{
+          backgroundColor: darkMode ? "#333" : null,
+          height: "calc(100vh - 48px)"
+        }}
         // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>

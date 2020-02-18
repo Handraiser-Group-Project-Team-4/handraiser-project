@@ -10,7 +10,7 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import InboxIcon from "@material-ui/icons/Inbox";
+import SchoolIcon from "@material-ui/icons/School";
 
 export default function PopupModal({ handleClose, open, data, userObj }) {
   const kick = (e, userObj, row) => {
@@ -43,12 +43,12 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
       >
         <DialogTitle id="alert-dialog-title">
           Are you sure you want to kick {userObj.firstname} {userObj.lastname}{" "}
-          from the class:
+          from the following cohort:
           <List component="nav" aria-label="main mailbox folders">
             {data.map(row => (
               <ListItem key={row.class_id}>
                 <ListItemIcon>
-                  <InboxIcon />
+                  <SchoolIcon />
                 </ListItemIcon>
                 <ListItemText primary={row.class_title} />
               </ListItem>

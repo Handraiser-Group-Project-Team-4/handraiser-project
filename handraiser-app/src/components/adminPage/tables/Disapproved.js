@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import MaterialTable from "material-table";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
+
+// components
+import Badger from "../../tools/Badger";
 
 export default function Disapproved() {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [disapproved, setDisapproved] = useState({
     columns: [
       {
@@ -31,6 +38,26 @@ export default function Disapproved() {
       },
       { title: "Email", field: "email" },
       { title: "Reason", field: "reason_disapproved" }
+    ],
+    mobileColumns: [
+      {
+        title: "Users",
+        field: "firstname",
+        render: rowData => (
+          <div style={{ display: `flex` }}>
+            <Badger obj={rowData} />
+            <div>
+              <p style={{ margin: 0 }}>
+                {rowData.firstname} {rowData.lastname}
+              </p>
+              <div style={{ margin: 0, fontSize: 10 }}>
+                <span>{rowData.email}</span>
+                <br />
+              </div>
+            </div>
+          </div>
+        )
+      }
     ],
     data: []
   });
@@ -63,7 +90,7 @@ export default function Disapproved() {
   return (
     <MaterialTable
       title=""
-      columns={disapproved.columns}
+      columns={matches ? disapproved.columns : disapproved.mobileColumns}
       data={disapproved.data}
       options={{
         pageSize: 10,

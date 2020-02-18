@@ -5,12 +5,9 @@ import axios from "axios";
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
-// import Unnamed from "./unnamed.jpg";
-// import Handraiser from "./Handraiser";
-// import ListOfCohorts from "./ListOfCohorts";
+import WarningIcon from "@material-ui/icons/Warning";
 
 // MATERIAL-UI
-
 import {
   AppBar,
   CssBaseline,
@@ -27,7 +24,9 @@ import {
   Switch,
   makeStyles,
   useTheme,
-  Chip
+  Chip,
+  Card,
+  CardContent
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 
@@ -155,7 +154,12 @@ export default function MainpageTemplate({
           </>
         )}
       </div>
-      <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
+      <Tabs
+        orientation="vertical"
+        value={tabIndex}
+        className={classes.tabs}
+        style={{ position: "relative", height: "calc(100vh - 250px)" }}
+      >
         <Tab
           label={
             <ListItem
@@ -239,6 +243,37 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 240
+          }}
+        >
+          <Card style={{ width: 220 }}>
+            <CardContent
+              style={{
+                paddingBottom: 16,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <WarningIcon />
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+              >
+                Your request to be a mentor is still being processed.
+              </Typography>
+            </CardContent>
+          </Card>
+        </div>
       </Tabs>
     </div>
   );

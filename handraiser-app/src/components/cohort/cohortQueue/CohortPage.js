@@ -24,7 +24,9 @@ import {
   fade,
   Hidden,
   Typography,
+  IconButton,
   Paper,
+  Avatar,
   Grid,
   MenuItem,
   InputLabel,
@@ -36,11 +38,22 @@ import {
   AppBar,
   Tabs,
   Tab,
-  Box
+  Box,
+  CardMedia,
+  Button,
+  Fab
 } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import Menu from "@material-ui/core/Menu";
+import FaceIcon from "@material-ui/icons/Face";
 
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
+import cohort from "../../../images/cohort.png";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
 export const UserContext = createContext(null);
 let socket;
@@ -62,7 +75,14 @@ export default function CohortPage({ value = 0, match }) {
 
   const theme = useTheme();
   const inputLabel = React.useRef(null);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const handleClick = event => {
+    setAnchorEl(event.currentTarget);
+  };
 
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   useEffect(() => {
     Axios({
       method: "get",
@@ -77,15 +97,11 @@ export default function CohortPage({ value = 0, match }) {
       .catch(err => {
         console.log(err);
       });
-  }, [userObj]);
+  }, []);
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {
-      socket.on("fetchOldChats", ({ data }) => {
-        setLogs(data);
-      });
-    });
+    socket.emit("joinConcern", { id }, () => {});
   }, [ENDPOINT]);
 
   useEffect(() => {
@@ -100,10 +116,6 @@ export default function CohortPage({ value = 0, match }) {
             })
           : setChatRoom();
       });
-    });
-
-    socket.on("newLog", ({ log }) => {
-      setLogs([log, ...logs]);
     });
 
     socket.on("concernData", ({ concern, alert }) => {
@@ -123,13 +135,6 @@ export default function CohortPage({ value = 0, match }) {
     };
   }, [data]);
 
-  // useEffect(() => {
-  //   return () => {
-  //     socket.emit("disconnectConcern", { id, userObj }, () => {});
-  //     socket.off();
-  //   };
-  // }, []);
-
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);
     event.target.name === "sortBy" && setFilter(event.target.value);
@@ -139,7 +144,6 @@ export default function CohortPage({ value = 0, match }) {
     event.stopPropagation();
     setChatRoom(value);
   };
-
   const handleConcernCount = value => {
     if (value === "allConcern") {
       let concernCount = data.filter(
@@ -156,9 +160,9 @@ export default function CohortPage({ value = 0, match }) {
     }
   };
 
-  // if (Object.keys(data).length === 0) {
-  //   return null;
-  // }
+  if (Object.keys(data).length === 0) {
+    return null;
+  }
   return (
     <MainpageTemplate>
       <div className={classes.parentDiv}>
@@ -178,7 +182,24 @@ export default function CohortPage({ value = 0, match }) {
           }}
         >
           <div className={classes.tabRoot}>
+            {/* <IconButton aria-label="back" style={{ position: "absolute" }}>
+              <ArrowBackIosIcon />
+            </IconButton> */}
+
             <AppBar position="static" color="default">
+              <Button
+                style={{
+                  position: "absolute",
+                  zIndex: 1,
+                  top: 5,
+                  marginLeft: 5
+                }}
+                color="default"
+                className={classes.button}
+                startIcon={<ArrowBackIosIcon />}
+              >
+                Back
+              </Button>
               <Tabs
                 value={value}
                 // onChange={handleChange}
@@ -203,6 +224,9 @@ export default function CohortPage({ value = 0, match }) {
             <SwipeableViews
               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
               index={value}
+              style={{
+                height: "calc(100vh - 48px)"
+              }}
               // onChangeIndex={handleChangeIndex}
             >
               <TabPanel
@@ -325,7 +349,370 @@ export default function CohortPage({ value = 0, match }) {
                 index={1}
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
-              ></TabPanel>
+              >
+                <Paper className={classes.paperr} elevation={2}>
+                  <Grid
+                    container
+                    spacing={0}
+                    className={classes.gridContainerr + " " + classes.banner}
+                    style={{
+                      backgroundColor: darkMode ? "#333" : null
+                    }}
+                  >
+                    <Grid
+                      container
+                      item
+                      xs={12}
+                      sm={12}
+                      md={8}
+                      lg={8}
+                      className={classes.loginBoxGridOne}
+                    >
+                      <Grid item xs={12} sm={12} md={12} lg={6}>
+                        <CardMedia
+                          className={classes.loginBoxGridOneCardMedia}
+                          image={cohort}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        className={classes.gridDetails}
+                      >
+                        <h1>Computer Programming I</h1>
+                        <h6
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            paddingBottom: 10
+                          }}
+                        >
+                          <span>
+                            Cohort Code: <Chip label="******" />
+                            <IconButton
+                              color="primary"
+                              aria-label="upload picture"
+                              component="span"
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </span>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="secondary"
+                            style={{ height: 30 }}
+                          >
+                            Leave Group
+                          </Button>
+                        </h6>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      container
+                      spacing={0}
+                      className={classes.gridContainerr + " " + classes.banner}
+                      style={{
+                        backgroundColor: darkMode ? "#333" : null
+                      }}
+                    >
+                      <Grid
+                        container
+                        item
+                        xs={12}
+                        sm={12}
+                        md={8}
+                        lg={8}
+                        className={classes.lest}
+                      >
+                        <form
+                          noValidate
+                          autoComplete="off"
+                          className={classes.searchform}
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center"
+                          }}
+                        >
+                          <TextField
+                            id="outlined-search"
+                            label="Search field"
+                            type="search"
+                            name="search"
+                            variant="outlined"
+                            onChange={changeHandler}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <SearchIcon />
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        </form>
+                        {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
+                        <Lest>
+                          <ul className={classes.lestUl}>
+                            <li
+                              className="list"
+                              style={{
+                                padding: 10,
+                                textTransform: "uppercase"
+                              }}
+                            >
+                              <div
+                                className="list__profile"
+                                style={{ width: "71%" }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    width: "17%",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  Avatar
+                                </div>
+                                <div>
+                                  <img style={{ width: 50 }} src=""></img>
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "40%"
+                                  }}
+                                >
+                                  Role
+                                </div>
+                                <div>
+                                  <img style={{ width: 50 }} />
+                                </div>
+                                <div className="list__label">
+                                  <div className="list__label--value">Name</div>
+                                </div>
+                              </div>
+                              <div className="list__photos">
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "53%"
+                                  }}
+                                >
+                                  Date Joined
+                                </span>
+                                <span></span>
+                                <span></span>
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "45%"
+                                  }}
+                                >
+                                  Actions
+                                </span>
+                              </div>
+                            </li>
+                            <li className="list">
+                              <div className="list__profile">
+                                <div>
+                                  <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
+                                </div>
+                                <div>
+                                  <img
+                                    style={{
+                                      width: 50
+                                    }}
+                                  />
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  <Chip
+                                    icon={<FaceIcon />}
+                                    label="Mentor"
+                                    color="secondary"
+                                  />
+                                </div>
+                                <div>
+                                  <img
+                                    style={{
+                                      width: 50
+                                    }}
+                                  />
+                                </div>
+                                <div className="list__label">
+                                  <div className="list__label--value">
+                                    <Chip
+                                      variant="outlined"
+                                      label="Jhon Michael Bolima"
+                                      className={classes.listChip}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="list__photos">
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  April 19, 2003 3:30 AM
+                                </span>
+                                <span></span>
+                                <span></span>
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "45%"
+                                  }}
+                                >
+                                  <IconButton
+                                    color="primary"
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    onClick={handleClick}
+                                    component="span"
+                                  >
+                                    <ExpandMoreIcon />
+                                  </IconButton>
+                                  <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                  >
+                                    <MenuItem onClick={handleClose}>
+                                      Profile
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                      My account
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                      Logout
+                                    </MenuItem>
+                                  </Menu>
+                                </span>
+                              </div>
+                            </li>
+                            <li className="list">
+                              <div className="list__profile">
+                                <div>
+                                  <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
+                                </div>
+                                <div>
+                                  <img
+                                    style={{
+                                      width: 50
+                                    }}
+                                  />
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  <Chip
+                                    icon={<FaceIcon />}
+                                    label="Student"
+                                    color="Primary"
+                                  />
+                                </div>
+                                <div>
+                                  <img
+                                    style={{
+                                      width: 50
+                                    }}
+                                  />
+                                </div>
+                                <div className="list__label">
+                                  <div className="list__label--value">
+                                    <Chip
+                                      variant="outlined"
+                                      label="Diana Geromo"
+                                      className={classes.listChip}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="list__photos">
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                  }}
+                                >
+                                  April 19, 2003 3:30 AM
+                                </span>
+                                <span></span>
+                                <span></span>
+                                <span
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "45%"
+                                  }}
+                                >
+                                  <IconButton
+                                    color="primary"
+                                    aria-controls="simple-menu"
+                                    aria-haspopup="true"
+                                    onClick={handleClick}
+                                    component="span"
+                                  >
+                                    <ExpandMoreIcon />
+                                  </IconButton>
+                                  <Menu
+                                    id="simple-menu"
+                                    anchorEl={anchorEl}
+                                    keepMounted
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                  >
+                                    <MenuItem onClick={handleClose}>
+                                      Profile
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                      My account
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                      Logout
+                                    </MenuItem>
+                                  </Menu>
+                                </span>
+                              </div>
+                            </li>
+                          </ul>
+                        </Lest>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </TabPanel>
               <TabPanel
                 value={value}
                 index={2}
@@ -383,7 +770,8 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.down("md")]: {
       height: "calc(110vh - 64px)",
       width: "100vw"
-    }
+    },
+    height: "calc(100vh - 64px)"
   },
   typoTitle: {
     fontFamily: "'Rubik', sans-serif",
@@ -425,6 +813,9 @@ const useStyles = makeStyles(theme => ({
     body: {
       fontFamily: "'Rubik', sans-serif"
     }
+  },
+  chatTitle: {
+    margin: "0 auto"
   },
   rootq: {
     display: "flex",
@@ -618,9 +1009,6 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column"
   },
-  logs: {
-    marginTop: 50
-  },
   lestUl: {
     padding: 0
   },
@@ -635,6 +1023,22 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     "& h3": {
       lineHeight: "inherit"
+    }
+  },
+  cardLogs: {
+    width: "100%",
+    maxHeight: "75vh",
+    overflow: "scroll",
+    "&::-webkit-scrollbar": {
+      width: "5px",
+      height: "8px",
+      backgroundColor: "#FFF",
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#673ab7" //'#23232F' //'#0595DD',
+      // borderTopRightRadius: 10
     }
   }
 }));
@@ -752,5 +1156,82 @@ const Timeline = styled.div`
   .timeline-title {
     font-weight: 300;
     padding-left: 10px;
+  }
+`;
+const Lest = styled.div`
+  img {
+    width: 75px;
+    margin: 7px 5px 5px 5px;
+    border-radius: 5px;
+  }
+  .list {
+    display: -webkit-box;
+    display: flex;
+    background-color: white;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.2);
+    -webkit-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .list:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25), 0 5px 8px rgba(0, 0, 0, 0.22);
+    cursor: pointer;
+  }
+  .list__profile {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-flex: 1;
+    flex-grow: 1;
+    text-align: left;
+    -webkit-box-pack: start;
+    justify-content: flex-start;
+  }
+  .list__photos {
+    display: -webkit-box;
+    display: flex;
+    width: 30%;
+  }
+  .list__photos img {
+    width: 100px;
+  }
+  @media screen and (max-width: 400px) {
+    .list__photos img {
+      width: 75px;
+    }
+  }
+  .list__label {
+    width: 100%;
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    -webkit-box-align: center;
+    align-items: center;
+    justify-content: center;
+  }
+  .list__label--header {
+    color: #9a9a9a;
+  }
+  @media screen and (max-width: 650px) {
+    .list {
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      flex-direction: column;
+    }
+    .list__profile {
+      -webkit-box-pack: center;
+      justify-content: center;
+      margin: 10px;
+    }
+    .list__label {
+      width: 170px;
+    }
+    .list__photos {
+      -webkit-box-pack: center;
+      justify-content: center;
+    }
   }
 `;

@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+// material ui
 import MaterialTable from "material-table";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
+
+// components
+import Badger from "../../tools/Badger";
 
 export default function Approved() {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [approved, setApproved] = useState({
     columns: [
       {
@@ -30,6 +38,26 @@ export default function Approved() {
         cellStyle: { display: `none` }
       },
       { title: "Email", field: "email" }
+    ],
+    mobileColumns: [
+      {
+        title: "Users",
+        field: "firstname",
+        render: rowData => (
+          <div style={{ display: `flex` }}>
+            <Badger obj={rowData} />
+            <div>
+              <p style={{ margin: 0 }}>
+                {rowData.firstname} {rowData.lastname}
+              </p>
+              <div style={{ margin: 0, fontSize: 10 }}>
+                <span>{rowData.email}</span>
+                <br />
+              </div>
+            </div>
+          </div>
+        )
+      }
     ],
     data: []
   });
@@ -62,7 +90,7 @@ export default function Approved() {
   return (
     <MaterialTable
       title=""
-      columns={approved.columns}
+      columns={matches ? approved.columns : approved.mobileColumns}
       data={approved.data}
       options={{
         pageSize: 10,

@@ -1,16 +1,13 @@
 import React from "react";
 import axios from "axios";
-
 // Material UI
 import MaterialTable from "material-table";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-
 // Material UI Icons
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-
 export default function PopupModal({ handleClose, open, data, title, id }) {
   const columns = [
     {
@@ -20,7 +17,6 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
         <div style={{ display: `flex` }}>
           <img
             src={rowData.avatar}
-            alt={rowData.avatar}
             width="50"
             height="50"
             style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}
@@ -33,15 +29,13 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
     },
     { title: "Email", field: "email" }
   ];
-
   const assign = (data, id) => {
     let date = new Date();
     let newDate = date.toLocaleString();
-
     data.map(x => {
-      return axios({
+      axios({
         method: "post",
-        url: `/api/assignMentor/`,
+        url: `/api/enroll/`,
         headers: {
           Authorization: "Bearer " + sessionStorage.getItem("accessToken")
         },
@@ -57,7 +51,6 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
         .catch(err => console.log("err"));
     });
   };
-
   return (
     <>
       <Dialog
@@ -81,14 +74,15 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
             <h6 style={{ margin: `0` }}>Assign Mentor</h6>
           </div>
         </DialogTitle>
-
         <DialogContent>
           <MaterialTable
             title="Mentors"
             columns={columns}
             data={data}
             options={{
-              selection: true
+              selection: true,
+              pageSize: 10,
+              headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
             }}
             actions={[
               {
@@ -99,7 +93,6 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
             ]}
           />
         </DialogContent>
-
         <DialogActions></DialogActions>
       </Dialog>
     </>

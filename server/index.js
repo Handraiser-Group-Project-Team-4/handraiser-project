@@ -34,11 +34,10 @@ massive({
     app.use(cors());
 
     app.get("/api/users", users.login);
-    app.patch("/api/logout/:id", users.logout);
     app.use(auth.header);
 
     // USERS
-
+    app.patch("/api/logout/:id", users.logout);
     app.post("/api/users", users.create);
     app.get("/api/users/:id", users.fetch);
     app.get("/api/users/:id/:room", users.chatFetch);
@@ -67,7 +66,9 @@ massive({
     app.delete("/api/kickstud/:userId/:classId", cohorts.deleteStud);
     app.get("/api/viewJoinedStudents/:id", cohorts.viewCohort);
     app.delete("/api/deleteClass/:id", cohorts.deleteClass);
-    app.post("/api/assignMentor", cohorts.assignMentor);
+    app.post("/api/enroll", cohorts.enroll);
+    app.patch("/api/updateTitleDesc/:id", cohorts.updateTitleDesc);
+    app.get("/api/getMentors/:id", cohorts.getMentors);
 
     //WEBSOCKETS
     io.on("connection", socket => {
