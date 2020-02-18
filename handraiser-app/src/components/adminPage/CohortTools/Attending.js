@@ -10,15 +10,21 @@ import Button from '@material-ui/core/Button';
 
 // components
 import AttendingKickModal from "./AttendingKickModal";
+import AssignCohort from "./AssignCohort";
 
 // icons
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
+import SchoolIcon from '@material-ui/icons/School';
 
 
 export default function AttendingModal({open, data, handleClose}) {
     const [removeObj, setRemoveObj] = useState({
         open: false,
         data: ''
+    })
+    const [assignCohortObj, setAssignCohortObj] = useState({
+      open: false,
+      data: ''
     })
     const [table, setTable] = React.useState({
         columns: [
@@ -87,10 +93,37 @@ export default function AttendingModal({open, data, handleClose}) {
 
    }
 
+   const getCohorts = data => {
+    // console.log(data)
+    axios({
+      method: "get",
+      url: `/api/getMentors/${data.user_id}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(data => {
+        
+        console.log(data.data)
+        setAssignCohortObj({
+          open: true,
+          data: data.data
+        });
+      })
+      .catch(err => console.log(err));
+
+   }
+
    const cloeseKickModal = (data) => {
         renderDataTable(data)
         setRemoveObj({...removeObj, open: false})
    }
+
+   const cloeseAssignModal = (data) => {
+    renderDataTable(data)
+    setAssignCohortObj({...assignCohortObj, open: false})
+}
+
   
    return (
     <>
@@ -101,9 +134,16 @@ export default function AttendingModal({open, data, handleClose}) {
             handleClose = {cloeseKickModal}
             userObj = {data}
          />
-          
-
       )}
+
+      {assignCohortObj.open && (
+        <AssignCohort
+          open={assignCohortObj.open}
+          data={assignCohortObj.data}
+          handleClose={()=>cloeseAssignModal(data)}
+          userId={data.user_id}
+          title={`${data.firstname} ${data.lastname}`}
+        />)}
 
 
       <Dialog
@@ -132,12 +172,23 @@ export default function AttendingModal({open, data, handleClose}) {
 
         <DialogContent>
             <MaterialTable
-                title="Enrolled Cohorts"
+                title={<Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={(e) => getCohorts(data)}
+                  startIcon={<SchoolIcon />}
+                >
+                  Assign in a Cohort
+                </Button>}
                 columns={table.columns}
                 data={table.data}
                 options={{
                     selection: true,
-                    exportButton: true
+                    exportButton: true,
+                    exportFileName: `${data.firstname} ${data.lastname}'s Enrolled Cohorts `,
+                    pageSize: 10,
+                    headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
                 }}
                 actions={[
                     {
