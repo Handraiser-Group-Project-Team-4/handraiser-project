@@ -41,7 +41,18 @@ const useStyles = makeStyles(theme => ({
   media: {
     height: "100%",
     minHeight: "500px",
-    padding: "0px!important"
+    padding: "0px!important",
+    "& > div > div::-webkit-scrollbar": {
+      width: "5px",
+      height: "8px",
+      backgroundColor: "#FFF",
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10
+    },
+    "& > div > div::-webkit-scrollbar-thumb": {
+      backgroundColor: "#673ab7" //'#23232F' //'#0595DD',
+      // borderTopRightRadius: 10
+    }
   },
   expand: {
     transform: "rotate(0deg)",
@@ -80,13 +91,13 @@ const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
   const [message, setMessage] = useState("");
-  const [typing, setTyping] = useState(false);
+
   const ENDPOINT = "localhost:3001";
 
-  const [open, setOpen] = useState(false);
+  const [setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const handleClose = () => setAnchorEl(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
 
   useEffect(() => {
@@ -100,21 +111,7 @@ const Chat = () => {
         });
       }
     );
-  }, [ENDPOINT, chatroom]);
-  useEffect(() => {
-    const handleTyping = () => {
-      socket.emit("typing", { name: userObj.name });
-    };
-    window.addEventListener("keypress", handleTyping);
-    return () => {
-      window.removeEventListener("keypress", handleTyping);
-    };
-  }, []);
-  useEffect(() => {
-    socket.on("displayTyping", ({ name }) => {
-      setTyping(true);
-    });
-  }, []);
+  }, [ENDPOINT, chatroom, userObj]);
 
   useEffect(() => {
     socket.on("message", message => {
@@ -306,7 +303,11 @@ const Chat = () => {
             margin="normal"
             variant="outlined"
             value={message}
-            onChange={({ target: { value } }) => setMessage(value)}
+            onChange={({ target: { value } }) => {
+              setMessage(value);
+              socket.emit("typing", { name: userObj.name });
+            }}
+            onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
             onKeyDown={event =>
               message.match(/\s/g) &&
               message.match(/\s/g).length === message.length

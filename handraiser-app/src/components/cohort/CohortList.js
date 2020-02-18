@@ -3,12 +3,12 @@ import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import io from "socket.io-client";
+import { DarkModeContext } from "../../App";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
 import CohortContainer from "./CohortContainer";
 import UsersModal from "../tools/UsersModal";
-import { DarkModeContext } from "../../App";
 
 // MATERIAL-UI
 import {
@@ -16,8 +16,12 @@ import {
   TextField,
   useMediaQuery,
   Typography,
-  Box
+  Box,
+  InputAdornment
 } from "@material-ui/core";
+
+//ICONS
+import SearchIcon from "@material-ui/icons/Search";
 
 let socket;
 export default function CohortList({ classes, value }) {
@@ -27,6 +31,7 @@ export default function CohortList({ classes, value }) {
   const userObj = jwtToken();
   const history = useHistory();
   const [cohorts, setCohorts] = useState([]);
+  const [search, setSearch] = useState();
   const [isKey, setIsKey] = useState({
     key: "",
     open: false,
@@ -126,6 +131,10 @@ export default function CohortList({ classes, value }) {
         setIsKey({ ...isKey, error: true });
       });
   };
+
+  const changeHandler = event => {
+    event.target.name === "search" && setSearch(event.target.value);
+  };
   return (
     <>
       <SwipeableViews
@@ -135,10 +144,27 @@ export default function CohortList({ classes, value }) {
         // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
+          <TextField
+            id="outlined-search"
+            label="Search field"
+            type="search"
+            size={"small"}
+            name="search"
+            variant="outlined"
+            onChange={changeHandler}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+          />
           <CohortContainer
             classes={classes}
             handleCohort={handleCohort}
             cohorts={cohorts}
+            search={search}
           />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>

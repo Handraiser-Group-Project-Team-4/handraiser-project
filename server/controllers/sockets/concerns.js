@@ -7,11 +7,17 @@ module.exports = {
           alert: undefined
         })
       );
+      db.query(
+        `SELECT * FROM classroom_logs WHERE class_id  = ${id} ORDER BY classroom_logs_id DESC`
+      ).then(res => {
+        io.to(`${id}`).emit("fetchOldChats", {
+          data: res
+        });
+      });
 
       socket.join(`${id}`);
       callback();
     });
-
     socket.on("getChatroom", ({ id }, callback) => {
       db.concern
         .find({
@@ -33,16 +39,17 @@ module.exports = {
             alert: {
               variant: "success",
               name: userObj.name,
-              action: "request for help"
+              action: "requested for help"
             }
           })
         )
       );
       logs(
         db,
+        io,
         concern.class_id,
         userObj.user_id,
-        `${userObj.name} requests for help`
+        `${userObj.name} requested for help`
       );
 
       callback();
@@ -74,16 +81,17 @@ module.exports = {
             })
           )
         );
-        concern_status === "onprocess"
-          ? logs(db, id, userObj.user_id, `${userObj.name} accepts a request`)
-          : concern_status === "done"
-          ? logs(db, id, userObj.user_id, `${userObj.name} finished a request`)
-          : logs(
-              db,
-              id,
-              userObj.user_id,
-              `${userObj.name} updates request back to queue`
-            );
+        logs(
+          db,
+          io,
+          id,
+          userObj.user_id,
+          concern_status === "done"
+            ? `${userObj.name} finished a request`
+            : concern_status === "onprocess"
+            ? `${userObj.name} accepts a request`
+            : `${userObj.name} updates request back to queue`
+        );
 
         callback();
       }
@@ -107,9 +115,10 @@ module.exports = {
             .catch()
         );
       });
-      logs(db, id, userObj.user_id, `${userObj.name} removes a concern`);
+      logs(db, io, id, userObj.user_id, `${userObj.name} removes a concern`);
       callback();
     });
+
     socket.on("disconnectConcern", () => {
       console.log("user disconnected to concern");
     });
@@ -128,7 +137,7 @@ const date = () => {
   return new_date;
 };
 
-const logs = (db, id, user_id, action) => {
+const logs = (db, io, id, user_id, action) => {
   db.classroom_logs
     .insert({
       class_id: id,
@@ -136,5 +145,9 @@ const logs = (db, id, user_id, action) => {
       action_made: action,
       date_time: `${date()}`
     })
-    .then(res => console.log(res));
+    .then(res =>
+      io.to(`${id}`).emit("newLog", {
+        log: res
+      })
+    );
 };

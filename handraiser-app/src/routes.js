@@ -4,12 +4,9 @@ import LoginPage from "./components/loginPage/LoginPage";
 import StudentPage from "./components/mainPage/StudentPage";
 import MentorPage from "./components/mainPage/MentorPage";
 import AdminPage from "./components/mainPage/AdminPage";
-import CohortPage, {
-  UserContext
-} from "./components/cohort/cohortQueue/CohortPage";
+import CohortPage from "./components/cohort/cohortQueue/CohortPage";
 import NotFound from "./components/tools/NotFound";
 import Team from "./components/tools/Team";
-import Logs from "./components/cohort/cohortQueue/Logs";
 
 export const newUserContext = createContext(null);
 const Routes = props => {
@@ -37,8 +34,17 @@ const Routes = props => {
           path="/student-page/my-cohort"
           render={() => <StudentPage value={1} location={props} />}
         />
-        <Route path="/cohort/:id" component={CohortPage} />
-        <Route path="/logs" component={Logs} />
+        <Route exact path="/cohort/:id" component={CohortPage} />
+        <Route
+          exact
+          path="/cohort/details/:id"
+          render={({ match }) => <CohortPage value={1} match={match} />}
+        />
+        <Route
+          exact
+          path="/cohort/log/:id"
+          render={({ match }) => <CohortPage value={2} match={match} />}
+        />
         <Route path="/team" component={Team} />
         <Route component={NotFound} />
       </Switch>

@@ -1,40 +1,47 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-
-import MaterialTable from 'material-table';
-
-
+import MaterialTable from "material-table";
 
 export default function Approved() {
-
-
   const [approved, setApproved] = useState({
     columns: [
       {
-        title: 'User', field: 'firstname',
-        render: (rowData) => (
+        title: "User",
+        field: "firstname",
+        render: rowData => (
           <div style={{ display: `flex` }}>
-            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
-            <p>{rowData.firstname} {rowData.lastname}</p>
+            <img
+              src={rowData.avatar}
+              alt={rowData.firstname}
+              width="50"
+              height="50"
+              style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}
+            />
+            <p>
+              {rowData.firstname} {rowData.lastname}
+            </p>
           </div>
         )
       },
-      { field: 'lastname', headerStyle: { display: `none` }, cellStyle: { display: `none` }, },
-      { title: 'Email', field: 'email' },
+      {
+        field: "lastname",
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` }
+      },
+      { title: "Email", field: "email" }
     ],
-    data: [],
+    data: []
   });
 
   useEffect(() => {
     let isCancelled = false;
 
-    if (!isCancelled)
-      renderApproved();
+    if (!isCancelled) renderApproved();
 
     return () => {
-      isCancelled = true
-    }
+      isCancelled = true;
+    };
   }, []);
 
   const renderApproved = () => {

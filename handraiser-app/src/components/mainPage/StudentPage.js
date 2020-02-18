@@ -5,26 +5,21 @@ import { Redirect, useHistory } from "react-router-dom";
 import io from "socket.io-client";
 
 // COMPONENTS
-import {newUserContext} from "../../routes"
+import { newUserContext } from "../../routes";
 import jwtToken from "../tools/assets/jwtToken";
 import MainpageTemplate from "../tools/MainpageTemplate";
 import CohortList from "../cohort/CohortList";
-import UsersModal from '../tools/UsersModal'
+import UsersModal from "../tools/UsersModal";
 
 // MATERIAL-UI
-import { 
-  makeStyles,
-  AppBar, 
-  Tabs, 
-  Tab,
-} from "@material-ui/core";
+import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
 export default function StudentPage({ value }) {
-  console.log(value)
+  console.log(value);
   const [request, setRequest] = useState();
   const [open, setOpen] = useState(true);
-  const {isNew} = useContext(newUserContext);
+  const { isNew } = useContext(newUserContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -96,17 +91,20 @@ export default function StudentPage({ value }) {
 
   return (
     <MainpageTemplate>
-      {sessionStorage.getItem("newUser") === "pending" || request === "pending" || userObj.user_approval_status_id === 2 ? 
-          <h3>Request Sent. Waiting for Confirmation!</h3>
-       :
+      {sessionStorage.getItem("newUser") === "pending" ||
+      request === "pending" ||
+      userObj.user_approval_status_id === 2 ? (
+        <h3>Request Sent. Waiting for Confirmation!</h3>
+      ) : (
         sessionStorage.getItem("newUser") === "true" && (
-        <UsersModal 
-          open={open}
-          handleClose={() => setOpen(false)}
-          handleSubmit={handleMentor}
-          type="New User"
-          buttonText = "I'am a Mentor"
-        />
+          <UsersModal
+            open={open}
+            handleClose={() => setOpen(false)}
+            handleSubmit={handleMentor}
+            type="New User"
+            buttonText="I'am a Mentor"
+          />
+        )
       )}
 
       <div className={classes.parentDiv}>
@@ -134,13 +132,6 @@ export default function StudentPage({ value }) {
       </div>
     </MainpageTemplate>
   );
-}
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
-  };
 }
 
 const useStyles = makeStyles(theme => ({
