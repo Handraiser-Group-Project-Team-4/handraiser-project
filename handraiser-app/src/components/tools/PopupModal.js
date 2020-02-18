@@ -10,14 +10,33 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import EditIcon from "@material-ui/icons/Edit";
-
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import SchoolIcon from '@material-ui/icons/School';
+import InputAdornment from '@material-ui/core/InputAdornment';
 import AdminTable from "./AdminTable"
+import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete}) {
+export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
     const ENDPOINT = "localhost:3001";
+    const [attending, setAttending] = useState({
+        open: false,
+        data: ''
+    })
+    const [counter, setCounter] = useState({
+        title: '30',
+        descriptiob: '50'
+    })
     const [body, setBody] = useState({
         data: 
+        (type === 'updating')?
+            {
+                class_title: data.class_title,
+                class_description: data.class_description 
+            }:
         (type === 'approving')?
             {
                 user_approval_status_id: 1
@@ -41,6 +60,14 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             }: null
     });
 
+    const closeAttending = () => {
+        setAttending({
+          ...attending,
+          open: false
+        })
+        getCohorts()
+      }
+
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
 
@@ -61,6 +88,14 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
         console.log(body)
     };
 
+    const manageEnrolled = data => {
+        
+        setAttending({ 
+            open: true, 
+            data: data 
+        })
+    }
+
     const handleInputs = e => {
         let date = new Date();
         let newDate = date.toLocaleString();
@@ -76,7 +111,16 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             class_status: "true"
         }
         });
-        console.log(body);
+
+        const bawas = e.target.value
+        const newBawas = bawas.length
+
+        {e.target.name === 'class_title' && (
+        setCounter({
+            ...counter,
+            title: 30-newBawas
+        })
+        )}
     };
 
     const generateKey = () => {
@@ -91,9 +135,21 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
         console.log(body)
     }
 
+    const updateCohort = e => {
+        setBody({
+            data:{
+                ...body.data,
+                [e.target.name]: e.target.value
+            }
+        })
+        console.log(body)
+    } 
+
     const submitUserData = e => {
         e.preventDefault();
-        const METHOD = (type === "Create Cohort")? 'post' :
+        const METHOD = 
+                        (type === "updating")? 'patch' :   
+                        (type === "Create Cohort")? 'post' :
                         (type === "disapproving") ? 'patch' : 
                         (type === "approving") ? 'patch' : 
                         (type === "Create Cohort") ? 'patch':
@@ -102,11 +158,12 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                         (type === 'Toggle Cohort') ? 'patch' : 
                         (type === 'Delete Cohort') ? 'delete' : null 
                             
-        const URL = (type === 'approving')?`/api/toapprove/${data.user_id}`:
+        const URL = (type === 'updating')? `/api/updateTitleDesc/${data.class_id}`:
+                    (type === 'approving')?`/api/toapprove/${data.user_id}`:
                     (type === 'disapproving')?`/api/todisapprove/${data.user_id}`:
                     (type === 'Create Cohort')?`/api/class`:
                     (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
-                    (type === 'users')?`/api/assigning/${data.id}`:
+                    (type === 'users')?`/api/assigning/${data.user_id}`:
                     (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
                     (type === 'Delete Cohort') ? `/api/deleteClass/${id}`: null
        
@@ -124,7 +181,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 }
             })
                 .then(() => {
-                    socket.emit("changeUserRole", {user_id: data.id, user_role_id: data.role});
+                    socket.emit("changeUserRole", {user_id: data.user_id, user_role_id: data.role});
 
                     render()
                     handleClose()
@@ -155,6 +212,16 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
     };
 
     return (
+        <>
+        {attending.open && (
+            <Attending
+              open={attending.open}
+              handleClose={closeAttending}
+              data={attending.data} 
+              type={'assigning'}
+            />
+        )}
+
         <Dialog
             open={open}
             onClose={handleClose}
@@ -165,14 +232,54 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
         >
             {(type !== 'approving')?
                 <form onSubmit={submitUserData}>
-                    <DialogTitle id="alert-dialog-title">
+                    <DialogTitle id="alert-dialog-title" >
                         {title}
-                        {/* Are you sure you want to disapprove {data.firstname} {data.lastname} as
-                        a mentor? */}
+                        {(type === 'users') ? 
+                            <List component="nav" aria-label="main mailbox folders">
+                            {cohorts.map(row => (
+                                <ListItem key={row.class_id}>
+                                    <ListItemIcon>
+                                    <SchoolIcon/>
+                                    </ListItemIcon>
+                                    <ListItemText primary={row.class_title} />
+                                </ListItem>
+                            ))
+
+                            }
+            
+                            </List>
+                    
+                        :
+                        null}
                     </DialogTitle>
 
                     <DialogContent>
-                        {(type === 'disapproving')?
+                        {(type === 'updating')?
+                        <div style={{display: `flex`, flexDirection: `column`}}>
+                            
+                            <TextField
+                                id="outlined-textarea2"
+                                label="Class Title"
+                                name="class_title"
+                                onChange={updateCohort}
+                                defaultValue={body.data.class_title}
+                                variant="outlined"
+                            />
+                            <br/>
+                            <TextField
+                                id="outlined-textarea1"
+                                label="Class Description"
+                                multiline
+                                name="class_description"
+                                rows="3"
+                                defaultValue={body.data.class_description}
+                                onChange={updateCohort}
+                                variant="outlined"
+                            />
+                              </div>
+                         :
+                            
+                        (type === 'disapproving')?
                         <div style={{display: `flex`, flexDirection: `column`}}>
                             <TextField
                                 id="outlined-textarea"
@@ -188,12 +295,24 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                             <div style={{display: `flex`, flexDirection: `column`}}>
                                
                                 <TextField
-                                    id="outlined-textarea"
+                                    id="outlined-textarea2"
                                     name="class_title"
                                     label="Title"
                                     variant="outlined"
                                     onChange={handleInputs}
+                                    InputProps={{
+                                        endAdornment: <InputAdornment 
+                                                        style={{
+                                                            color:(counter.title < 5) ? "red" : null,
+                                                            opacity: '0.5'
+                                                        }} 
+                                                        position="end">{counter.title}/30</InputAdornment>
+                                    }}
+                                    inputProps={{
+                                        maxLength: 30,
+                                    }}
                                 />
+                
                                 <br/>
                                 <TextField
                                     id="outlined-textarea"
@@ -234,55 +353,67 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                         }
                     </DialogContent>
 
-                    <DialogActions>
+                    <DialogActions >
                         {(type !== 'Delete Cohort')
                         
                         ?
-                        <>
-                        <Button onClick={handleClose} color="primary">
-                            Disagree
-                        </Button>
-                       
-                        <Button type="submit" color="primary" autoFocus>
-                            Agree
-                        </Button>
-                        </> :
+                            <>
+              
+                            {(type === 'users') ? 
+                                <Button onClick={(e)=>manageEnrolled(data)} color="secondary" style={{float: 'right'}} autoFocus>
+                                    Manage Enrolled Cohorts
+                                </Button>
+                            : null}
 
-                        <>
-                        <Button onClick={handleClose} color="primary">
-                            Disagree
-                        </Button>
-                            {(canDelete === "yes")
-                            ?
-                            <Button type="submit" color="primary" autoFocus>
-                                Agree
+                   
+                                    <Button onClick={handleClose} color="secondary">
+                                        Close
+                                    </Button>
+                                
+                                    <Button type="submit" color="secondary">
+                                        Confirm
+                                    </Button>
+                               
+                            </>
+                        
+                        :
+
+                            <>
+                            <Button onClick={handleClose} color="secondary">
+                                Close
                             </Button>
-                            :
-                            <Button onClick={handleClose}  color="primary" autoFocus>
-                                Agree
-                            </Button>
-                            }
-                        </>
+                                {(canDelete === "yes")
+                                ?
+                                <Button type="submit" color="secondary" autoFocus>
+                                    Confirm
+                                </Button>
+                                :
+                                <Button onClick={handleClose}  color="secondary" autoFocus>
+                                    Confirm
+                                </Button>
+                                }
+                            </>
                         }
+                       
                     </DialogActions>
                 </form>
                 :
                 <>  
                     
-                    <DialogTitle id="alert-dialog-title"> Are you sure you want to assign {data.firstname} {data.lastname} as a mentor?</DialogTitle>
+                    <DialogTitle id="alert-dialog-title"> Are you sure you want to approve {data.firstname} {data.lastname} as a mentor?</DialogTitle>
 
                     <DialogContent>
 
                     </DialogContent>
 
                     <DialogActions>
-                        <Button onClick={handleClose} color="primary">
-                            Disagree
+                        <Button onClick={handleClose} color="secondary">
+                            Close
                     </Button>
             
                 
-                        <Button onClick={e => submitUserData(e)} color="primary" autoFocus>
-                            Agree
+                        <Button onClick={e => submitUserData(e)} color="secondary" autoFocus>
+                            Approve
                     </Button>
                           
                        
@@ -291,5 +422,6 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             }
 
         </Dialog>
+        </>
     )
 }

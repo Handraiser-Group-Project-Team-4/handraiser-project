@@ -12,18 +12,38 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 
-export default function PopupModal({ handleClose, open, data, title, id}) {
+export default function PopupModal({ handleClose, open, data, title, userId}) {
     const columns = [
         
-        { title: 'Avatar', field: 'avatar',
-        render: (rowData) => (
-          <div style={{display: `flex`}}>
-            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
-            <p>{rowData.firstname} {rowData.lastname}</p>
-          </div>
-        )
-        },
-        { title: "Email", field: "email" },
+        { title: 'Title', field: 'class_title' },
+        { title: "Email", field: "class_description" },
+        { title: "Status", field: "class_status",lookup: {
+            true: (
+              <span
+                style={{
+                  background: `green`,
+                  color: `white`,
+                  padding: `2px 4px`,
+                  borderRadius: `3px`
+                }}
+              >
+                active
+              </span>
+            ),
+            false: (
+              <span
+                style={{
+                  background: `red`,
+                  color: `white`,
+                  padding: `2px 4px`,
+                  borderRadius: `3px`
+                }}
+              >
+                close
+              </span>
+            )
+          } },
+        { title: "Status", field: "class_created" },
         
       ]
   
@@ -39,13 +59,13 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
                 Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             },
                 data: {
-                    class_id: id,
-                    user_id: x.user_id,
+                    class_id: x.class_id,
+                    user_id: id,
                     date_joined: newDate
                 }
             })
             .then(() => {
-                handleClose(id)
+                handleClose()
             })
             .catch(err => console.log("err"))
     
@@ -58,7 +78,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
     <>
       <Dialog
         open={open}
-        onClose={() =>handleClose(id)}
+        onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}
@@ -66,15 +86,14 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
       >
         <DialogTitle id="alert-dialog-title">
          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
-            <h4 style={{margin: `0`}}>{title}</h4>
-            <h6 style={{margin: `0`}}>Assign Mentor</h6>
-          </div>
+            <h4>Assign Cohort to {title}</h4>
+         </div>
         </DialogTitle>
 
         <DialogContent>
 
         <MaterialTable
-            title="Mentors"
+            title="Cohorts"
             columns={columns}
             data={data}
             options={{
@@ -84,9 +103,9 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         }}
         actions={[
           {
-            tooltip: 'Assign as a Mentor',
+            tooltip: 'Assign as Cohort',
             icon: () => <AddCircleIcon/>,
-            onClick: (e, data) => assign(data, id)
+            onClick: (e, data) => assign(data, userId)
           }
         ]}
           />

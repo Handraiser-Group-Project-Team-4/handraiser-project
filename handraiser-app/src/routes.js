@@ -10,11 +10,13 @@ import Design from "./components/Chat/design";
 import NotFound from "./components/tools/NotFound";
 import Team from "./components/tools/Team";
 
+
 const Routes = props => {
   return (
     <Switch>
       <Route exact path="/" component={LoginPage} />
       <Route exact path="/admin-page" component={AdminPage} />
+      
       <Route exact path="/mentor-page" component={MentorPage} />
       <Route
         exact
