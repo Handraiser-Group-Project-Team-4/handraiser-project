@@ -4,15 +4,10 @@ import axios from "axios";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
-import handraise from "../../images/handraise.png";
 import { DarkModeContext } from "../../App";
-import Team from "./Team";
-// import Unnamed from "./unnamed.jpg";
-// import Handraiser from "./Handraiser";
-// import ListOfCohorts from "./ListOfCohorts";
+import WarningIcon from "@material-ui/icons/Warning";
 
 // MATERIAL-UI
-
 import {
   AppBar,
   CssBaseline,
@@ -25,18 +20,18 @@ import {
   Toolbar,
   Typography,
   Tab,
-  Box,
   Tabs,
   Switch,
   makeStyles,
   useTheme,
-  Chip
+  Chip,
+  Card,
+  CardContent
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 
 // ICONS
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
-import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -160,7 +155,12 @@ export default function MainpageTemplate({
           </>
         )}
       </div>
-      <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
+      <Tabs
+        orientation="vertical"
+        value={tabIndex}
+        className={classes.tabs}
+        style={{ position: "relative", height: "calc(100vh - 250px)" }}
+      >
         <Tab
           label={
             <ListItem
@@ -244,6 +244,37 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
+        <div
+          style={{
+            position: "absolute",
+            bottom: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 240
+          }}
+        >
+          <Card style={{ width: 220 }}>
+            <CardContent
+              style={{
+                paddingBottom: 16,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <WarningIcon />
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+              >
+                Your request to be a mentor is still being processed.
+              </Typography>
+            </CardContent>
+          </Card>
+        </div>
       </Tabs>
     </div>
   );
@@ -387,7 +418,6 @@ const useStyles = makeStyles(theme => ({
   },
   studentImg: {
     borderRadius: "50%",
-    border: "5px solid white",
     width: 90,
     height: 90,
     cursor: "pointer",
@@ -432,23 +462,3 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-function a11yPropss(index) {
-  return {
-    id: `vertical-tab-${index}`,
-    "aria-controls": `vertical-tabpanel-${index}`
-  };
-}
-function TabPanel({ children, value, index, ...other }) {
-  return (
-    <Typography
-      component="div"
-      role="tabpanel"
-      hidden={value !== index}
-      id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box p={3}>{children}</Box>}
-    </Typography>
-  );
-}

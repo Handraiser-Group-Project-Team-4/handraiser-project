@@ -11,13 +11,7 @@ import CohortContainer from "./CohortContainer";
 import UsersModal from "../tools/UsersModal";
 
 // MATERIAL-UI
-import {
-  useTheme,
-  TextField,
-  useMediaQuery,
-  Typography,
-  Box
-} from "@material-ui/core";
+import { useTheme, useMediaQuery, Typography, Box } from "@material-ui/core";
 
 let socket;
 export default function CohortList({ classes, value }) {
@@ -131,7 +125,10 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        style={{
+          backgroundColor: darkMode ? "#333" : null,
+          height: "calc(100vh - 48px)"
+        }}
         // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
