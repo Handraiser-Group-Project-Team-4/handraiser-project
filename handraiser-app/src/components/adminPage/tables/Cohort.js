@@ -1,24 +1,33 @@
 import React, { useEffect, useState } from "react";
 import copy from "clipboard-copy";
 import axios from "axios";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
 import MaterialTable, { MTableToolbar } from "material-table";
 import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
 
 // COMPONENTS
-import AdminModal from "../../tools/AdminModal";
+import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
 
 // ICONS
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import SchoolIcon from "@material-ui/icons/School";
-import DeleteIcon from "@material-ui/icons/Delete";
+import SchoolIcon from '@material-ui/icons/School';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+// import PopupModal from "../CohortTools/AssignCohort";
 
 export function ToolTipCopy({ data }) {
   const [open, setOpen] = useState(false);
+
 
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
@@ -48,7 +57,14 @@ export function ToolTipCopy({ data }) {
 }
 
 export default function MaterialTableDemo() {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [createCohort, setCreateCohort] = useState(false);
+  const [updateTitleDesc, setUpdateTitleDesc] = useState({
+    open: false,
+    data: "",
+    type: "updating"
+  })
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
     title: "",
@@ -82,35 +98,16 @@ export default function MaterialTableDemo() {
           </div>
         )
       },
-      {
-        title: "Status",
+      {title: "Status",
         field: "class_status",
-        lookup: {
-          true: (
-            <span
-              style={{
-                background: `green`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
+        render: (rowData) => ((rowData.class_status === 'true')
+        ?  <span style={{background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
               active
-            </span>
-          ),
-          false: (
-            <span
-              style={{
-                background: `red`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              close
-            </span>
-          )
-        }
+           </span>    
+        :<span style={{background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
+            close
+         </span>
+        )
       },
       {
         title: "Actions",
@@ -119,7 +116,8 @@ export default function MaterialTableDemo() {
           textAlign: "center"
         },
         cellStyle: {
-          textAlign: "center"
+          textAlign: "center",
+         
         },
         render: row => (
           <div
@@ -150,15 +148,93 @@ export default function MaterialTableDemo() {
               <VisibilityIcon onClick={e => openViewStudentsModal(row)} />
             </Tooltip>
 
+            <Tooltip title="Update Cohort Title/Description">
+              <EditIcon onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: row})} />
+            </Tooltip>
+
             <Tooltip title="Delete Cohort">
               <DeleteIcon onClick={e => deleteCohort(row)} />
             </Tooltip>
+
+            
+
           </div>
+        )
+      }
+    ],
+    mobileColumns : [
+      { title: "Title", field: "class_title",
+        render: (rowData) => ((rowData.class_status === 'true')
+        ? 
+          <> 
+          <status-indicator active pulse positive />
+          <span> {rowData.class_title}</span>
+          </>    
+        :
+          <>
+         
+          <status-indicator active pulse negative />
+          <span> {rowData.class_title}</span>
+          </>
+        )
+      },
+      {title: "Key", field: "class_key",
+        render: (rowData) => (
+          <div style={{ display: `flex`, alignItems:`center` }}>
+            <p style={{ width: `90px` }}>{rowData.class_key}</p>
+            <ToolTipCopy data={rowData.class_key} />
+          </div>
+        )
+      },
+      { field: "class_key", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
+        render: (rowData) => (
+          <PopupState variant="popover" popupId="demo-popup-menu">
+            {popupState => (
+              <React.Fragment>
+                
+                  <MoreVertIcon {...bindTrigger(popupState)}/>
+             
+
+                <Menu {...bindMenu(popupState)}>
+
+                  <MenuItem >
+                  Toggle Status
+                    <Switch
+                      checked={rowData.class_status === "true" ? true : false}
+                      onChange={e => {
+                        toggleClassFn(rowData);
+                      }}
+                    />
+                  </MenuItem>
+
+                  <MenuItem  onClick={e => setChangeKey({ open: true, data: rowData })} >
+                    Change Key
+                  </MenuItem>
+
+                  <MenuItem  onClick={e => openViewStudentsModal(rowData)} >
+                    View Joined Users
+                  </MenuItem>
+
+                  <MenuItem  onClick={e => openViewStudentsModal(rowData)} >
+                    View Joined Users
+                  </MenuItem>
+
+                  <MenuItem  onClick={e => deleteCohort(rowData)} >
+                  Delete Cohort
+                  </MenuItem>
+              
+              </Menu>
+
+              </React.Fragment>
+            )}
+          </PopupState>
         )
       }
     ],
     data: []
   });
+
+
 
   useEffect(() => {
     renderCohorts();
@@ -276,9 +352,19 @@ export default function MaterialTableDemo() {
   };
 
   return (
-    <>
+      <>
+      {updateTitleDesc.open && (
+        <PopupModal
+          open={updateTitleDesc.open}
+          data={updateTitleDesc.data}
+          type={updateTitleDesc.type}
+          handleClose={(e) => setUpdateTitleDesc({...updateTitleDesc, open: false})}
+          render={renderCohorts}
+          title={`Update Class Title/Description`}
+        />)}
+
       {deleteCohortObj.open && (
-        <AdminModal
+        <PopupModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
           handleClose={e =>
@@ -292,7 +378,7 @@ export default function MaterialTableDemo() {
       )}
 
       {createCohort && (
-        <AdminModal
+        <PopupModal
           title={"Create Cohort"}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
@@ -302,7 +388,7 @@ export default function MaterialTableDemo() {
       )}
 
       {changeKey.open && (
-        <AdminModal
+        <PopupModal
           title={"Change Key"}
           data={changeKey.data}
           open={changeKey.open}
@@ -327,24 +413,31 @@ export default function MaterialTableDemo() {
       )}
 
       <MaterialTable
+
         title={
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={() => setCreateCohort(true)}
-            startIcon={<SchoolIcon />}
-          >
-            New Cohort
-          </Button>
-        }
-        columns={table.columns}
+          <div>
+            {(matches) && <h3>Cohorts</h3>}
+
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => setCreateCohort(true)}
+              startIcon={<SchoolIcon  style={{display: (matches) ? null: 'none'}} />}
+              style={{fontSize: (matches) ? null: '10px'}}
+            >
+              New Cohort
+            </Button>
+          </div>
+                }
+        columns={(matches) ? table.columns : table.mobileColumns} 
         data={table.data}
         options={{
           pageSize: 10,
-          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` },
+          
         }}
       />
-    </>
+      </>
   );
 }

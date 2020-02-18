@@ -2,27 +2,38 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-// MATERIAL-UI
 import MaterialTable from 'material-table';
 import Tooltip from "@material-ui/core/Tooltip";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
-// COMPONENTS
-import AdminModal from '../../tools/AdminModal'
-
-// ICONS
-import EditIcon from "@material-ui/icons/Edit";
+// Components
+import AdminModal from '../../tools/AdminModal';
+import Badger from '../../tools/Badger';
 
 // Icons
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 
 
 let socket;
 export default function Pending() {
   const ENDPOINT = "localhost:3001";
-
-
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const [approving, setApproving] = useState({
+    open: false,
+    data: ""
+  })
+  const [disapproving, setDisapproving] = useState({
+    open: false,
+    data: ""
+  })
   const [pending, setPending] = useState({
     columns: [
       {
@@ -63,25 +74,61 @@ export default function Pending() {
               />
             </Tooltip>
           </div>
-          
-            
-           
-              
-           
-        )
+         )
       }
+    ],
+    
+    mobileColumns: [
+        { title: 'Users', field: 'firstname',
+          render: (rowData) => (
+            <div style={{display: `flex`}}>
+              
+              <Badger obj={rowData}/>
+              <div>
+              
+                <p style={{margin: 0}}>
+                
+                {rowData.firstname} {rowData.lastname}</p>
+                <div style={{margin: 0, fontSize: 10}}>
+                    <span>{rowData.email}</span><br/>
+                
+                </div>
+              </div>
+            </div>
+          )
+        },
+        { field: "Action", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
+        render: (rowData) => (
+          <PopupState variant="popover" popupId="demo-popup-menu">
+            {popupState => (
+              <React.Fragment>
+                
+                  <MoreVertIcon {...bindTrigger(popupState)}/>
+             
+
+                <Menu {...bindMenu(popupState)}>
+                
+
+                <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
+                  Approve
+                </MenuItem>
+
+                <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
+                  Disapprove
+                </MenuItem>
+              
+              </Menu>
+
+              </React.Fragment>
+            )}
+          </PopupState>
+        )
+      } 
     ],
     data: [],
   });
 
-  const [approving, setApproving] = useState({
-    open: false,
-    data: ""
-  })
-  const [disapproving, setDisapproving] = useState({
-    open: false,
-    data: ""
-  })
+ 
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -151,7 +198,7 @@ export default function Pending() {
 
       <MaterialTable
         title=""
-        columns={pending.columns}
+        columns={(matches) ? pending.columns : pending.mobileColumns}
         data={pending.data}
         options={{
           pageSize: 10,
