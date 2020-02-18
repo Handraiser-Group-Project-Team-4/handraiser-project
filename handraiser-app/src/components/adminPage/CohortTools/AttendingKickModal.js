@@ -20,7 +20,7 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
     e.preventDefault();
 
     row.map(x => {
-
+   
         axios({
             method: "delete",
             url: `/api/kickstud/${userObj.user_id}/${x.class_id}`,
@@ -29,10 +29,11 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
             }
           })
             .then(res => {
-              handleClose(userObj);
+             handleClose(userObj);
             })
             .catch(err => console.log(err));
-    })
+      return
+          })
     
   };
   console.log(data);

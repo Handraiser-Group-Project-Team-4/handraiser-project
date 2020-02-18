@@ -19,16 +19,14 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, titleLen, descLen}) {
     const ENDPOINT = "localhost:3001";
     const [attending, setAttending] = useState({
         open: false,
         data: ''
     })
-    const [counter, setCounter] = useState({
-        title: '30',
-        descriptiob: '50'
-    })
+    
+  
     const [body, setBody] = useState({
         data: 
         (type === 'updating')?
@@ -58,6 +56,13 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 class_key: data.class_key
             }: null
     });
+    const [counter, setCounter] = useState({
+        title: '30',
+        description: '50',
+        updatingTitle: 30-titleLen,
+        updatingDescription: 50-descLen
+        
+    })
 
     const closeAttending = () => {
         setAttending({
@@ -100,7 +105,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
         let newDate = date.toLocaleString();
 
         let key = keyGenerator();
-
+       
         setBody({
         data: {
             ...body.data,
@@ -110,16 +115,29 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
             class_status: "true"
         }
         });
-
+        console.log(counter)
         const bawas = e.target.value
         const newBawas = bawas.length
 
-        {e.target.name === 'class_title' && (
-        setCounter({
-            ...counter,
-            title: 30-newBawas
-        })
-        )}
+
+        if(e.target.name === 'class_title' ) {   
+            setCounter({
+                    ...counter,
+                    title: 30-newBawas
+                
+            })
+        }
+    
+
+        
+        if(e.target.name === 'class_description'){    
+            setCounter({
+                ...counter,
+                description: 50-newBawas
+                
+            })
+        }
+       
     };
 
     const generateKey = () => {
@@ -141,7 +159,28 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 [e.target.name]: e.target.value
             }
         })
-        console.log(body)
+
+        const bawas = e.target.value
+        const newBawas = bawas.length
+
+      
+        if(e.target.name === 'class_title'){
+            setCounter({
+                ...counter,
+                updatingTitle: 30-newBawas
+                
+            })
+        }
+        
+            
+      
+        if(e.target.name === 'class_description') {   
+            setCounter({
+                ...counter,
+               updatingDescription: 50-newBawas
+              
+            })
+        }
     } 
 
     const submitUserData = e => {
@@ -263,6 +302,18 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                                 onChange={updateCohort}
                                 defaultValue={body.data.class_title}
                                 variant="outlined"
+                                InputProps={{endAdornment: 
+                                            <InputAdornment 
+                                                style={{
+                                                    color:(counter.updatingTitle < 5) ? "red" : null,
+                                                    opacity: '0.5'
+                                                }} 
+                                                position="end">{counter.updatingTitle}/30
+                                            </InputAdornment>
+                                    }}
+                                inputProps={{
+                                    maxLength: 30,
+                                }}
                             />
                             <br/>
                             <TextField
@@ -274,6 +325,18 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                                 defaultValue={body.data.class_description}
                                 onChange={updateCohort}
                                 variant="outlined"
+                                InputProps={{endAdornment: 
+                                            <InputAdornment 
+                                                style={{
+                                                    color:(counter.updatingDescription < 10) ? "red" : null,
+                                                    opacity: '0.5'
+                                                }} 
+                                                position="end">{counter.updatingDescription}/50
+                                            </InputAdornment>
+                                    }}
+                                inputProps={{
+                                    maxLength: 50,
+                                }}
                             />
                               </div>
                          :
@@ -294,18 +357,20 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                             <div style={{display: `flex`, flexDirection: `column`}}>
                                
                                 <TextField
+                                   
                                     id="outlined-textarea2"
                                     name="class_title"
                                     label="Title"
                                     variant="outlined"
                                     onChange={handleInputs}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment 
-                                                        style={{
-                                                            color:(counter.title < 5) ? "red" : null,
-                                                            opacity: '0.5'
-                                                        }} 
-                                                        position="end">{counter.title}/30</InputAdornment>
+                                    InputProps={{endAdornment: 
+                                            <InputAdornment 
+                                                style={{
+                                                    color:(counter.title < 5) ? "red" : null,
+                                                    opacity: '0.5'
+                                                }} 
+                                                position="end">{counter.title}/30
+                                            </InputAdornment>
                                     }}
                                     inputProps={{
                                         maxLength: 30,
@@ -314,6 +379,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 
                                 <br/>
                                 <TextField
+                                   
                                     id="outlined-textarea"
                                     name="class_description"
                                     label="Class Description"
@@ -321,6 +387,18 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                                     variant="outlined"
                                     multiline
                                     rows="3"
+                                    InputProps={{endAdornment: 
+                                            <InputAdornment 
+                                                style={{
+                                                    color:(counter.description < 10) ? "red" : null,
+                                                    opacity: '0.5'
+                                                }} 
+                                                position="end">{counter.description}/50
+                                            </InputAdornment>
+                                    }}
+                                    inputProps={{
+                                        maxLength: 50,
+                                    }}
                                 />
                             </div>
                          : (type === 'Change Key')?

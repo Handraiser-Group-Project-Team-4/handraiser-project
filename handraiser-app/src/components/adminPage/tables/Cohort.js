@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
 
 // COMPONENTS
@@ -357,6 +357,8 @@ export default function MaterialTableDemo() {
         <PopupModal
           open={updateTitleDesc.open}
           data={updateTitleDesc.data}
+          titleLen={updateTitleDesc.data.class_title.length}
+          descLen={updateTitleDesc.data.class_description.length}
           type={updateTitleDesc.type}
           handleClose={(e) => setUpdateTitleDesc({...updateTitleDesc, open: false})}
           render={renderCohorts}

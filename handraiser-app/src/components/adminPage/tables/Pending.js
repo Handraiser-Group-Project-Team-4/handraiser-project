@@ -98,32 +98,32 @@ export default function Pending() {
           )
         },
         { field: "Action", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
-        render: (rowData) => (
-          <PopupState variant="popover" popupId="demo-popup-menu">
-            {popupState => (
-              <React.Fragment>
-                
-                  <MoreVertIcon {...bindTrigger(popupState)}/>
-             
-
-                <Menu {...bindMenu(popupState)}>
+          render: (rowData) => (
+            <PopupState variant="popover" popupId="demo-popup-menu">
+              {popupState => (
+                <React.Fragment>
+                  
+                    <MoreVertIcon {...bindTrigger(popupState)}/>
                 
 
-                <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
-                  Approve
-                </MenuItem>
+                  <Menu {...bindMenu(popupState)}>
+                  
 
-                <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
-                  Disapprove
-                </MenuItem>
-              
-              </Menu>
+                  <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
+                    Approve
+                  </MenuItem>
 
-              </React.Fragment>
-            )}
-          </PopupState>
-        )
-      } 
+                  <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
+                    Disapprove
+                  </MenuItem>
+                
+                </Menu>
+
+                </React.Fragment>
+              )}
+            </PopupState>
+          )
+        } 
     ],
     data: [],
   });

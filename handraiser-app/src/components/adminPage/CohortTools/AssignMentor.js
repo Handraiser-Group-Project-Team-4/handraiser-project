@@ -18,7 +18,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         { title: 'Avatar', field: 'avatar',
         render: (rowData) => (
           <div style={{display: `flex`}}>
-            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
+            <img src={rowData.avatar} alt='pic' width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
             <p>{rowData.firstname} {rowData.lastname}</p>
           </div>
         )
