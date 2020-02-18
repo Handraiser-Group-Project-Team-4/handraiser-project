@@ -12,7 +12,6 @@ const Logs = ({ classes, Timeline, changeHandler, logs, search }) => {
 
   useEffect(() => {
     let filter = [];
-    console.log(search);
     if (search) {
       logs.filter(log => {
         const regex = new RegExp(search, "gi");

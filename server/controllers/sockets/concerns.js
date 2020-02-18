@@ -10,7 +10,7 @@ module.exports = {
       db.query(
         `SELECT * FROM classroom_logs WHERE class_id  = ${id} ORDER BY classroom_logs_id DESC`
       ).then(res => {
-        io.to(`${id}`).emit("fetchOldChats", {
+        io.to(`${id}`).emit("fetchOldLogs", {
           data: res
         });
       });

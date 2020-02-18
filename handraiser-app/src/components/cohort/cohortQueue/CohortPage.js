@@ -101,7 +101,11 @@ export default function CohortPage({ value = 0, match }) {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {});
+    socket.emit("joinConcern", { id }, () => {
+      socket.on("fetchOldLogs", ({ data }) => {
+        setLogs(data);
+      });
+    });
   }, [ENDPOINT]);
 
   useEffect(() => {
@@ -116,6 +120,10 @@ export default function CohortPage({ value = 0, match }) {
             })
           : setChatRoom();
       });
+    });
+
+    socket.on("newLog", ({ log }) => {
+      setLogs([log, ...logs]);
     });
 
     socket.on("concernData", ({ concern, alert }) => {
@@ -160,9 +168,6 @@ export default function CohortPage({ value = 0, match }) {
     }
   };
 
-  if (Object.keys(data).length === 0) {
-    return null;
-  }
   return (
     <MainpageTemplate>
       <div className={classes.parentDiv}>

@@ -1,12 +1,17 @@
 import React, { useState, useEffect, Fragment, useContext } from "react";
 import { Redirect, Link, useHistory } from "react-router-dom";
+import { GoogleLogout } from "react-google-login";
 import axios from "axios";
-
+import io from "socket.io-client";
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
+// import handraise from '../../images/handraise.png';
 import { DarkModeContext } from "../../App";
-import WarningIcon from "@material-ui/icons/Warning";
-
+// import Team from './Team';
+import UsersModal from "../tools/UsersModal";
+// import Unnamed from "./unnamed.jpg";
+// import Handraiser from "./Handraiser";
+// import ListOfCohorts from "./ListOfCohorts";
 // MATERIAL-UI
 import {
   AppBar,
@@ -20,40 +25,48 @@ import {
   Toolbar,
   Typography,
   Tab,
+  // Box,
   Tabs,
   Switch,
   makeStyles,
   useTheme,
   Chip,
-  Card,
-  CardContent
+  Divider
 } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
-
+// import Skeleton from "@material-ui/lab/Skeleton";
 // ICONS
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
+// import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
-
+let socket;
 export default function MainpageTemplate({
   children,
   container,
   tabIndex = 0
 }) {
+  const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
-  const [user, setUser] = useState();
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  // const [value, setValue] = React.useState(0);
+  // const handleChanges = (e, newValue) => setValue(newValue);
   const history = useHistory();
-
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
-
+  const [notify, setNotify] = useState({
+    open: false,
+    title: "",
+    buttonText: "",
+    type: "",
+    modalTextContent: ""
+  });
   const handleLogout = () => {
+    setNotify({ ...notify, open: false });
     axios({
       method: `patch`,
       url: `/api/logout/${userObj.user_id}`,
@@ -69,33 +82,75 @@ export default function MainpageTemplate({
       });
     sessionStorage.clear();
   };
-
   useEffect(() => {
-    let isCancelled = false;
-    axios({
-      method: "get",
-      url: `/api/users/${userObj && userObj.user_id}`,
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    })
-      .then(res => {
-        // console.log(res.data)
-        if (!isCancelled) setUser(res.data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
+  useEffect(() => {
+    socket.on("mentorToStudent", user_id => {
+      if (userObj.user_id === user_id)
+        // alert(`Your role has been change to Student Please Logout to see the changes!`);
+        setNotify({
+          open: true,
+          title:
+            "Your role has been change to Student Please Logout to see the changes!",
+          buttonText: "Logout",
+          type: "mentorToStudent"
+        });
+    });
     return () => {
-      isCancelled = true;
+      socket.emit("disconnect");
+      socket.off();
     };
-  }, [userObj]);
-
+  });
+  useEffect(() => {
+    socket.on("studentToMentor", user_id => {
+      if (userObj.user_id === user_id)
+        // alert(`Your role has been change to Mentor. Please Logout to see the changes!`);
+        setNotify({
+          open: true,
+          title:
+            "Your role has been change to Mentor. Please Logout to see the changes!",
+          buttonText: "Logout",
+          type: "studentToMentor"
+        });
+    });
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  });
+  useEffect(() => {
+    socket.on("notifyUser", ({ user_id, approval_status }) => {
+      if (userObj.user_id === user_id) {
+        if (approval_status.user_approval_status_id === 1)
+          // alert(`Your Request has been Approve. Please Logout to see the changes!`);
+          setNotify({
+            open: true,
+            title:
+              "Your Request to be a Mentor has been Approve. Please Logout to see the changes!",
+            buttonText: "Logout",
+            type: "notifyUserApprove"
+          });
+        if (approval_status.user_approval_status_id === 3)
+          // alert(`Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`);
+          setNotify({
+            open: true,
+            title: `Your Request to be a Mentor has been Disapprove.`,
+            modalTextContent: `Reason: ${approval_status.reason_disapproved}`,
+            buttonText: "Agree",
+            type: "notifyUserDisapprove"
+          });
+      }
+    });
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  });
   const handleDarkMode = async () => {
-    await axios({
+    let res = await axios({
       method: "patch",
-      url: `/api/darkmode/${user.user_id}`,
+      url: `/api/darkmode/${userObj.user_id}`,
       data: { dark_mode: !darkMode },
       headers: {
         Authorization: "Bearer " + sessionStorage.getItem("accessToken")
@@ -103,63 +158,31 @@ export default function MainpageTemplate({
     });
     setDarkMode(!darkMode);
   };
-
   if (!userObj) return <Redirect to="/" />;
-
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
-        {user ? (
-          <>
-            <img src={user.avatar} className={classes.studentImg} alt="" />
-            <Typography className={classes.studentImgButton}>
-              {user.firstname} {user.lastname}
-            </Typography>
-            <Chip
-              label="*Student"
-              color="primary"
-              style={{
-                backgroundColor: "white",
-                color: "black"
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Skeleton
-              variant="circle"
-              width={85}
-              height={85}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="text"
-              width={180}
-              height={45}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="rect"
-              width={80}
-              height={30}
-              style={{
-                borderRadius: 90,
-                backgroundColor: "#8154D1"
-              }}
-            />
-          </>
-        )}
+        <img src={userObj.avatar} className={classes.studentImg} alt="" />
+        <Typography className={classes.studentImgButton}>
+          {userObj.name}
+        </Typography>
+        <Chip
+          // icon={<FaceIcon />}
+          label={
+            userObj.user_role_id === 3
+              ? `Student`
+              : userObj.user_role_id === 2
+              ? `Mentor`
+              : `Admin`
+          }
+          color="black"
+          style={{
+            backgroundColor: "white",
+            color: darkMode ? "#000" : null
+          }}
+        />
       </div>
-      <Tabs
-        orientation="vertical"
-        value={tabIndex}
-        className={classes.tabs}
-        style={{ position: "relative", height: "calc(100vh - 250px)" }}
-      >
+      <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
         <Tab
           label={
             <ListItem
@@ -199,27 +222,6 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        {/* <Divider className={classes.divider} /> */}
-        <Tab
-          label={
-            <ListItem
-              to="/"
-              renderas={Link}
-              onClick={handleLogout}
-              button
-              className={classes.listItemButton}
-            >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <ExitToAppIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" className={classes.listItemText} />
-            </ListItem>
-          }
-        />
         <Tab
           label={
             <ListItem className={classes.listItemButton}>
@@ -243,41 +245,42 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        <div
-          style={{
-            position: "absolute",
-            bottom: 10,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: 240
-          }}
-        >
-          <Card style={{ width: 220 }}>
-            <CardContent
-              style={{
-                paddingBottom: 16,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
+        <Divider className={classes.divider} />
+        <Tab
+          label={
+            <ListItem
+              to="/"
+              renderas={Link}
+              onClick={handleLogout}
+              button
+              className={classes.listItemButton}
             >
-              <WarningIcon />
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+              <ListItemIcon
+                style={{
+                  color: "white"
+                }}
               >
-                Your request to be a mentor is still being processed.
-              </Typography>
-            </CardContent>
-          </Card>
-        </div>
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <GoogleLogout
+                    render={renderProps => (
+                      <p style={{ margin: `0` }}>Logout</p>
+                    )}
+                    clientId={process.env.REACT_APP_CLIENT_ID}
+                    buttonText="Logout"
+                    onLogoutSuccess={handleLogout}
+                  ></GoogleLogout>
+                }
+                className={classes.listItemText}
+              />
+            </ListItem>
+          }
+        />
       </Tabs>
     </div>
   );
-
   return (
     <Fragment>
       <CssBaseline />
@@ -337,6 +340,17 @@ export default function MainpageTemplate({
           <div className={classes.tabPanel}>{children}</div>
         </main>
       </div>
+      {notify.open && (
+        <UsersModal
+          open={notify.open}
+          title={notify.title}
+          modalTextContent={notify.modalTextContent}
+          handleClose={() => setNotify({ ...notify, open: false })}
+          handleSubmit={handleLogout}
+          type={notify.type}
+          buttonText={notify.buttonText}
+        />
+      )}
     </Fragment>
   );
 }
@@ -417,6 +431,7 @@ const useStyles = makeStyles(theme => ({
   },
   studentImg: {
     borderRadius: "50%",
+    border: "5px solid white",
     width: 90,
     height: 90,
     cursor: "pointer",
@@ -452,7 +467,8 @@ const useStyles = makeStyles(theme => ({
     color: "#9ea0b8"
   },
   divider: {
-    backgroundColor: "#ffe4c4"
+    backgroundColor: "#ffe4c4",
+    margin: `10px 0 20px 0`
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,

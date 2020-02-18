@@ -1,4 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
+import io from "socket.io-client";
+import clsx from "clsx";
+import "emoji-mart/css/emoji-mart.css";
+import { Picker } from "emoji-mart";
+import ReactHtmlParser from "react-html-parser";
+import ScrollableFeed from "react-scrollable-feed";
+// MATERIAL-UI
 import {
   makeStyles,
   Card,
@@ -17,18 +24,14 @@ import {
   Menu
 } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
-import io from "socket.io-client";
-import clsx from "clsx";
-import "emoji-mart/css/emoji-mart.css";
-import { Picker } from "emoji-mart";
-import ReactHtmlParser from "react-html-parser";
-import ScrollableFeed from "react-scrollable-feed";
+// COMPONENTS
 import { UserContext } from "../cohort/cohortQueue/CohortPage";
+import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
+// ICONS
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-import jwtToken from "../tools/assets/jwtToken";
 const useStyles = makeStyles(theme => ({
   root: {
     borderRadius: 10,
@@ -91,18 +94,18 @@ const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
   const [message, setMessage] = useState("");
-
+  const [typing, setTyping] = useState({
+    isTyping: false,
+    name: ""
+  });
   const ENDPOINT = "localhost:3001";
-
-  const [setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
-
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.off();
     socket.emit(
       "join",
       { username: userObj.name, chatroom: chatroom.room, userObj },
@@ -112,17 +115,24 @@ const Chat = () => {
         });
       }
     );
-  }, [ENDPOINT, chatroom, userObj]);
+  }, [ENDPOINT, chatroom]);
 
   useEffect(() => {
+    if (message.length <= 0) socket.emit("NotTyping", { name: userObj.name });
     socket.on("message", message => {
       setCurrentChat([...currentChat, message]);
+    });
+    socket.on("displayTyping", ({ name }) => {
+      setTyping({ isTyping: true, name });
+    });
+    socket.on("displayNotTyping", ({ name }) => {
+      setTyping({ isTyping: false, name: "" });
     });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [currentChat]);
+  }, [currentChat, chatroom]);
 
   const sendMessage = event => {
     setOpen(true);
@@ -131,12 +141,12 @@ const Chat = () => {
     const temp = message.replace(/\n/g, "<br />");
     if (message) {
       socket.emit("sendMessage", { message: temp }, () => setMessage(""));
+      socket.emit("NotTyping", { name: userObj.name });
     }
   };
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
   const toggleEmoji = () => {
     setShowEmoji(!showEmoji);
   };
@@ -303,6 +313,7 @@ const Chat = () => {
             fullWidth
             margin="normal"
             variant="outlined"
+            value={message}
             value={message}
             onChange={({ target: { value } }) => {
               setMessage(value);
