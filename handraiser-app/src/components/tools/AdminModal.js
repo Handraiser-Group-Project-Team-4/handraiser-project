@@ -135,16 +135,17 @@ export default function AdminModal({ title, data, open, handleClose, render, typ
                     if(type === 'Change User Role')
                         socket.emit("changeUserRole", { user_id: data.id, user_role_id: data.role });
 
-                    // if (type === 'Create Cohort' || type === 'Toggle Cohort')
-                    //     socket.emit("renderCohort", { data: body.data });
+                    if (type === 'Create Cohort' || type === 'Toggle Cohort' || type === 'Delete Cohort' || type === 'updating')
+                        socket.emit("renderCohort", { data: body.data });
                     
                     if (type === 'approving' || type === 'disapproving') 
                         socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
                     
 
-                    if (type === 'Kick Student')
+                    if (type === 'Kick Student'){
+                        socket.emit("studentKicked", { user_id: data.user_id, class_id: data.class_id });
                         handleClose(data.class_id);
-                    
+                    }
                     else{ 
                         render()
                         handleClose()

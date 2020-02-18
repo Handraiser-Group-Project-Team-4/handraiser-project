@@ -23,5 +23,19 @@ module.exports = {
       else if (user_role_id === 3) io.emit("mentorToStudent", user_id);
       // })
     });
+
+    socket.on(`studentKicked`, ({user_id, class_id}) => {
+      db.classroom_details.find(class_id)
+      .then(classroom => {
+        io.emit("notifyKicked", {
+          user_id, 
+          classroom:{
+            class_id: classroom.class_id,
+            class_title: classroom.class_title
+          }
+        })
+      })
+      
+    });
   }
 };

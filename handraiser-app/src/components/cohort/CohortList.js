@@ -2,9 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { withSnackbar } from 'notistack';
+// import io from "socket.io-client";
 
 // COMPONENTS
-import encryptDecrypt from '../tools/assets/encryptDecrypt'
+// import encryptDecrypt from '../tools/assets/encryptDecrypt'
 import jwtToken from "../tools/assets/jwtToken";
 import CohortContainer from './CohortContainer'
 import UsersModal from '../tools/UsersModal'
@@ -13,13 +15,13 @@ import {DarkModeContext} from '../../App'
 // MATERIAL-UI
 import {
   useTheme,
-  TextField,
+  // TextField,
   useMediaQuery,
   Typography,
-  Box,
+  Box
 } from "@material-ui/core";
 
-export default function CohortList({ classes, value }) {
+function CohortList({ classes, value, enqueueSnackbar }) {
   const {darkMode}  = useContext(DarkModeContext)
   const theme = useTheme();
   const userObj = jwtToken();
@@ -49,6 +51,7 @@ export default function CohortList({ classes, value }) {
           // setTimeout(() => {
           //   history.push(`/cohort/${encryptURL}`);
           // }, 600)
+                            
           history.push(`/cohort/${x.class_id}`);
         }
       })
@@ -79,7 +82,8 @@ export default function CohortList({ classes, value }) {
     })
       .then(res => {
         setIsKey({ ...isKey, open: false });
-        alert(`Welcome to ${isKey.classroomObj.class_title}!`);
+        // alert(`Welcome to ${isKey.classroomObj.class_title}!`);
+        enqueueSnackbar(`Welcome to ${isKey.classroomObj.class_title}!`, {variant: 'success'})
         history.push(`/cohort/${class_id}`);
       })
       .catch(err => {
@@ -94,7 +98,8 @@ export default function CohortList({ classes, value }) {
         style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-      // onChangeIndex={handleChangeIndex}
+        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           <CohortContainer classes={classes} handleCohort={handleCohort} value={value} />
@@ -152,22 +157,24 @@ export default function CohortList({ classes, value }) {
         </DialogActions>
       </Dialog> */}
       {isKey.open && (
-        <UsersModal 
+        <UsersModal
           fullScreen={fullScreen}
           open={isKey.open}
           data={isKey}
-          setData = {(e) => setIsKey({ ...isKey, key: e.target.value })}
+          setData={e => setIsKey({ ...isKey, key: e.target.value })}
           title={`Join ${isKey.classroomObj.class_title}`}
           modalTextContent = "To join to this cohort, please enter the cohort key given by your Mentor."
           handleClose={() => setIsKey({ key: "", open: false, classroomObj: {}, error: false })}
           handleSubmit={() => handleSubmitKey(isKey)}
           type="Enter Key"
-          buttonText = "Join"
+          buttonText="Join"
         />
       )}
     </>
   );
 }
+
+export default withSnackbar(CohortList);
 
 function TabPanel({ children, value, index, ...other }) {
   return (

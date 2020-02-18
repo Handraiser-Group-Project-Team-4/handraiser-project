@@ -4,7 +4,7 @@ import io from 'socket.io-client';
 
 // COMPONENTS
 import jwtToken from '../../tools/assets/jwtToken';
-import { UserContext } from './CohortPage';
+import { UserContext } from '../CohortPage';
 
 // MATERIAL-UI
 import {

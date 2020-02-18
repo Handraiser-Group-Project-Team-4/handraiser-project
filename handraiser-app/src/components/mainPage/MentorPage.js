@@ -176,6 +176,14 @@ const useStyles = makeStyles(theme => ({
     padding: `8px`,
     border:`1px solid #212121`
   },
+  num_text_mentor: {
+    backgroundColor: `#949090`,
+    borderRadius:`50%`,
+    color: `white`,
+    padding: `8px`,
+    fontSize:`11px`, 
+    padding:`3px 5px`
+  },
   tabRoot: {
     width: "100%",
     flexGrow: 1

@@ -5,25 +5,20 @@ import { Redirect, useHistory } from "react-router-dom";
 import io from "socket.io-client";
 
 // COMPONENTS
-import {newUserContext} from "../../routes"
+import { newUserContext } from "../../routes";
 import jwtToken from "../tools/assets/jwtToken";
 import MainpageTemplate from "../tools/MainpageTemplate";
 import CohortList from "../cohort/CohortList";
-import UsersModal from '../tools/UsersModal'
+import UsersModal from "../tools/UsersModal";
 
 // MATERIAL-UI
-import { 
-  makeStyles,
-  AppBar, 
-  Tabs, 
-  Tab,
-} from "@material-ui/core";
+import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
 export default function StudentPage({ value }) {
   const [request, setRequest] = useState();
   const [open, setOpen] = useState(true);
-  const {isNew} = useContext(newUserContext);
+  const { isNew } = useContext(newUserContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -96,9 +91,11 @@ export default function StudentPage({ value }) {
 
   return (
     <MainpageTemplate>
-      {sessionStorage.getItem("newUser") === "pending" || request === "pending" || userObj.user_approval_status_id === 2 ? 
-          <h3>Request Sent. Waiting for Confirmation!</h3>
-       :
+      {sessionStorage.getItem("newUser") === "pending" ||
+      request === "pending" ||
+      userObj.user_approval_status_id === 2 ? (
+        <h3>Request Sent. Waiting for Confirmation!</h3>
+      ) : (
         sessionStorage.getItem("newUser") === "true" && (
         <UsersModal 
           open={open}
@@ -109,6 +106,7 @@ export default function StudentPage({ value }) {
           type="New User"
           buttonText = "I'am a Mentor"
         />
+        )
       )}
 
       <div className={classes.parentDiv}>
@@ -255,6 +253,14 @@ const useStyles = makeStyles(theme => ({
     color: `black`,
     padding: `8px`,
     border:`1px solid #212121`
+  },
+  num_text_mentor: {
+    backgroundColor: `#949090`,
+    borderRadius:`50%`,
+    color: `white`,
+    padding: `8px`,
+    fontSize:`11px`, 
+    padding:`3px 5px`
   },
   tabRoot: {
     width: "100%",

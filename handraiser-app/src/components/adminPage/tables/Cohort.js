@@ -3,7 +3,7 @@ import axios from "axios";
 import io from "socket.io-client";
 
 // MATERIAL-UI
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import {
   Switch, 
   Tooltip,
@@ -18,8 +18,8 @@ import CopyToClipBoard from '../../tools/CopyToClipBoard'
 // ICONS
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import SchoolIcon from '@material-ui/icons/School';
-import DeleteIcon from '@material-ui/icons/Delete';
+import SchoolIcon from "@material-ui/icons/School";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 let socket;
 export default function Cohort() {
@@ -30,7 +30,7 @@ export default function Cohort() {
     title: "",
     id: "",
     canDelete: ""
-  })
+  });
   const [changeKey, setChangeKey] = useState({
     open: false,
     data: ""
@@ -49,9 +49,10 @@ export default function Cohort() {
       { title: "Title", field: "class_title" },
       { title: "Description", field: "class_description" },
       {
-        title: "Key", field: "class_key",
-        render: (rowData) => (
-          <div style={{ display: `flex`, alignItems:`center` }}>
+        title: "Key",
+        field: "class_key",
+        render: rowData => (
+          <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
             <CopyToClipBoard data={rowData.class_key} />
           </div>
@@ -87,11 +88,11 @@ export default function Cohort() {
           )
         }
       },
-      { title: "Actions",
-        headerStyle : {
+      {
+        title: "Actions",
+        headerStyle: {
           // border: "none",
           textAlign: "center"
-
         },
         cellStyle: {
           textAlign: "center"
@@ -159,7 +160,6 @@ export default function Cohort() {
       }
     })
       .then(data => {
-   
         setTable({
           ...table,
           data: data.data
@@ -169,7 +169,7 @@ export default function Cohort() {
   };
 
   const toggleClassFn = data => {
-    console.log(data)
+    console.log(data);
 
     if (data.class_status === "true") {
       axios({
@@ -249,17 +249,16 @@ export default function Cohort() {
             open: true,
             title: `Are you you want to delete ${row.class_title}`,
             id: row.class_id,
-            canDelete: 'yes'
-          })
+            canDelete: "yes"
+          });
         } else {
           setDeleteCohortObj({
             ...deleteCohortObj,
             open: true,
             title: ` ${row.class_title} still has a users on it.`,
-            canDelete: 'no'
-          })
+            canDelete: "no"
+          });
         }
-
       })
       .catch(err => console.log("object"));
   };
@@ -270,20 +269,23 @@ export default function Cohort() {
         <AdminModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
-          handleClose={(e) => setDeleteCohortObj({ ...deleteCohort, open: false })}
+          handleClose={e =>
+            setDeleteCohortObj({ ...deleteCohort, open: false })
+          }
           id={deleteCohortObj.id}
           render={renderCohorts}
-          type={'Delete Cohort'}
+          type={"Delete Cohort"}
           canDelete={deleteCohortObj.canDelete}
-        />)}
+        />
+      )}
 
       {createCohort && (
         <AdminModal
-          title={'Create Cohort'}
+          title={"Create Cohort"}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
           render={renderCohorts}
-          type={'Create Cohort'}
+          type={"Create Cohort"}
         />
       )}
 
@@ -313,22 +315,23 @@ export default function Cohort() {
       )}
 
       <MaterialTable
-        title={<Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={() => setCreateCohort(true)}
-                  startIcon={<SchoolIcon />}
-                >
-                  New Cohort
-                </Button>}
+        title={
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={() => setCreateCohort(true)}
+            startIcon={<SchoolIcon />}
+          >
+            New Cohort
+          </Button>
+        }
         columns={table.columns}
         data={table.data}
         options={{
           pageSize: 10,
           headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}
-    
       />
     </>
   );

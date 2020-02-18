@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import Students from './Students';
-import { UserContext } from './CohortPage';
+import { UserContext } from '../CohortPage';
 import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
 import { DarkModeContext } from '../../../App';
 

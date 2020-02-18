@@ -69,9 +69,7 @@ export default function LoginBtn() {
 		
 	return (
 		<GoogleLogin
-			clientId={
-				'583886288270-pclb0onu831kl9a3n1onuqbnhs5sk8k1.apps.googleusercontent.com'
-			}
+			clientId={process.env.REACT_APP_CLIENT_ID}
 			buttonText="Login with Google"
 			onSuccess={responseGoogle}
 			onFailure={response => console.log(response)}

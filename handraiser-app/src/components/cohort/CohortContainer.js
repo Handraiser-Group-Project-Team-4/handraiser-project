@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import io from "socket.io-client";
 
@@ -16,11 +16,12 @@ import {
     Chip,
     Avatar,
     Badge,
-    Tooltip
-  } from "@material-ui/core";
+    Tooltip,
+    Typography
+} from "@material-ui/core";
 
 let socket;
-export default function CohortContainer({classes, handleCohort, value}) {
+export default function CohortContainer({ classes, handleCohort, value }) {
     const userObj = jwtToken();
     const ENDPOINT = "localhost:3001";
     const [classroom, setClassroom] = useState([]);
@@ -28,7 +29,7 @@ export default function CohortContainer({classes, handleCohort, value}) {
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
     }, [ENDPOINT]);
-    
+
     useEffect(() => {
         socket.on("fetchCohort", () => {
             renderCohorts();
@@ -43,46 +44,53 @@ export default function CohortContainer({classes, handleCohort, value}) {
     useEffect(() => {
         let isCancelled = false;
 
-        if(!isCancelled)
+        if (!isCancelled)
             renderCohorts();
-        return () => { 
+        return () => {
             isCancelled = true
         };
     }, [value]);
-      
+
     const renderCohorts = (updateFromAdmin) => {
+        let temp = [];
         axios({
             method: `get`,
             url: `/api/cohorts?user_id=${userObj.user_id}&&value=${value}`,
             headers: {
-              Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+                Authorization: "Bearer " + sessionStorage.getItem("accessToken")
             }
-          })
-        .then(res => {
-            res.data.map(x => {                                                  
-                axios({
-                    method:'get',
-                    url:`/api/viewJoinedStudents/${x.class_id}`,
-                    headers: {
-                        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-                    }
-                })
-                .then(users => {
-                    let currentUser, mentor=[];
-
-                    users.data.map(user => {
-                        if(user.user_id === userObj.user_id)
-                            currentUser = user
-
-                        if(user.user_role_id === 2)
-                            mentor.push(user)
+        })
+            .then(res => {
+                res.data.map(x => {
+                    axios({
+                        method: 'get',
+                        url: `/api/viewJoinedStudents/${x.class_id}`,
+                        headers: {
+                            Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+                        }
                     })
+                        .then(users => {
+                            let currentUser, mentor = [], studentCount=0;
 
-                    setClassroom(prevState => {return [...prevState, {currentUser, mentor, class_details: x}] })
+                            users.data.map(user => {
+                                if (user.user_id === userObj.user_id)
+                                    currentUser = user
+
+                                if (user.user_role_id === 2)
+                                    mentor.push(user)
+                                
+                                if(user.user_role_id === 3)
+                                    studentCount+=1;
+                            })
+                            temp.push({studentCount, currentUser, mentor, class_details: x })
+                            // setClassroom(prevState => { return [...prevState, {studentCount, currentUser, mentor, class_details: x }] })
+                        })
+                        .catch(err => console.log(err))
                 })
-                .catch(err => console.log(err))
-            })
-        });
+                setTimeout(() => {
+                    setClassroom(temp)
+                }, 100)
+            });
     }
 
     return (
@@ -111,17 +119,17 @@ export default function CohortContainer({classes, handleCohort, value}) {
                                         <Badge
                                             overlap="circle"
                                             anchorOrigin={{
-                                            vertical: 'bottom',
-                                            horizontal: 'right',
+                                                vertical: 'bottom',
+                                                horizontal: 'right',
                                             }}
                                             badgeContent={
-                                                (x.mentor.length>1)&&
-                                                <Tooltip title={x.mentor.map((mentor, i) => (i>0)&&`${mentor.firstname}, `)}>
-                                                    <h2 className={classes.num_of_mentor}>+{x.mentor.length-1}</h2>
+                                                (x.mentor.length > 1) &&
+                                                <Tooltip title={x.mentor.map((mentor, i) => (i > 0)&&`${mentor.firstname}, `)}>
+                                                    <h2 className={classes.num_of_mentor}>+{x.mentor.length - 1}</h2>
                                                 </Tooltip>
                                             }
                                         >
-                                            <Avatar alt="Mentor's Name" src={(x.mentor[0])&&x.mentor[0].avatar} className={classes.avatar} />
+                                            <Avatar alt="Mentor's Name" src={(x.mentor[0]) && x.mentor[0].avatar} className={classes.avatar} />
                                         </Badge>
                                     </Grid>
                                     <Grid item xs={8} className={classes.cardDesc}>
@@ -131,58 +139,61 @@ export default function CohortContainer({classes, handleCohort, value}) {
                                         </div>
                                         <div>
                                             <span>
-                                                {/* <p>Head Mentor</p>
-                                                <h5>*Aodhan Hayter</h5> */}
-                                            </span>
-                                            <span>
-                                                <p>Students</p>
-                                                <h5>*5</h5>
-                                            </span>
-                                            <span>
-                                                <p>Cohort Status</p>
+                                                <p>Mentor/s</p>
                                                 <h5>
-                                                    {x.class_details.class_status === "true" ? (
-                                                        <Chip
-                                                            label="Open"
-                                                            style={{
-                                                                backgroundColor: "green",
-                                                                color: `white`,
-                                                                marginTop: -5
-                                                            }}
-                                                        />
-                                                    ) : (
+                                                    {x.mentor[0]&&x.mentor[0].firstname + ' ' + x.mentor[0].lastname} 
+                                                    {x.mentor.length>1&&<b className={classes.num_text_mentor}>+{i>0&& x.mentor.length-1}</b>}
+                                                </h5>
+                                            </span>
+                                                <span>
+                                                    <p>Student/s</p>
+                                                    <h5>{x.studentCount}</h5>
+                                                </span>
+                                                <span>
+                                                    <p>Cohort Status</p>
+                                                    <h5>
+                                                        {x.class_details.class_status === "true" ? (
                                                             <Chip
-                                                                label="Close"
+                                                                label="Open"
                                                                 style={{
-                                                                    backgroundColor: "red",
+                                                                    backgroundColor: "green",
                                                                     color: `white`,
                                                                     marginTop: -5
                                                                 }}
                                                             />
-                                                        )}
-                                                </h5>
-                                            </span>
+                                                        ) : (
+                                                                <Chip
+                                                                    label="Close"
+                                                                    style={{
+                                                                        backgroundColor: "red",
+                                                                        color: `white`,
+                                                                        marginTop: -5
+                                                                    }}
+                                                                />
+                                                            )}
+                                                    </h5>
+                                                </span>
                                         </div>
                                     </Grid>
-                                </Grid>
+                                    </Grid>
                             </CardContent>
-                            <CardActions className={classes.cohortCardActions}>
-                                <Button
-                                    size="small"
-                                    onClick={() =>
-                                        x.class_details.class_status === "true"
-                                            ? handleCohort(x.class_details)
-                                            : alert("Sorry This class is closed")
-                                    }
-                                >
-                                    {(x.currentUser)?`Enter Cohort`:`Join Cohort`}
-                                    {/* Join Cohort */}
-                      </Button>
-                            </CardActions>
+                                <CardActions className={classes.cohortCardActions}>
+                                    <Button
+                                        size="small"
+                                        onClick={() =>
+                                            x.class_details.class_status === "true"
+                                                ? handleCohort(x.class_details)
+                                                : alert("Sorry This class is closed")
+                                        }
+                                    >
+                                        {(x.currentUser) ? `Enter Cohort` : `Join Cohort`}
+                                        {/* Join Cohort */}
+                                    </Button>
+                                </CardActions>
                         </Card>
                     </Grid>
-                ))}
+                        ))}
             </Grid>
         </Container>
-    )
-}
+            )
+        }
