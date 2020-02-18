@@ -34,10 +34,10 @@ massive({
 		app.use(cors());
 
 		app.get('/api/users', users.login);
+		app.patch('/api/logout/:id', users.logout);
 		app.use(auth.header);
 
 		// USERS
-		app.patch('/api/logout/:id', users.logout);
 		app.post('/api/users', users.create);
 		app.get('/api/users/:id', users.fetch);
 		app.get('/api/users/:id/:room', users.chatFetch);
@@ -48,6 +48,8 @@ massive({
 		app.post('/api/cohorts', cohorts.create);
 		app.get('/api/cohort-check/:id', cohorts.checkUser);
 		app.post('/api/submit-key/', cohorts.submitKey);
+		app.get('/api/class-details/:id', cohorts.classDetails);
+		// app.get('/api/cohortMentors/:id', cohorts.getCohortMentors)
 
 		// ADMIN - USERS
 		app.patch("/api/assigning/:id", users.assign);

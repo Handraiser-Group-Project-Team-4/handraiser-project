@@ -14,6 +14,7 @@ import jwtToken from '../../tools/assets/jwtToken';
 import { DarkModeContext } from '../../../App';
 import Search from './CohortFilter';
 import CopyToClipBoard from '../../tools/CopyToClipBoard'
+import encryptDecrypt from '../../tools/assets/encryptDecrypt'
 
 // MATERIAL-UI
 import {
@@ -46,6 +47,7 @@ export default function CohortPage(props) {
 	const classes = useStyles();
 	const userObj = jwtToken();
 	const { id } = props.match.params;
+	// const id = encryptDecrypt('decrypt', props.match.params.id);
 	const [data, setData] = useState([]);
 	const [user, setUser] = useState();
 	const [classDetails, setClassDetails] = useState([]);

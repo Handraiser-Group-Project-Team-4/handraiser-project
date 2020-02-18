@@ -45,9 +45,11 @@ export default function CohortList({ classes, value }) {
         if (res.data.length === 0) {
           setIsKey({ ...isKey, open: true, classroomObj: x });
         } else {
+          // const encryptURL = encryptDecrypt('encrypt', `${x.class_id}`)
+          // setTimeout(() => {
+          //   history.push(`/cohort/${encryptURL}`);
+          // }, 600)
           history.push(`/cohort/${x.class_id}`);
-          // let sample = encryptDecrypt('encrypt', `${x.class_id}`);
-          console.log(sample)
         }
       })
       .catch(err => {

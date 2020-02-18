@@ -40,11 +40,11 @@ module.exports = {
       socket.to(user.room).emit("displayTyping", {name})
     });
 
-    socket.on("NotTyping", ({name}) => {
-      const user = users.find(user => user.id === socket.id);                                                         
-    
-      socket.to(user.room).emit("displayNotTyping", {name})                  
-    });
+      socket.on("NotTyping", ({name}) => {
+        const user = users.find(user => user.id === socket.id);                                                         
+      
+        socket.to(user.room).emit("displayNotTyping", {name})                  
+      });
 
     socket.on("sendMessage", ({ message }, callback) => {
       const new_date = new Intl.DateTimeFormat("en-US", {

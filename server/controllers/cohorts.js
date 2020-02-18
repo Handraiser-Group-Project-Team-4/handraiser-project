@@ -22,7 +22,7 @@ module.exports = {
       db.query(`SELECT * FROM classroom_students, classroom, classroom_details WHERE classroom_students.user_id = '${user_id}' 
               AND classroom_students.class_id = classroom.class_id 
               AND classroom_students.class_id = classroom_details.class_id 
-              AND classroom.class_id = classroom_details.class_id `)
+              AND classroom.class_id = classroom_details.class_id order by classroom_students.class_id asc`)
         .then(get => res.status(200).json(get))
         .catch(err => {
           console.error(err);
@@ -254,5 +254,20 @@ module.exports = {
         console.error(err);
         res.status(500).end();
       });
+  },
+
+  classDetails: (req, res) => {
+    const db = req.app.get('db');
+    
+    db.query(`SELECT * FROM classroom_details, classroom, classroom_students, users WHERE classroom_students.class_id = ${req.params.id}
+              AND users.user_id = classroom_students.user_id
+              AND classroom_students.class_id = classroom.class_id 
+              AND classroom_students.class_id = classroom_details.class_id 
+              AND classroom.class_id = classroom_details.class_id`)
+    .then(classDetail => res.status(200).json(classDetail))
+    .catch(err => {
+      console.error(err);
+      res.status(500).end();
+    });
   }
 };

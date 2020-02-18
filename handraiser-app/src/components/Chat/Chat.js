@@ -111,24 +111,39 @@ const Chat = () => {
 			}
 		);
 	}, [ENDPOINT, chatroom]);
+
+	// useEffect(() => {
+	// 	const handleTyping = () => {
+	// 		socket.emit('typing', { name: userObj.name });
+	// 	};
+	// 	window.addEventListener('keypress', handleTyping);
+	// 	return () => {
+	// 		window.removeEventListener('keypress', handleTyping);
+	// 	};
+	// }, []);
+
+	// useEffect(() => {
+	// 	socket.on('displayTyping', ({ name }) => {
+	// 		setTyping({isTyping: true, name});
+	// 	});
+	// }, []);
+
 	useEffect(() => {
-		const handleTyping = () => {
-			socket.emit('typing', { name: userObj.name });
-		};
-		window.addEventListener('keypress', handleTyping);
-		return () => {
-			window.removeEventListener('keypress', handleTyping);
-		};
-	}, []);
-	useEffect(() => {
-		socket.on('displayTyping', ({ name }) => {
-			setTyping(true);
-		});
-	}, []);
-	useEffect(() => {
+		if(message.length <= 0)
+			socket.emit("NotTyping", { name: userObj.name })
+
 		socket.on('message', message => {
 			setCurrentChat([...currentChat, message]);
 		});
+		
+		socket.on('displayTyping', ({ name }) => {
+			setTyping({isTyping: true, name});
+		});
+
+		socket.on('displayNotTyping', ({ name }) => {
+			setTyping({isTyping: false, name: ""});
+		});
+
 		return () => {
 			socket.emit('disconnect');
 			socket.off();
@@ -142,6 +157,7 @@ const Chat = () => {
 		const temp = message.replace(/\n/g, '<br />');
 		if (message) {
 			socket.emit('sendMessage', { message: temp }, () => setMessage(''));
+			socket.emit("NotTyping", { name: userObj.name })
 		}
 	};
 	const handleExpandClick = () => {
@@ -281,6 +297,8 @@ const Chat = () => {
 			</CardContent>
 			{chatroom.concern_status !== 'done' ? (
 				<CardActions disableSpacing>
+					{console.log(typing)}
+					{(typing.isTyping && typing.name !== userObj.name)&&<p>{typing.name} is typing ...</p>}
 					<TextField
 						InputProps={{
 							startAdornment: showEmoji && (
@@ -320,7 +338,7 @@ const Chat = () => {
 							setMessage(value)
 							socket.emit("typing", { name: userObj.name });
 						}}
-					  onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
+					  	// onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
 						onKeyDown={event =>
 							message.match(/\s/g) &&
 							message.match(/\s/g).length === message.length

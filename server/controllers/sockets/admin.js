@@ -11,8 +11,8 @@ module.exports = {
       // })
     });
 
-    socket.on(`renderCohort`, ({ data }) => {
-      io.emit("fetchCohort", data);
+    socket.on(`renderCohort`, () => {
+      io.emit("fetchCohort");
     });
 
     socket.on(`changeUserRole`, ({ user_id, user_role_id }) => {
