@@ -1,10 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
@@ -12,7 +7,17 @@ import Select from '@material-ui/core/Select';
 
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
-// Components
+// MATERIAL-UI
+import {
+  makeStyles,
+  Tabs,
+  Tab,
+  Typography,
+  Box,
+  useTheme
+} from '@material-ui/core/';
+
+// COMPONENTS
 import Pending from './tables/Pending';
 import Approved from './tables/Approved';
 import Disapproved from './tables/Disapproved';
@@ -147,14 +152,14 @@ export default function VerticalTabs() {
         <Tab label="Approved" {...a11yProps(1)} />
         <Tab label="Disapproved" {...a11yProps(2)} />
       </Tabs>
-      <TabPanel style={{width: '100%'}} value={value} index={0}>
-        <Pending/>
+      <TabPanel style={{ width: '100%' }} value={value} index={0}>
+        <Pending />
       </TabPanel>
-      <TabPanel style={{width: '100%'}} value={value} index={1}>
-        <Approved/>
+      <TabPanel style={{ width: '100%' }} value={value} index={1}>
+        <Approved />
       </TabPanel>
-      <TabPanel style={{width: '100%'}} value={value} index={2}>
-        <Disapproved/>
+      <TabPanel style={{ width: '100%' }} value={value} index={2}>
+        <Disapproved />
       </TabPanel>
      </div>
     </div>

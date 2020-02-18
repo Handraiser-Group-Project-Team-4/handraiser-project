@@ -1,10 +1,9 @@
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState, useEffect } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import jwtToken from "../tools/assets/jwtToken";
 import io from "socket.io-client";
-import { DarkModeContext } from '../../App';
 import {
   useTheme,
   TextField,
@@ -22,15 +21,13 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
+  DialogTitle
 } from "@material-ui/core";
 import Unnamed from "../../images/unnamed.jpg";
-import { height } from "@material-ui/system";
 
 let socket;
 export default function CohortList({ classes, value }) {
   const theme = useTheme();
-	const { darkMode } = useContext(DarkModeContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const history = useHistory();
@@ -64,7 +61,7 @@ export default function CohortList({ classes, value }) {
 
   useEffect(() => {
     renderCohorts(value);
-    return () => { };
+    return () => {};
   }, [value]);
 
   const renderCohorts = () => {
@@ -76,6 +73,7 @@ export default function CohortList({ classes, value }) {
       }
     })
       .then(res => {
+        console.log(res.data);
         setCohorts(res.data);
       })
       .catch(err => {
@@ -218,8 +216,7 @@ export default function CohortList({ classes, value }) {
       <SwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-        style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
-      // onChangeIndex={handleChangeIndex}
+        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           <Container className={classes.paperr} maxWidth="xl">
@@ -272,15 +269,15 @@ export default function CohortList({ classes, value }) {
                                     }}
                                   />
                                 ) : (
-                                    <Chip
-                                      label="Close"
-                                      style={{
-                                        backgroundColor: "red",
-                                        color: `white`,
-                                        marginTop: -5
-                                      }}
-                                    />
-                                  )}
+                                  <Chip
+                                    label="Close"
+                                    style={{
+                                      backgroundColor: "red",
+                                      color: `white`,
+                                      marginTop: -5
+                                    }}
+                                  />
+                                )}
                               </h5>
                             </span>
                           </div>
@@ -356,15 +353,15 @@ export default function CohortList({ classes, value }) {
                                     }}
                                   />
                                 ) : (
-                                    <Chip
-                                      label="Close"
-                                      style={{
-                                        backgroundColor: "red",
-                                        color: `white`,
-                                        marginTop: -5
-                                      }}
-                                    />
-                                  )}
+                                  <Chip
+                                    label="Close"
+                                    style={{
+                                      backgroundColor: "red",
+                                      color: `white`,
+                                      marginTop: -5
+                                    }}
+                                  />
+                                )}
                               </h5>
                             </span>
                           </div>

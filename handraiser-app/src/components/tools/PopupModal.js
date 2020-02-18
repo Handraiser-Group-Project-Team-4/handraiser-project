@@ -16,7 +16,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SchoolIcon from '@material-ui/icons/School';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import AdminTable from "./AdminTable"
 import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
@@ -345,10 +344,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                                     Generate New Key
                                 </Button>
                             </>
-                         : (type === 'View Joined')? 
-                            <>
-                                <AdminTable data={data} temp={temp} type={'View Joined'} setTemp={(filteredContacts) => setTemp(filteredContacts)}/>
-                            </>
+                         
                          : null
                         }
                     </DialogContent>

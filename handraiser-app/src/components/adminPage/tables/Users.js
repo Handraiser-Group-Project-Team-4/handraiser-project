@@ -12,7 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // Components
-import PopupModal from '../../tools/PopupModal'
+import AdminModal from '../../tools/AdminModal'
 import Attending from '../CohortTools/Attending'
 import Badger from "../../tools/Badger"
 
@@ -236,7 +236,7 @@ export default function StickyHeadTable() {
   return (
     <>
       {assignModal && (
-        <PopupModal
+        <AdminModal
           title={(cohorts.length === 0)
               ? `Assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3 ? 'student' : 'mentor'}?`
               :`${assignObj.firstname} ${assignObj.lastname} will be a ${assignObj.role === 3 ? 'student' : 'mentor'} to the following cohort:`}
