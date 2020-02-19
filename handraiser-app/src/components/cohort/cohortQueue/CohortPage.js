@@ -51,6 +51,7 @@ import FaceIcon from "@material-ui/icons/Face";
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
 import cohort from "../../../images/cohort.png";
+import cohortDark from "../../../images/cohortdark.jpg";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
@@ -95,6 +96,22 @@ export default function CohortPage({ value = 0, match }) {
       .catch(err => {
         console.log(err);
       });
+       // ACCESS KEY
+       Axios({
+      	method: `get`,
+      	url: `/api/cohort-check/${id}?user_id=${userObj.user_id}`,
+      	headers: {
+      		Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+      	}
+      })
+      	.then(res => {
+      		if (res.data.length === 0) {
+      			history.push(`/student-page`);
+      		}
+      	})
+      	.catch(err => {
+      		console.log(err);
+      	});
   }, []);
 
   useEffect(() => {
@@ -158,9 +175,6 @@ export default function CohortPage({ value = 0, match }) {
     }
   };
 
-  if (Object.keys(data).length === 0) {
-    return null;
-  }
   return (
     <MainpageTemplate>
       <div className={classes.parentDiv}>
@@ -176,6 +190,7 @@ export default function CohortPage({ value = 0, match }) {
             chatHandler,
             search,
             filter,
+						setFilter,
             handleConcernCount
           }}
         >
@@ -348,7 +363,9 @@ export default function CohortPage({ value = 0, match }) {
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
               >
-                <Paper className={classes.paperr} elevation={2}>
+                <Paper className={classes.paperr} elevation={2} style={{
+                      backgroundColor: darkMode ? "#333" : null
+                    }}>
                   <Grid
                     container
                     spacing={0}
@@ -369,7 +386,7 @@ export default function CohortPage({ value = 0, match }) {
                       <Grid item xs={12} sm={12} md={12} lg={6}>
                         <CardMedia
                           className={classes.loginBoxGridOneCardMedia}
-                          image={cohort}
+                          image={darkMode ? cohortDark : cohort}
                         />
                       </Grid>
                       <Grid
@@ -378,7 +395,9 @@ export default function CohortPage({ value = 0, match }) {
                         sm={12}
                         md={12}
                         lg={6}
-                        className={classes.gridDetails}
+                        className={classes.gridDetails}style={{
+                          backgroundColor: darkMode ? "#333" : null
+                        }}
                       >
                         <h1>Computer Programming I</h1>
                         <h6
@@ -460,7 +479,8 @@ export default function CohortPage({ value = 0, match }) {
                               className="list"
                               style={{
                                 padding: 10,
-                                textTransform: "uppercase"
+                                textTransform: "uppercase",
+                                backgroundColor: darkMode ? "#333" : null
                               }}
                             >
                               <div
@@ -522,7 +542,9 @@ export default function CohortPage({ value = 0, match }) {
                                 </span>
                               </div>
                             </li>
-                            <li className="list">
+                            <li className="list" style={{
+                                backgroundColor: darkMode ? "#333" : null
+                              }}>
                               <div className="list__profile">
                                 <div>
                                   <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
@@ -613,7 +635,9 @@ export default function CohortPage({ value = 0, match }) {
                                 </span>
                               </div>
                             </li>
-                            <li className="list">
+                            <li className="list" style={{
+                                backgroundColor: darkMode ? "#333" : null
+                              }}>
                               <div className="list__profile">
                                 <div>
                                   <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
@@ -760,8 +784,8 @@ export default function CohortPage({ value = 0, match }) {
                       <Card className={classes.cardLogs}>
                         <CardContent>
                           <Timeline>
-                            <ul className={classes.timeline}>
-                              <li className="timeline-item">
+                            <ul className={classes.timeline} >
+                              <li className="timeline-item" >
                                 <div className="timeline-info">
                                   <span>March 12, 2016</span>
                                 </div>
@@ -771,7 +795,12 @@ export default function CohortPage({ value = 0, match }) {
                                     alt="Remy Sharp"
                                     src="/static/images/avatar/1.jpg"
                                   />
-                                  <h3 className="timeline-title">
+                                  <h3 
+                                    className="timeline-title" 
+                                    style={{
+                                      color: darkMode ? "#fff" : null
+                                    }}
+                                  >
                                     <b>Jhon Michael Bolima</b> updated the
                                     cohort details.
                                   </h3>

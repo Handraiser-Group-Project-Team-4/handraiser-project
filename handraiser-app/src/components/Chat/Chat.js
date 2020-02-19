@@ -298,6 +298,7 @@ const Chat = () => {
               startAdornment: showEmoji && (
                 <Picker
                   set="facebook"
+                  darkMode={darkMode}
                   title="Pick your emoji…"
                   emoji="point_up"
                   sheetSize={64}

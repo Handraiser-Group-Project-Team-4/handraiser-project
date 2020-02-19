@@ -5,13 +5,22 @@ import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
 import { DarkModeContext } from '../../../App';
 
 export default function Search({ classes }) {
-	const { id, user, search, data, filter } = useContext(UserContext);
+	const {
+		id,
+		user,
+		search,
+		data,
+		filter,
+		setFilter,
+		handleConcernCount
+	} = useContext(UserContext);
 	const { darkMode } = useContext(DarkModeContext);
 	const [searchResult, setSearchResult] = useState([]);
 
 	useEffect(() => {
 		let filter = [];
 		if (search) {
+			setFilter('');
 			data.filter(concern => {
 				const regex = new RegExp(search, 'gi');
 				return concern.concern_title.match(regex) &&
@@ -40,7 +49,15 @@ export default function Search({ classes }) {
 					}}
 				>
 					{search ? 'Search Result' : filter ? 'Closed Concerns' : ''}
-					<Chip label="*5" />
+					<Chip
+						label={
+							search
+								? searchResult.length
+								: filter
+								? handleConcernCount('done')
+								: ''
+						}
+					/>
 				</Typography>
 				{searchResult.length ? (
 					<List className={classes.roots}>

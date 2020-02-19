@@ -1,28 +1,28 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
 // COMPONENTS
-import IMG_4049 from "../../images/TeamMembers/IMG_4049.JPG";
-import DSC_0966 from "../../images/TeamMembers/DSC_0966.jpg";
-import DSC_0984 from "../../images/TeamMembers/DSC_0984.jpg";
-import DSC_0958 from "../../images/TeamMembers/DSC_0958.jpg";
-import DSC_0997 from "../../images/TeamMembers/DSC_0997.jpg";
-import DSC_0952 from "../../images/TeamMembers/DSC_0952.jpg";
-import MainpageTemplate from "../tools/MainpageTemplate";
+import IMG_4049 from '../../images/TeamMembers/IMG_4049.JPG';
+import DSC_0966 from '../../images/TeamMembers/DSC_0966.jpg';
+import DSC_0984 from '../../images/TeamMembers/DSC_0984.jpg';
+import DSC_0958 from '../../images/TeamMembers/DSC_0958.jpg';
+import DSC_0997 from '../../images/TeamMembers/DSC_0997.jpg';
+import DSC_0952 from '../../images/TeamMembers/DSC_0952.jpg';
+import MainpageTemplate from '../tools/MainpageTemplate';
 import { DarkModeContext } from '../../App';
 
 // MATERIAL-UI
-import { 
-  makeStyles, 
-  IconButton, 
-  Typography, 
-  Box, 
-  Grid
-} from "@material-ui/core/";
+import {
+	makeStyles,
+	IconButton,
+	Typography,
+	Box,
+	Grid
+} from '@material-ui/core/';
 
 // ICONS
-import FacebookIcon from "@material-ui/icons/Facebook";
-import LinkedInIcon from "@material-ui/icons/LinkedIn";
+import FacebookIcon from '@material-ui/icons/Facebook';
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
 
 export default function Team() {
 	const { darkMode } = React.useContext(DarkModeContext);

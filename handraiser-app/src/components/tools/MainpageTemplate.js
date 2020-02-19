@@ -26,7 +26,10 @@ import {
   useTheme,
   Chip,
   Card,
-  CardContent
+  CardContent,
+  Backdrop,
+  Button,
+	CircularProgress,Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,Slide
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 
@@ -48,26 +51,34 @@ export default function MainpageTemplate({
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+	const [open, setOpen] = React.useState(false);
+	const [modal, setModal] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const history = useHistory();
 
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
 
   const handleLogout = () => {
-    axios({
-      method: `patch`,
-      url: `/api/logout/${userObj.user_id}`,
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    })
-      .then(res => {
-        console.log(res);
+    setModal(false);
+    setOpen(true);
+		setTimeout(() => {
+			setOpen(false);
+      axios({
+        method: `patch`,
+        url: `/api/logout/${userObj.user_id}`,
+        headers: {
+          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+        }
       })
-      .catch(err => {
-        console.log(err);
-      });
-    sessionStorage.clear();
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      sessionStorage.clear();
+      history.push('/');
+    }, 2000);
   };
 
   useEffect(() => {
@@ -109,7 +120,8 @@ export default function MainpageTemplate({
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
-        {user ? (
+        {
+          user ? (
           <>
             <img src={user.avatar} className={classes.studentImg} alt="" />
             <Typography className={classes.studentImgButton}>
@@ -117,8 +129,11 @@ export default function MainpageTemplate({
             </Typography>
             <Chip
               // icon={<FaceIcon />}
-              label="*Student"
-              color="black"
+              label={
+                user.user_role_id === 1 ? 'Admin' : 
+                user.user_role_id === 2 ? 'Mentor' : 
+                user.user_role_id === 3 ? 'Student' : null
+              }
               style={{
                 backgroundColor: "white",
                 color: darkMode ? "#000" : null
@@ -200,13 +215,12 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        {/* <Divider className={classes.divider} /> */}
         <Tab
           label={
             <ListItem
               to="/"
               renderas={Link}
-              onClick={handleLogout}
+              onClick={() => setModal(true)}
               button
               className={classes.listItemButton}
             >
@@ -244,14 +258,16 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        <div
+        
+      </Tabs>
+      <div
           style={{
             position: "absolute",
             bottom: 10,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            width: 240
+            width: 230
           }}
         >
           <Card style={{ width: 220 }}>
@@ -275,7 +291,6 @@ export default function MainpageTemplate({
             </CardContent>
           </Card>
         </div>
-      </Tabs>
     </div>
   );
 
@@ -338,12 +353,52 @@ export default function MainpageTemplate({
           <div className={classes.tabPanel}>{children}</div>
         </main>
       </div>
+
+      <Dialog
+        open={modal}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={() => setModal(false)}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">{"Confirmation"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Are you sure you want to logout?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModal(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleLogout} color="primary">
+            Log Out 
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+			<Backdrop
+				className={classes.backdrop}
+				open={open}
+				onClick={() => setOpen(true)}
+			>
+				<CircularProgress color="inherit" />
+			</Backdrop>
     </Fragment>
   );
 }
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
   tabPanel: {
     "&>div": {
       padding: 0
