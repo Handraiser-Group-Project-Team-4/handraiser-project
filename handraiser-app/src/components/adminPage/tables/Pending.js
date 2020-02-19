@@ -15,7 +15,7 @@ import PopupModal from '../../tools/PopupModal'
 import Badger from "../../tools/Badger";
 
 // ICONS
-import EditIcon from "@material-ui/icons/Edit";
+// import EditIcon from "@material-ui/icons/Edit";
 
 // Icons
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
@@ -151,16 +151,6 @@ export default function Pending() {
   }, [ENDPOINT]);
 
   useEffect(() => {
-    let isCancelled = false;
-
-    if (!isCancelled) renderPending();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
     socket.on("fetchMentorRequest", () => {
       renderPending();
     });
@@ -170,6 +160,16 @@ export default function Pending() {
       socket.off();
     };
   });
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!isCancelled) renderPending();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   // GET THE COHORT VALUES
   const renderPending = () => {
@@ -181,12 +181,12 @@ export default function Pending() {
       }
     })
       .then(data => {
-        console.log(data.data);
-        setPending({ ...pending, data: data.data });
+        // console.log(data.data);
+        setPending(prevState => {return{ ...prevState, data: data.data }});
       })
       .catch(err => console.log("object"));
   };
-
+  
   return (
     <React.Fragment>
       {approving.open && (

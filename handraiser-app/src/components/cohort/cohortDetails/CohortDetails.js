@@ -12,20 +12,22 @@ import UsersModal from '../../tools/UsersModal'
 
 // MATERIAL-UI
 import {
-    // IconButton,
+    IconButton,
     Paper,
     Grid,
-    // MenuItem,
     Chip,
     CardMedia,
-    // Menu,
+    Button,
+    TextField,
+    InputAdornment,
 } from "@material-ui/core";
 
 // ICONS 
 // import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import FaceIcon from "@material-ui/icons/Face";
+import SearchIcon from "@material-ui/icons/Search";
 
-function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
+function CohortDetails({ classes, class_id, Lest, changeHandler, enqueueSnackbar }) {
     const userObj = jwtToken();
     const history = useHistory();
     const [classDetails, setClassDetails] = useState([]);
@@ -55,10 +57,10 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
         })
             .then(res => setClassDetails(res.data))
             .catch(err => console.log(err))
-    }, [])
+    }, [class_id])
 
     const handleLeaveCohort = () => {
-        if(leaveCohort.data === 'Confirm')
+        if (leaveCohort.data === 'Confirm')
             axios({
                 url: `/api/kickstud/${userObj.user_id}/${class_id}`,
                 method: `delete`,
@@ -67,24 +69,24 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                 }
             })
                 .then(res => {
-                    enqueueSnackbar(`You Just Leave on ${classDetails[0].class_title}`, {variant: 'error'})
+                    enqueueSnackbar(`You Just Leave on ${classDetails[0].class_title}`, { variant: 'error' })
                     history.push(`/`);
                 })
                 .catch(err => console.log(err))
-        else{
-            setLeaveCohort({...leaveCohort, err: true})
+        else {
+            setLeaveCohort({ ...leaveCohort, err: true })
         }
     }
 
     return (
         <>
-            {leaveCohort.open&&
-                <UsersModal 
+            {leaveCohort.open &&
+                <UsersModal
                     open={leaveCohort.open}
                     data={leaveCohort}
                     setData={e => setLeaveCohort({ ...leaveCohort, data: e.target.value })}
                     title={`Are you sure you want to leave this cohort?`}
-                    modalTextContent = "Leaving on this cohort means that you are not allowed to access this cohort anymore. Please type 'Confirm' to leave"
+                    modalTextContent="Leaving on this cohort means that you are not allowed to access this cohort anymore. Please type 'Confirm' to leave"
                     handleClose={() => setLeaveCohort({ data: "", open: false, err: false })}
                     handleSubmit={() => handleLeaveCohort()}
                     type="Leave Cohort"
@@ -123,16 +125,41 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                             lg={6}
                             className={classes.gridDetails}
                         >
-                            <h1>{classDetails.length > 0&&classDetails[0].class_title}</h1>
+                            <h1>{classDetails.length > 0 && classDetails[0].class_title}</h1>
 
-                            {(userObj.user_role_id === 2) &&
-                                <h6 style={{display:`flex`, justifyContent:`center`}}>
-                                    Cohort Code: <Chip label="**********" />    
-                                    <CopyToClipBoard data={classDetails.length>0&&classDetails[0].class_key} />
-                                </h6>
-                            }
-                            <p style={{ color: `red`, fontSize: `10px`, cursor: `pointer` }} onClick={() => setLeaveCohort({...leaveCohort, open: true})}>Leave Cohort</p>
-                        </Grid>
+                            <h6
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "space-around",
+                                    alignItems: "center",
+                                    paddingBottom: 10
+                                }}
+                            >
+                                {(userObj.user_role_id === 2) &&
+                                    <span>
+                                        Cohort Code: <Chip label="**********" />
+                                        <IconButton
+                                            color="primary"
+                                            aria-label="upload picture"
+                                            component="span"
+                                        >
+                                            {/* <VisibilityIcon /> */}
+                                            
+                                            <CopyToClipBoard data={classDetails.length&&classDetails[0].class_key} />
+                                        </IconButton>
+                                    </span>
+                                }
+                                <Button
+                                    onClick={() => setLeaveCohort({ ...leaveCohort, open: true })}
+                                    variant="outlined"
+                                    size="small"
+                                    color="secondary"
+                                    style={{ height: 30 }}
+                                >
+                                    Leave Cohort
+                          </Button>
+                            </h6>
+                        </Grid> 
                     </Grid>
                     <Grid
                         container
@@ -151,6 +178,32 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                             lg={8}
                             className={classes.lest}
                         >
+                            <form
+                                noValidate
+                                autoComplete="off"
+                                className={classes.searchform}
+                                style={{
+                                    display: "flex",
+                                    justifyContent: "flex-end",
+                                    alignItems: "center"
+                                }}
+                            >
+                                <TextField
+                                    id="outlined-search"
+                                    label="Search field"
+                                    type="search"
+                                    name="search"
+                                    variant="outlined"
+                                    onChange={changeHandler}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                            </form>
                             {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
                             <Lest>
                                 <ul className={classes.lestUl}>
@@ -176,7 +229,7 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                                                 Avatar
                                     </div>
                                             <div>
-                                                <img style={{ width: 50 }} src=""></img>
+                                                <img style={{ width: 50 }} src="" alt=""></img>
                                             </div>
                                             <div
                                                 style={{
@@ -189,7 +242,7 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                                                 Role
                                     </div>
                                             <div>
-                                                <img style={{ width: 50 }} />
+                                                <img style={{ width: 50 }} alt=""/>
                                             </div>
                                             <div className="list__label">
                                                 <div className="list__label--value">Name</div>
@@ -224,13 +277,14 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                                         <li className="list" key={user}>
                                             <div className="list__profile">
                                                 <div>
-                                                    <img src={user.avatar} />
+                                                    <img src={user.avatar} alt="avatar" />
                                                 </div>
                                                 <div>
                                                     <img
                                                         style={{
                                                             width: 50
                                                         }}
+                                                        alt=""
                                                     />
                                                 </div>
                                                 <div
@@ -251,6 +305,7 @@ function CohortDetails({ classes, class_id, Lest, enqueueSnackbar}) {
                                                         style={{
                                                             width: 50
                                                         }}
+                                                        alt=""
                                                     />
                                                 </div>
                                                 <div className="list__label">

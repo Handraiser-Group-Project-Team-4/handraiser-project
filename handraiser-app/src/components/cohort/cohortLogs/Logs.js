@@ -30,7 +30,7 @@ const Logs = ({ classes, Timeline, changeHandler, logs, search }) => {
     } else {
       setSearchResult([]);
     }
-  }, [search]);
+  }, [search, logs]);
 
   return (
     <Paper className={classes.paperr} elevation={2}>

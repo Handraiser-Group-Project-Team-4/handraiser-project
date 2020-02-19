@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
@@ -31,7 +31,6 @@ function CohortList({ classes, value, enqueueSnackbar }) {
   const theme = useTheme();
   const userObj = jwtToken();
   const history = useHistory();
-  const [cohorts, setCohorts] = useState([]);
   const [search, setSearch] = useState();
   const [isKey, setIsKey] = useState({
     key: "",
@@ -105,7 +104,7 @@ function CohortList({ classes, value, enqueueSnackbar }) {
   return (
     <>
       <SwipeableViews
-        style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
+        // style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
         style={{
@@ -134,7 +133,6 @@ function CohortList({ classes, value, enqueueSnackbar }) {
           <CohortContainer
             classes={classes}
             handleCohort={handleCohort}
-            cohorts={cohorts}
             search={search}
             value={value}
           />
@@ -158,7 +156,7 @@ function CohortList({ classes, value, enqueueSnackbar }) {
               id="outlined-full-width"
               label="Label"
               helperText=""
-              fullWidth
+              fullwidth
               margin="normal"
               InputLabelProps={{
                 shrink: true
@@ -172,7 +170,7 @@ function CohortList({ classes, value, enqueueSnackbar }) {
               rows="4"
               variant="outlined"
               helperText=""
-              fullWidth
+              fullwidth
               multiline
               margin="normal"
               InputLabelProps={{

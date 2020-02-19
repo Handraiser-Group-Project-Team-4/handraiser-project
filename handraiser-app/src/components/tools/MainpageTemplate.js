@@ -32,7 +32,7 @@ import {
   makeStyles,
   useTheme,
   Chip,
-  Divider
+  // Divider
 } from "@material-ui/core";
 // import Skeleton from "@material-ui/lab/Skeleton";
 
@@ -170,7 +170,7 @@ export default function MainpageTemplate({
   });
 
   const handleDarkMode = async () => {
-    let res = await axios({
+    await axios({
       method: "patch",
       url: `/api/darkmode/${userObj.user_id}`,
       data: { dark_mode: !darkMode },
@@ -192,7 +192,7 @@ export default function MainpageTemplate({
           // icon={<FaceIcon />}
           label={(userObj.user_role_id === 3) ? `Student` :
             (userObj.user_role_id === 2) ? `Mentor` : `Admin`}
-          color="black"
+          color="primary"
           style={{
             backgroundColor: "white",
             color: darkMode ? "#000" : null
@@ -262,7 +262,9 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        <Divider className={classes.divider} />
+
+        {/* <Divider className={classes.divider} /> */}
+
         <Tab
           label={
             <ListItem
@@ -296,6 +298,7 @@ export default function MainpageTemplate({
           }
         />
       </Tabs>
+
     </div>
   );
   return (
@@ -460,7 +463,7 @@ const useStyles = makeStyles(theme => ({
   },
   studentImg: {
     borderRadius: "50%",
-    border: "5px solid white",
+    // border: "5px solid white",
     width: 90,
     height: 90,
     cursor: "pointer",

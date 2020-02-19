@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 import useMediaQuery from "@material-ui/core/useMediaQuery";
@@ -224,12 +224,10 @@ export default function StickyHeadTable() {
       .catch(err => console.log(err));
   };
 
-  useEffect(() => {
-    renderUsers();
-  }, []);
+
 
   // GET THE Users VALUES
-  const renderUsers = () => {
+  const renderUsers = useCallback(() => {
     axios({
       method: "get",
       url: `/api/allusers`,
@@ -238,10 +236,14 @@ export default function StickyHeadTable() {
       }
     })
       .then(data => {
-        setUsers({ ...users, data: data.data });
+        setUsers(prevState => {return {...prevState, data: data.data}});
       })
       .catch(err => console.log("err"));
-  };
+  }, []);
+
+  useEffect(() => {
+    renderUsers();
+  }, [renderUsers]);
 
   const closeAttending = () => {
     setAttending({

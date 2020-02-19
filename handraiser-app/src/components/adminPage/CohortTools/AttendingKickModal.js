@@ -38,7 +38,7 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
         onClose={() => handleClose(userObj)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={false}
+        fullwidth={false}
         maxWidth="sm"
       >
         <DialogTitle id="alert-dialog-title">

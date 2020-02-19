@@ -94,12 +94,12 @@ const Chat = () => {
   const [showEmoji, setShowEmoji] = useState(false);
   const [currentChat, setCurrentChat] = useState([]);
   const [message, setMessage] = useState("");
-  const [typing, setTyping] = useState({
-    isTyping: false,
-    name: ""
-  });
+  // const [typing, setTyping] = useState({
+  //   isTyping: false,
+  //   name: ""
+  // });
   const ENDPOINT = "localhost:3001";
-  const [open, setOpen] = useState(false);
+  // const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -108,7 +108,7 @@ const Chat = () => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
     socket.emit(
       "join",
-      { username: userObj.name, chatroom: chatroom.room, userObj },
+      { chatroom },
       () => {
         socket.on("oldChat", data => {
           setCurrentChat(data.data.messages);
@@ -122,20 +122,20 @@ const Chat = () => {
     socket.on("message", message => {
       setCurrentChat([...currentChat, message]);
     });
-    socket.on("displayTyping", ({ name }) => {
-      setTyping({ isTyping: true, name });
-    });
-    socket.on("displayNotTyping", ({ name }) => {
-      setTyping({ isTyping: false, name: "" });
-    });
+    // socket.on("displayTyping", ({ name }) => {
+    //   setTyping({ isTyping: true, name });
+    // });
+    // socket.on("displayNotTyping", ({ name }) => {
+    //   setTyping({ isTyping: false, name: "" });
+    // });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [currentChat, chatroom]);
+  }, [currentChat, chatroom, message.length, userObj.name]);
 
   const sendMessage = event => {
-    setOpen(true);
+    // setOpen(true);
     setMessage("");
     event.preventDefault();
     const temp = message.replace(/\n/g, "<br />");
@@ -310,16 +310,15 @@ const Chat = () => {
             rowsMax="5"
             style={{ margin: 8 }}
             placeholder="Send a message here"
-            fullWidth
+            fullwidth
             margin="normal"
             variant="outlined"
             value={message}
-            value={message}
             onChange={({ target: { value } }) => {
               setMessage(value);
-              socket.emit("typing", { name: userObj.name });
+              // socket.emit("typing", { name: userObj.name });
             }}
-            onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
+            // onBlur={() => socket.emit("NotTyping", { name: userObj.name })}
             onKeyDown={event =>
               message.match(/\s/g) &&
               message.match(/\s/g).length === message.length

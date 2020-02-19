@@ -136,7 +136,7 @@ export default function CohortModal({
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
+        fullwidth={true}
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">

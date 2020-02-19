@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Redirect, useHistory } from "react-router-dom";
 // import io from "socket.io-client";
 
@@ -178,7 +178,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: `#949090`,
     borderRadius:`50%`,
     color: `white`,
-    padding: `8px`,
     fontSize:`11px`, 
     padding:`3px 5px`
   },

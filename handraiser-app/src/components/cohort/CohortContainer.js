@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
 import io from "socket.io-client";
 
@@ -17,11 +17,10 @@ import {
   Avatar,
   Badge,
   Tooltip,
-  Typography
 } from "@material-ui/core";
 
 let socket;
-export default function CohortContainer({ classes, handleCohort, cohorts, value, search }) {
+export default function CohortContainer({ classes, handleCohort, value, search }) {
   const userObj = jwtToken();
   const ENDPOINT = "localhost:3001";
   const [classroom, setClassroom] = useState([]);
@@ -42,17 +41,7 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
     };
   });
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    if (!isCancelled)
-      renderCohorts();
-    return () => {
-      isCancelled = true
-    };
-  }, [value]);
-
-  const renderCohorts = (updateFromAdmin) => {
+  const renderCohorts = useCallback(() => {
     let temp = [];
     axios({
       method: `get`,
@@ -63,7 +52,7 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
     })
       .then(res => {
         res.data.map(x => {
-          axios({
+          return axios({
             method: 'get',
             url: `/api/viewJoinedStudents/${x.class_id}`,
             headers: {
@@ -82,6 +71,8 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
 
                 if (user.user_role_id === 3)
                   studentCount += 1;
+
+                return null;
               })
               temp.push({ studentCount, currentUser, mentor, class_details: x })
               // setClassroom(prevState => { return [...prevState, {studentCount, currentUser, mentor, class_details: x }] })
@@ -92,12 +83,21 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
           setClassroom(temp)
         }, 100)
       });
-  }
+  }, [userObj.user_id, value])
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!isCancelled)
+      renderCohorts();
+    return () => {
+      isCancelled = true
+    };
+  }, [value, renderCohorts]);
 
   useEffect(() => {
     let filter = [];
-    console.log(search);
+    // console.log(search);
     if (search) {
       classroom.filter(cohort => {
         const regex = new RegExp(search, "gi");
@@ -110,7 +110,7 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
     } else {
       setSearchResult([]);
     }
-  }, [search]);
+  }, [search, classroom]);
 
   return (
     <Container className={classes.paperr} maxWidth="xl">
@@ -209,6 +209,7 @@ export default function CohortContainer({ classes, handleCohort, cohorts, value,
             </Grid>
           )) : classroom.map((x, i) => (
             <Grid
+              key={i}
               container
               spacing={0}
               className={classes.gridCardContainer}

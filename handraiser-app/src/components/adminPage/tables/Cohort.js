@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
@@ -223,12 +223,8 @@ export default function Cohort() {
     };
   }, [ENDPOINT]);
 
-  useEffect(() => {
-    renderCohorts();
-  }, []);
-
   // GET THE COHORT VALUES
-  const renderCohorts = () => {
+  const renderCohorts = useCallback(() => {
     axios({
       method: "get",
       url: `/api/cohorts/`,
@@ -237,13 +233,17 @@ export default function Cohort() {
       }
     })
       .then(data => {
-        setTable({
-          ...table,
+        setTable(prevState => {return{
+          ...prevState,
           data: data.data
-        });
+        }});
       })
       .catch(err => console.log(err));
-  };
+  }, []);
+
+  useEffect(() => {
+    renderCohorts();
+  }, [renderCohorts]);
 
   const toggleClassFn = data => {
     console.log(data);

@@ -160,7 +160,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             onClose={handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
-            fullWidth={true}
+            // fullwidth={true}
             maxWidth='sm'
         >
             {(type === 'approving' || type === 'Kick Student') ?

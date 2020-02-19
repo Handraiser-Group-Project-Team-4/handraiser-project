@@ -24,7 +24,7 @@ export default function Search({ classes }) {
     } else {
       setSearchResult([]);
     }
-  }, [search]);
+  }, [search, data, user.user_id]);
 
   return (
     <Card className={classes.cardRootContent + " " + classes.searchRootContent}>

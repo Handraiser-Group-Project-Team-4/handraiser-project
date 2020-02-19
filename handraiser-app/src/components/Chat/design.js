@@ -105,7 +105,7 @@ const Design = () => {
             id="filled-full-width"
             style={{ margin: 8 }}
             placeholder="Send a message here"
-            fullWidth
+            fullwidth
             margin="normal"
             variant="outlined"
           />

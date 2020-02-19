@@ -16,6 +16,7 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
       render: rowData => (
         <div style={{ display: `flex` }}>
           <img
+            alt = "avatar"
             src={rowData.avatar}
             width="50"
             height="50"
@@ -33,7 +34,7 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
     let date = new Date();
     let newDate = date.toLocaleString();
     data.map(x => {
-      axios({
+      return axios({
         method: "post",
         url: `/api/enroll/`,
         headers: {
@@ -58,7 +59,7 @@ export default function PopupModal({ handleClose, open, data, title, id }) {
         onClose={() => handleClose(id)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
+        fullwidth={true}
         maxWidth="sm"
       >
         <DialogTitle id="alert-dialog-title">

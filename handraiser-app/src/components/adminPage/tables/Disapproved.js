@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 import MaterialTable from "material-table";
@@ -62,7 +62,7 @@ export default function Disapproved() {
     data: []
   });
 
-  const renderDisapproved = () => {
+  const renderDisapproved = useCallback(() => {
     axios({
       method: "get",
       url: `/api/user_approval_fetch?user_approval_status_id=3`,
@@ -72,10 +72,10 @@ export default function Disapproved() {
     })
       .then(data => {
         console.log(data.data);
-        setDisapproved({ ...disapproved, data: data.data });
+        setDisapproved(prevState => {return { ...prevState, data: data.data }});
       })
       .catch(err => console.log("object"));
-  };
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -85,7 +85,7 @@ export default function Disapproved() {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [renderDisapproved]);
 
   return (
     <MaterialTable

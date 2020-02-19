@@ -24,7 +24,7 @@ export default function UsersModal({
 }) {
   return (
     <Dialog
-      fullScreen={fullScreen}
+      // fullScreen={fullScreen}
       open={open}
       onClose={handleClose}
       disableBackdropClick={(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove")?true:false}
@@ -40,7 +40,7 @@ export default function UsersModal({
             autoFocus
             label="Cohort Key"
             id="outlined-full-width"
-            fullWidth
+            fullwidth="true"
             margin="normal"
             InputLabelProps={{
               shrink: true
@@ -61,7 +61,7 @@ export default function UsersModal({
             rows="4"
             variant="outlined"
             helperText=""
-            fullWidth
+            fullwidth="true"
             multiline
             margin="normal"
             InputLabelProps={{
@@ -76,8 +76,7 @@ export default function UsersModal({
             autoFocus
             label="Leave Cohort"
             id="outlined-full-width"
-            helperText=""
-            fullWidth
+            fullwidth="true"
             margin="normal"
             InputLabelProps={{
               shrink: true

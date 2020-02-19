@@ -251,7 +251,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: `#949090`,
     borderRadius:`50%`,
     color: `white`,
-    padding: `8px`,
+    // padding: `8px`,
     fontSize:`11px`, 
     padding:`3px 5px`
   },
