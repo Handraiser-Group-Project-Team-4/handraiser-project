@@ -69,7 +69,6 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
   }, []);
 
   if (!userObj) return <Redirect to="/" />;
-  console.log(tabIndex);
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>

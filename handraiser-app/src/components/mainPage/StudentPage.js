@@ -16,7 +16,6 @@ import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
 export default function StudentPage({ value, tabIndex }) {
-  console.log(value);
   const [request, setRequest] = useState();
   const [open, setOpen] = useState(true);
   const { isNew } = useContext(newUserContext);
@@ -171,8 +170,7 @@ const useStyles = makeStyles(theme => ({
     padding: "20px 10px"
   },
   cardRoot: {
-    minWidth: 590,
-    maxWidth: 590,
+    width: 600,
     borderRadius: 10,
     "& > div:first-of-type": {
       paddingBottom: 10

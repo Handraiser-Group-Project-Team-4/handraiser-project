@@ -94,7 +94,7 @@ const useStyles = makeStyles(theme => ({
     padding: "20px 10px"
   },
   cardRoot: {
-    minWidth: 590,
+    width: 600,
     borderRadius: 10,
     "& > div:first-of-type": {
       paddingBottom: 10
