@@ -104,17 +104,14 @@ const Chat = () => {
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
+
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit(
-      "join",
-      { username: userObj.name, chatroom: chatroom.room, userObj },
-      () => {
-        socket.on("oldChat", data => {
-          setCurrentChat(data.data.messages);
-        });
-      }
-    );
+    socket.emit("join", { chatroom }, () => {
+      socket.on("oldChat", data => {
+        setCurrentChat(data.data.messages);
+      });
+    });
   }, [ENDPOINT, chatroom]);
 
   useEffect(() => {

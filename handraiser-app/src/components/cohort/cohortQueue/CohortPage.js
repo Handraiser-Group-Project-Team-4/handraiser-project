@@ -116,7 +116,11 @@ export default function CohortPage({ value = 0, match }) {
             data[0].student_id === userObj.user_id
             ? setChatRoom({
                 room: data[0].concern_id,
-                concern: data[0].concern_title
+                concern: data[0].concern_title,
+                concern_status: data[0].concern_status,
+                user_id: userObj.user_id,
+                avatar: userObj.avatar,
+                name: userObj.name
               })
             : data.map(concern => {
                 concern.concern_status !== "pending" &&
@@ -124,7 +128,11 @@ export default function CohortPage({ value = 0, match }) {
                   concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
                       room: concern.concern_id,
-                      concern: concern.concern_title
+                      concern: concern.concern_title,
+                      concern_status: concern.concern_status,
+                      user_id: userObj.user_id,
+                      avatar: userObj.avatar,
+                      name: userObj.name
                     })
                   : setChatRoom();
               })
