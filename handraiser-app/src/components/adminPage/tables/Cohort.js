@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core/";
 
 // COMPONENTS
-import AdminModal from "../../tools/AdminModal";
+import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
 import CopyToClipBoard from '../../tools/CopyToClipBoard'
 
@@ -266,7 +266,7 @@ export default function Cohort() {
   return (
     <>
       {deleteCohortObj.open && (
-        <AdminModal
+        <PopupModal
           title={deleteCohortObj.title}
           open={deleteCohortObj.open}
           handleClose={e =>
@@ -280,7 +280,7 @@ export default function Cohort() {
       )}
 
       {createCohort && (
-        <AdminModal
+        <PopupModal
           title={"Create Cohort"}
           open={createCohort}
           handleClose={() => setCreateCohort(false)}
@@ -290,7 +290,7 @@ export default function Cohort() {
       )}
 
       {changeKey.open && (
-        <AdminModal
+        <PopupModal
           title={"Change Key"}
           data={changeKey.data}
           open={changeKey.open}

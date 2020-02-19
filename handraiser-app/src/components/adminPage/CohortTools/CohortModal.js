@@ -13,7 +13,7 @@ import {
 
 // COMPONENTS
 
-import AdminModal from "../../tools/AdminModal";
+import PopupModal from "../../tools/PopupModal";
 import AssingMentor from "./AssignMentor";
 
 // ICONS
@@ -112,7 +112,7 @@ export default function CohortModal({
     <>
       {kickbool && (
         // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
-        <AdminModal 
+        <PopupModal 
           title={`Are you sure you want to kick ${kickobj.firstname} ${kickobj.lastname}`}
           open={kickbool} 
           handleClose={closeKickModal} 

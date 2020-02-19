@@ -19,7 +19,7 @@ import {
 import EditIcon from "@material-ui/icons/Edit";
 
 let socket;
-export default function AdminModal({ title, data, open, handleClose, render, type, id, canDelete }) {
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete }) {
     const ENDPOINT = "localhost:3001";
     const [body, setBody] = useState({
         data:

@@ -8,7 +8,7 @@ import Chip from '@material-ui/core/Chip';
 import Tooltip from "@material-ui/core/Tooltip";
 
 // Components
-import AdminModal from '../../tools/AdminModal'
+import PopupModal from '../../tools/PopupModal'
 import Attending from '../CohortTools/Attending'
 
 // Icons
@@ -145,7 +145,7 @@ export default function StickyHeadTable() {
   return (
     <React.Fragment>
       {assignModal && (
-        <AdminModal
+        <PopupModal
           title={`Are you sure you want to assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3 ? 'student' : 'mentor'}?`}
           data={assignObj}
           open={assignModal}

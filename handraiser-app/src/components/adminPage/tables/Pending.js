@@ -7,7 +7,7 @@ import MaterialTable from 'material-table';
 import Tooltip from "@material-ui/core/Tooltip";
 
 // COMPONENTS
-import AdminModal from '../../tools/AdminModal'
+import PopupModal from '../../tools/PopupModal'
 
 // ICONS
 import EditIcon from "@material-ui/icons/Edit";
@@ -128,7 +128,7 @@ export default function Pending() {
   return (
     <React.Fragment>
       {approving.open && (
-        <AdminModal
+        <PopupModal
           title={`Are you sure you want to assign ${approving.data.firstname} ${approving.data.lastname} as a mentor?`}
           data={approving.data}
           open={approving.open}
@@ -139,7 +139,7 @@ export default function Pending() {
       )}
 
       {disapproving.open && (
-        <AdminModal
+        <PopupModal
           title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
           data={disapproving.data}
           open={disapproving.open}
