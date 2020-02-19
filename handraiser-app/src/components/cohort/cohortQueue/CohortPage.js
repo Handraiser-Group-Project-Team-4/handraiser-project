@@ -118,7 +118,16 @@ export default function CohortPage({ value = 0, match }) {
               room: data[0].concern_id,
               concern: data[0].concern_title
             })
-          : setChatRoom();
+          : data.map(concern => {
+              concern.concern_status !== "pending" &&
+              (concern.student_id === userObj.user_id ||
+                concern.mentor_id === userObj.user_id)
+                ? setChatRoom({
+                    room: concern.concern_id,
+                    concern: concern.concern_title
+                  })
+                : setChatRoom();
+            });
       });
     });
 

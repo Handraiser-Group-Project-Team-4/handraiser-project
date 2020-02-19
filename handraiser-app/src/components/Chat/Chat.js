@@ -172,7 +172,7 @@ const Chat = () => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={e => alert("Add Mentor")}>
+              <MenuItem onClick={e => console.log(chatroom)}>
                 {/* <ListItemIcon>
                       <HelpIcon />
                     </ListItemIcon> */}
