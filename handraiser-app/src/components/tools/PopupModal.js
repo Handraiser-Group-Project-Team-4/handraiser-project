@@ -19,7 +19,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
     const ENDPOINT = "localhost:3001";
     const [attending, setAttending] = useState({
         open: false,
@@ -232,7 +232,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
 
         <Dialog
             open={open}
-            onClose={handleClose}
+            onClose={(type === 'Kick Student') ? (e) => handleClose(data.class_id) : handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
             fullWidth={true}
@@ -371,7 +371,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                             : null}
 
                    
-                                    <Button onClick={handleClose} color="secondary">
+                                    <Button onClick={(type === "Kick Student") ? (e)=>handleClose(data.class_id) : handleClose} color="secondary">
                                         Close
                                     </Button>
                                 
