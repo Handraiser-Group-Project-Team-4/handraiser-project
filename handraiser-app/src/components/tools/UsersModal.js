@@ -39,7 +39,6 @@ export default function UsersModal({
             autoFocus
             label="Cohort Key"
             id="outlined-full-width"
-            helperText=""
             fullWidth
             margin="normal"
             InputLabelProps={{
@@ -58,7 +57,6 @@ export default function UsersModal({
           <TextField
             id="outlined-multiline-static"
             label="Concern"
-            multiline
             rows="4"
             variant="outlined"
             helperText=""

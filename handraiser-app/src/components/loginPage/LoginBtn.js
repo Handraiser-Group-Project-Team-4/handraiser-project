@@ -21,7 +21,10 @@ export default function LoginBtn() {
 			url: `/api/users?user_id=${response.profileObj.googleId}`
 		})
 			.then(res => {
-				// console.log(res.data)
+				sessionStorage.setItem(
+					'notification',
+					`Hi ${res.data[0].firstname}! Welcome to Handraiser!`
+				);
 				if (res.data[0] !== undefined)
 					sessionStorage.setItem('accessToken', res.data.token);
 				if (res.data[0] === undefined) {
