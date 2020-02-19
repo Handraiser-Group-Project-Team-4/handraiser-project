@@ -15,24 +15,42 @@ const Routes = props => {
     <newUserContext.Provider value={{ isNew, setisNew }}>
       <Switch>
         <Route exact path="/" component={LoginPage} />
-        <Route path="/admin-page" component={AdminPage} />
+        <Route
+          exact
+          path="/admin-page"
+          render={() => <AdminPage tabIndex={"admin-cohorts"} />}
+        />
+        <Route
+          exact
+          path="/admin-page/users"
+          render={() => <AdminPage tabIndex={"admin-users"} />}
+        />
+        <Route
+          exact
+          path="/admin-page/approval"
+          render={() => <AdminPage tabIndex={"admin-approval"} />}
+        />
         <Route
           exact
           path="/mentor-page"
-          render={() => <MentorPage value={0} />}
+          render={() => <MentorPage value={0} tabIndex={"student-page"} />}
         />
         <Route
           path="/mentor-page/my-cohort"
-          render={() => <MentorPage value={1} />}
+          render={() => <MentorPage value={1} tabIndex={"student-page"} />}
         />
         <Route
           exact
           path="/student-page"
-          render={() => <StudentPage value={0} location={props} />}
+          render={() => (
+            <StudentPage value={0} tabIndex={"student-page"} location={props} />
+          )}
         />
         <Route
           path="/student-page/my-cohort"
-          render={() => <StudentPage value={1} location={props} />}
+          render={() => (
+            <StudentPage value={1} tabIndex={"student-page"} location={props} />
+          )}
         />
         <Route exact path="/cohort/:id" component={CohortPage} />
         <Route
@@ -45,7 +63,7 @@ const Routes = props => {
           path="/cohort/log/:id"
           render={({ match }) => <CohortPage value={2} match={match} />}
         />
-        <Route path="/team" component={Team} />
+        <Route path="/team" render={() => <Team tabIndex={"team"} />} />
         <Route component={NotFound} />
       </Switch>
     </newUserContext.Provider>
