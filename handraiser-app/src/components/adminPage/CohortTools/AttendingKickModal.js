@@ -12,7 +12,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SchoolIcon from '@material-ui/icons/School';
 
-
 export default function PopupModal({ handleClose, open, data, userObj }) {
   
     const kick = (e, userObj, row) => {
@@ -32,8 +31,8 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
              handleClose(userObj);
             })
             .catch(err => console.log(err));
-      return
-          })
+         
+    })
     
   };
   console.log(data);

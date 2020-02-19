@@ -15,6 +15,7 @@ import AssignCohort from "./AssignCohort";
 // icons
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import SchoolIcon from '@material-ui/icons/School';
+import CloseIcon from '@material-ui/icons/Close';
 
 
 export default function AttendingModal({open, data, handleClose}) {
@@ -154,20 +155,22 @@ export default function AttendingModal({open, data, handleClose}) {
         fullWidth={true}
         maxWidth="lg"
       >
-        <DialogTitle id="alert-dialog-title">
-            <div style={{display: 'flex'}}>
-                <img src={data.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 10px 0 0`, border: `5px solid #673ab7` }} />
-                
-                <div>
-                    <h5 style={{margin:`0`}}> {data.firstname} {data.lastname}</h5>
-                    <div style={{display: 'flex', alignItems: 'baseline'}}>
-                    { (data.user_status)? <status-indicator active pulse positive /> : <status-indicator active pulse negative />}
-                    {(data.user_role_id === 3 ) ? <h6 style={{margin:`0 0 0 10px`}}>Student</h6> : <h6 style={{margin: `0 0 0 10px`}}>Mentor</h6>}
-                    </div>
-                    
-                </div>
+        <DialogTitle id="alert-dialog-title" onClose={handleClose}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div style={{display: 'flex'}}>
+                  <img src={data.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 10px 0 0`, border: `5px solid #673ab7` }} />
+                  
+                  <div>
+                      <h5 style={{margin:`0`}}> {data.firstname} {data.lastname}</h5>
+                      <div style={{display: 'flex', alignItems: 'baseline'}}>
+                      { (data.user_status)? <status-indicator active pulse positive /> : <status-indicator active pulse negative />}
+                      {(data.user_role_id === 3 ) ? <h6 style={{margin:`0 0 0 10px`}}>Student</h6> : <h6 style={{margin: `0 0 0 10px`}}>Mentor</h6>}
+                      </div>
+                      
+                  </div>
+              </div>
+              <CloseIcon onClick={handleClose}/>
             </div>
-           
         </DialogTitle>
 
         <DialogContent>
@@ -192,7 +195,7 @@ export default function AttendingModal({open, data, handleClose}) {
                 }}
                 actions={[
                     {
-                    tooltip: 'Assign as a Mentor',
+                    tooltip: 'Remove Cohort',
                     icon: () => <HighlightOffIcon/>,
                     onClick: (e, data) => setRemoveObj({open: true, data: data})
                     }

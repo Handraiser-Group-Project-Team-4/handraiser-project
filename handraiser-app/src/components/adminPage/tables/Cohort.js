@@ -60,6 +60,7 @@ export default function MaterialTableDemo() {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [createCohort, setCreateCohort] = useState(false);
+  const [cohortObj, setCohortObj] = useState({})
   const [updateTitleDesc, setUpdateTitleDesc] = useState({
     open: false,
     data: "",
@@ -215,12 +216,12 @@ export default function MaterialTableDemo() {
                     View Joined Users
                   </MenuItem>
 
-                  <MenuItem  onClick={e => openViewStudentsModal(rowData)} >
-                    View Joined Users
+                  <MenuItem  onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: rowData})} >
+                    Update Cohort
                   </MenuItem>
 
                   <MenuItem  onClick={e => deleteCohort(rowData)} >
-                  Delete Cohort
+                   Delete Cohort
                   </MenuItem>
               
               </Menu>
@@ -300,6 +301,7 @@ export default function MaterialTableDemo() {
       created: row.class_created,
       id: row.class_id
     });
+    setCohortObj(row)
     renderViewStudentsTable(row.class_id);
   };
 
@@ -402,6 +404,7 @@ export default function MaterialTableDemo() {
 
       {viewJoinedModal.open && (
         <CohortModal
+          cohortObj={cohortObj}
           open={viewJoinedModal.open}
           handleClose={() =>
             setViewJoinedModal({ ...viewJoinedModal, open: false })
@@ -428,7 +431,7 @@ export default function MaterialTableDemo() {
               startIcon={<SchoolIcon  style={{display: (matches) ? null: 'none'}} />}
               style={{fontSize: (matches) ? null: '10px'}}
             >
-              New Cohort
+              Add Cohort
             </Button>
           </div>
                 }
