@@ -3,14 +3,12 @@ import { Redirect, useHistory } from "react-router-dom";
 // import io from "socket.io-client";
 
 // MATERIAL-UI
-import { AppBar, Tabs, Tab, makeStyles} from "@material-ui/core";
+import { AppBar, Tabs, Tab, makeStyles } from "@material-ui/core";
 
 // COMPONENTS
-import Unnamed from '../../images/unnamed.jpg';
 import jwtToken from "../tools/assets/jwtToken";
 import MainpageTemplate from "../tools/MainpageTemplate";
 import CohortList from "../cohort/CohortList";
-import CreateCohort from '../cohort/CreateCohort';
 
 // let socket;
 export default function MentorPage({value = 0}) {
@@ -38,10 +36,10 @@ export default function MentorPage({value = 0}) {
 	// 	};
 	// });
 
-	if (userObj) {
-		if (userObj.user_role_id === 1) return <Redirect to="/admin-page" />;
-		else if (userObj.user_role_id === 3) return <Redirect to="/student-page" />;
-	} else return <Redirect to="/" />;
+  if (userObj) {
+    if (userObj.user_role_id === 1) return <Redirect to="/admin-page" />;
+    else if (userObj.user_role_id === 3) return <Redirect to="/student-page" />;
+  } else return <Redirect to="/" />;
 
   return (
     <MainpageTemplate>

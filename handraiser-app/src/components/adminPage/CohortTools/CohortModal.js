@@ -169,7 +169,9 @@ export default function CohortModal({
             options={{
               actionsColumnIndex: -1,
               exportButton: true,
-              exportFileName: title
+              exportFileName: title,
+              pageSize: 10,
+              headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
             }}
            
           />

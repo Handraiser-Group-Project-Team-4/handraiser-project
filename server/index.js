@@ -1,27 +1,27 @@
-const massive = require('massive');
-const http = require('http');
-const express = require('express');
-const io = require('socket.io')();
-const cors = require('cors');
+const massive = require("massive");
+const http = require("http");
+const express = require("express");
+const io = require("socket.io")();
+const cors = require("cors");
 
-require('dotenv').config();
+require("dotenv").config();
 
 //ENDPOINTS
-const auth = require('./controllers/auth');
-const users = require('./controllers/users');
-const cohorts = require('./controllers/cohorts');
+const auth = require("./controllers/auth");
+const users = require("./controllers/users");
+const cohorts = require("./controllers/cohorts");
 
 //SOCKETS
-const admin = require('./controllers/sockets/admin');
-const chats = require('./controllers/sockets/chat');
-const concerns = require('./controllers/sockets/concerns');
+const admin = require("./controllers/sockets/admin");
+const chats = require("./controllers/sockets/chat");
+const concerns = require("./controllers/sockets/concerns");
 
 massive({
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT,
-	database: process.env.DB_NAME,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASS
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS
 })
 	.then(db => {
 		const app = express();
@@ -68,7 +68,10 @@ massive({
 		app.delete("/api/kickstud/:userId/:classId", cohorts.deleteStud);
 		app.get("/api/viewJoinedStudents/:id", cohorts.viewCohort);
 		app.delete("/api/deleteClass/:id", cohorts.deleteClass)
-		app.post("/api/assignMentor", cohorts.assignMentor)
+    // app.post("/api/assignMentor", cohorts.assignMentor)
+    app.post("/api/enroll", cohorts.enroll);
+    app.patch("/api/updateTitleDesc/:id", cohorts.updateTitleDesc);
+    app.get("/api/getMentors/:id", cohorts.getMentors);
 
 
 		//WEBSOCKETS

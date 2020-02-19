@@ -13,7 +13,6 @@ import UsersModal from '../tools/UsersModal'
 // import Unnamed from "./unnamed.jpg";
 // import Handraiser from "./Handraiser";
 // import ListOfCohorts from "./ListOfCohorts";
-
 // MATERIAL-UI
 import {
   AppBar,
@@ -82,7 +81,6 @@ export default function MainpageTemplate({
       });
     sessionStorage.clear();
   };
-
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
@@ -182,9 +180,7 @@ export default function MainpageTemplate({
     });
     setDarkMode(!darkMode);
   };
-
   if (!userObj) return <Redirect to="/" />;
-
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
@@ -284,22 +280,24 @@ export default function MainpageTemplate({
                 <ExitToAppIcon />
               </ListItemIcon>
               <ListItemText
-                primary={<GoogleLogout
-                  render={renderProps => (
-                    <p style={{ margin: `0` }}>Logout</p>
-                  )}
-                  clientId={process.env.REACT_APP_CLIENT_ID}
-                  buttonText="Logout"
-                  onLogoutSuccess={handleLogout}
-                ></GoogleLogout>}
-                className={classes.listItemText} />
+                primary={
+                  <GoogleLogout
+                    render={renderProps => (
+                      <p style={{ margin: `0` }}>Logout</p>
+                    )}
+                    clientId={process.env.REACT_APP_CLIENT_ID}
+                    buttonText="Logout"
+                    onLogoutSuccess={handleLogout}
+                  ></GoogleLogout>
+                }
+                className={classes.listItemText}
+              />
             </ListItem>
           }
         />
       </Tabs>
     </div>
   );
-
   return (
     <Fragment>
       <CssBaseline />
@@ -508,23 +506,3 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
-// function a11yPropss(index) {
-//   return {
-//     id: `vertical-tab-${index}`,
-//     "aria-controls": `vertical-tabpanel-${index}`
-//   };
-// }
-// function TabPanel({ children, value, index, ...other }) {
-//   return (
-//     <Typography
-//       component="div"
-//       role="tabpanel"
-//       hidden={value !== index}
-//       id={`vertical-tabpanel-${index}`}
-//       aria-labelledby={`vertical-tab-${index}`}
-//       {...other}
-//     >
-//       {value === index && <Box p={3}>{children}</Box>}
-//     </Typography>
-//   );
-// }

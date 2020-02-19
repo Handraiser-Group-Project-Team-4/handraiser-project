@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import io from "socket.io-client";
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
 import MaterialTable from "material-table";
 import {
-  Switch, 
+  Switch,
   Tooltip,
   Button,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem,
 } from "@material-ui/core/";
 
 // COMPONENTS
@@ -18,13 +23,23 @@ import CopyToClipBoard from '../../tools/CopyToClipBoard'
 // ICONS
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
-import SchoolIcon from "@material-ui/icons/School";
-import DeleteIcon from "@material-ui/icons/Delete";
+import SchoolIcon from '@material-ui/icons/School';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+// import PopupModal from "../CohortTools/AssignCohort";
 
 let socket;
 export default function Cohort() {
   const ENDPOINT = "localhost:3001";
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [createCohort, setCreateCohort] = useState(false);
+  const [updateTitleDesc, setUpdateTitleDesc] = useState({
+    open: false,
+    data: "",
+    type: "updating"
+  })
   const [deleteCohortObj, setDeleteCohortObj] = useState({
     open: false,
     title: "",
@@ -61,32 +76,14 @@ export default function Cohort() {
       {
         title: "Status",
         field: "class_status",
-        lookup: {
-          true: (
-            <span
-              style={{
-                background: `green`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              active
-            </span>
-          ),
-          false: (
-            <span
-              style={{
-                background: `red`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              close
-            </span>
-          )
-        }
+        render: (rowData) => ((rowData.class_status === 'true')
+          ? <span style={{ background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
+            active
+           </span>
+          : <span style={{ background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
+            close
+         </span>
+        )
       },
       {
         title: "Actions",
@@ -95,7 +92,8 @@ export default function Cohort() {
           textAlign: "center"
         },
         cellStyle: {
-          textAlign: "center"
+          textAlign: "center",
+
         },
         render: row => (
           <div
@@ -126,10 +124,89 @@ export default function Cohort() {
               <VisibilityIcon onClick={e => openViewStudentsModal(row)} />
             </Tooltip>
 
+            <Tooltip title="Update Cohort Title/Description">
+              <EditIcon onClick={e => setUpdateTitleDesc({ ...updateTitleDesc, open: true, data: row })} />
+            </Tooltip>
+
             <Tooltip title="Delete Cohort">
               <DeleteIcon onClick={e => deleteCohort(row)} />
             </Tooltip>
+
+
+
           </div>
+        )
+      }
+    ],
+    mobileColumns: [
+      {
+        title: "Title", field: "class_title",
+        render: (rowData) => ((rowData.class_status === 'true')
+          ?
+          <>
+            <status-indicator active pulse positive />
+            <span> {rowData.class_title}</span>
+          </>
+          :
+          <>
+
+            <status-indicator active pulse negative />
+            <span> {rowData.class_title}</span>
+          </>
+        )
+      },
+      {
+        title: "Key", field: "class_key",
+        render: (rowData) => (
+          <div style={{ display: `flex`, alignItems: `center` }}>
+            <p style={{ width: `90px` }}>{rowData.class_key}</p>
+            <CopyToClipBoard data={rowData.class_key} />
+          </div>
+        )
+      },
+      {
+        field: "class_key", width: 50, cellStyle: { textAlign: "right" }, headerStyle: { textAlign: "right" },
+        render: (rowData) => (
+          <PopupState variant="popover" popupId="demo-popup-menu">
+            {popupState => (
+              <React.Fragment>
+
+                <MoreVertIcon {...bindTrigger(popupState)} />
+
+
+                <Menu {...bindMenu(popupState)}>
+
+                  <MenuItem >
+                    Toggle Status
+                    <Switch
+                      checked={rowData.class_status === "true" ? true : false}
+                      onChange={e => {
+                        toggleClassFn(rowData);
+                      }}
+                    />
+                  </MenuItem>
+
+                  <MenuItem onClick={e => setChangeKey({ open: true, data: rowData })} >
+                    Change Key
+                  </MenuItem>
+
+                  <MenuItem onClick={e => openViewStudentsModal(rowData)} >
+                    View Joined Users
+                  </MenuItem>
+
+                  <MenuItem onClick={e => openViewStudentsModal(rowData)} >
+                    View Joined Users
+                  </MenuItem>
+
+                  <MenuItem onClick={e => deleteCohort(rowData)} >
+                    Delete Cohort
+                  </MenuItem>
+
+                </Menu>
+
+              </React.Fragment>
+            )}
+          </PopupState>
         )
       }
     ],
@@ -141,8 +218,8 @@ export default function Cohort() {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
 
     return () => {
-        socket.emit("disconnect");
-        socket.off();
+      socket.emit("disconnect");
+      socket.off();
     };
   }, [ENDPOINT]);
 
@@ -265,6 +342,16 @@ export default function Cohort() {
 
   return (
     <>
+      {updateTitleDesc.open && (
+        <PopupModal
+          open={updateTitleDesc.open}
+          data={updateTitleDesc.data}
+          type={updateTitleDesc.type}
+          handleClose={(e) => setUpdateTitleDesc({ ...updateTitleDesc, open: false })}
+          render={renderCohorts}
+          title={`Update Class Title/Description`}
+        />)}
+
       {deleteCohortObj.open && (
         <PopupModal
           title={deleteCohortObj.title}
@@ -315,22 +402,29 @@ export default function Cohort() {
       )}
 
       <MaterialTable
+
         title={
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            onClick={() => setCreateCohort(true)}
-            startIcon={<SchoolIcon />}
-          >
-            New Cohort
-          </Button>
+          <div>
+            {(matches) && <h3>Cohorts</h3>}
+
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => setCreateCohort(true)}
+              startIcon={<SchoolIcon style={{ display: (matches) ? null : 'none' }} />}
+              style={{ fontSize: (matches) ? null : '10px' }}
+            >
+              New Cohort
+            </Button>
+          </div>
         }
-        columns={table.columns}
+        columns={(matches) ? table.columns : table.mobileColumns}
         data={table.data}
         options={{
           pageSize: 10,
-          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` },
+
         }}
       />
     </>

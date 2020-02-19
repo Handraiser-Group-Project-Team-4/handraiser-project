@@ -172,6 +172,30 @@ exports.up = pgm => {
         notNull: true
       }
     }),
+    pgm.createTable("classroom_logs", {
+      classroom_logs_id: {
+        type: "serial",
+        primaryKey: true
+      },
+      class_id: {
+        type: "integer",
+        notNull: true,
+        references: "classroom_details"
+      },
+      user_id: {
+        type: "text",
+        notNull: true,
+        references: "users"
+      },
+      action_made: {
+        type: "text",
+        notNull: true
+      },
+      date_time: {
+        type: "text",
+        notNull: true
+      }
+    }),
     pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Approved')`);
   pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Pending')`);
   pgm.sql(`INSERT INTO approval (approval_status) VALUES ('Disapproved')`);

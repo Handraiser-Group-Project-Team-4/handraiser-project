@@ -4,9 +4,7 @@ import LoginPage from "./components/loginPage/LoginPage";
 import StudentPage from "./components/mainPage/StudentPage";
 import MentorPage from "./components/mainPage/MentorPage";
 import AdminPage from "./components/mainPage/AdminPage";
-import CohortPage, {
-  UserContext
-} from "./components/cohort/CohortPage";
+import CohortPage from "./components/cohort/cohortQueue/CohortPage";
 import NotFound from "./components/tools/NotFound";
 import Team from "./components/tools/Team";
 

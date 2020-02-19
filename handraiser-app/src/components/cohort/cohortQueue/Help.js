@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useContext } from "react";
 import io from "socket.io-client";
 import styled, { keyframes } from "styled-components";
-
 // COMPONENTS
-import { UserContext } from "../CohortPage";
+import { UserContext } from "./CohortPage";
 import jwtToken from "../../tools/assets/jwtToken";
 import Handraise from "../../../images/handraise.png";
 import UsersModal from "../../tools/UsersModal";
-
 // Material-UI
 import { useMediaQuery, useTheme, Fab } from "@material-ui/core";
-
 let socket;
 export default function Helps({ fab, classes }) {
   const [value, setValue] = useState("");
@@ -19,7 +16,6 @@ export default function Helps({ fab, classes }) {
   const { id, data, user } = useContext(UserContext);
   const userObj = jwtToken();
   const ENDPOINT = "localhost:3001";
-
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = React.useState(false);
@@ -95,7 +91,6 @@ export default function Helps({ fab, classes }) {
       border-radius: 10% 30% 50% 70%;
     }
   `;
-
   const handleClose = () => {
     setOpen(false);
     setValue("");
@@ -103,10 +98,8 @@ export default function Helps({ fab, classes }) {
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
-
   const sendConcern = e => {
     e.preventDefault();
-
     if (value) {
       setIsEmpty(false);
       const concern = {
@@ -122,7 +115,6 @@ export default function Helps({ fab, classes }) {
       setIsEmpty(true);
     }
   };
-
   useEffect(() => {
     if (user) {
       let isNull = false;
@@ -138,7 +130,6 @@ export default function Helps({ fab, classes }) {
       setIsTrue(isNull);
     }
   });
-
   return user ? (
     !isTrue && user.user_role_id === 3 ? (
       <>
@@ -190,7 +181,6 @@ export default function Helps({ fab, classes }) {
     ) : null
   ) : null;
 }
-
 const play = keyframes`
 0% {
   transform: scale(1);

@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 
 // COMPONENTS
 import Students from "./Students";
-import { UserContext } from "../CohortPage";
+import { UserContext } from "./CohortPage";
 import { DarkModeContext } from "../../../App";
 
 // MATERIAL-UI

@@ -224,6 +224,28 @@ module.exports = {
       });
   },
 
+  updateTitleDesc: (req, res) => {
+    const db = req.app.get("db");
+    const { class_title, class_description } = req.body;
+    // let class_status = toggle_class_status === "true" ? "true" : "false";
+
+    db.classroom_details
+      .update(
+        {
+          class_id: req.params.id
+        },
+        {
+          class_title,
+          class_description
+        }
+      )
+      .then(classroom => res.status(200).send(classroom))
+      .catch(err => {
+        console.err(err);
+        res.status(500).end();
+      });
+  },
+
   deleteClass: (req, res) => {
     const db = req.app.get("db");
 
@@ -238,7 +260,7 @@ module.exports = {
       });
   },
 
-  assignMentor: (req, res) => {
+  enroll: (req, res) => {
     const db = req.app.get("db");
     const { class_id, user_id, date_joined } = req.body;
     db.classroom_students
@@ -269,5 +291,20 @@ module.exports = {
       console.error(err);
       res.status(500).end();
     });
-  }
+  },
+  
+  getMentors: (req, res) => {
+    const db = req.app.get("db");
+
+    db.query(
+      `select * from classroom_details WHERE class_id NOT IN
+      (select class_id from classroom_students where user_id = '${req.params.id}')`
+    )
+      .then(get => res.status(200).json(get))
+      .catch(err => {
+        console.error(err);
+        res.status(500).end();
+      });
+  },
+
 };

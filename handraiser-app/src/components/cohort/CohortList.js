@@ -15,17 +15,24 @@ import {DarkModeContext} from '../../App'
 // MATERIAL-UI
 import {
   useTheme,
-  // TextField,
   useMediaQuery,
   Typography,
-  Box
+  Box,
+  TextField,
+  InputAdornment
 } from "@material-ui/core";
 
+//ICONS
+import SearchIcon from "@material-ui/icons/Search";
+
+// let socket;
 function CohortList({ classes, value, enqueueSnackbar }) {
-  const {darkMode}  = useContext(DarkModeContext)
+  const { darkMode } = useContext(DarkModeContext);
   const theme = useTheme();
   const userObj = jwtToken();
   const history = useHistory();
+  const [cohorts, setCohorts] = useState([]);
+  const [search, setSearch] = useState();
   const [isKey, setIsKey] = useState({
     key: "",
     open: false,
@@ -92,18 +99,45 @@ function CohortList({ classes, value, enqueueSnackbar }) {
       });
   };
 
+  const changeHandler = event => {
+    event.target.name === "search" && setSearch(event.target.value);
+  };
   return (
     <>
       <SwipeableViews
         style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
-        style={{ backgroundColor: darkMode ? "#333" : null, height: "100%" }}
+        style={{
+          backgroundColor: darkMode ? "#333" : null,
+          height: "calc(100vh - 48px)"
+        }}
         // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          <CohortContainer classes={classes} handleCohort={handleCohort} value={value} />
-
+          <TextField
+            id="outlined-search"
+            label="Search field"
+            type="search"
+            size={"small"}
+            name="search"
+            variant="outlined"
+            onChange={changeHandler}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              )
+            }}
+          />
+          <CohortContainer
+            classes={classes}
+            handleCohort={handleCohort}
+            cohorts={cohorts}
+            search={search}
+            value={value}
+          />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
           <CohortContainer classes={classes} handleCohort={handleCohort} value={value} />

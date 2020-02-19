@@ -2,86 +2,149 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
 
-// MATERIAL-UI
-import MaterialTable from 'material-table';
+import MaterialTable from "material-table";
 import Tooltip from "@material-ui/core/Tooltip";
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+import { useTheme } from "@material-ui/core/styles";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 // COMPONENTS
 import PopupModal from '../../tools/PopupModal'
+import Badger from "../../tools/Badger";
 
 // ICONS
 import EditIcon from "@material-ui/icons/Edit";
 
 // Icons
-import ThumbDownIcon from '@material-ui/icons/ThumbDown';
-import ThumbUpIcon from '@material-ui/icons/ThumbUp';
-
-
+import ThumbDownIcon from "@material-ui/icons/ThumbDown";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 let socket;
 export default function Pending() {
   const ENDPOINT = "localhost:3001";
-
-
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const [approving, setApproving] = useState({
+    open: false,
+    data: ""
+  });
+  const [disapproving, setDisapproving] = useState({
+    open: false,
+    data: ""
+  });
   const [pending, setPending] = useState({
     columns: [
       {
-        title: 'User', field: 'firstname',
-        render: (rowData) => (
+        title: "User",
+        field: "firstname",
+        render: rowData => (
           <div style={{ display: `flex` }}>
-            <img src={rowData.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
-            <p>{rowData.firstname} {rowData.lastname}</p>
+            <img
+              src={rowData.avatar}
+              width="50"
+              height="50"
+              alt={rowData.avatar}
+              style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}
+            />
+            <p>
+              {rowData.firstname} {rowData.lastname}
+            </p>
           </div>
         )
       },
-      { field: 'lastname', headerStyle: { display: `none` }, cellStyle: { display: `none` }, },
-      { title: 'Email', field: 'email' },
+      {
+        field: "lastname",
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` }
+      },
+      { title: "Email", field: "email" },
       {
         title: "Actions",
-        headerStyle : {
+        headerStyle: {
           // border: "none",
           textAlign: "center"
-
         },
-        render: (rowData) => (
-
-          <div style={{
-            // backgroundColor: "red",
-            display: `flex`,
-            alignItems: `center`,
-            justifyContent: `space-evenly`,
-            // marginRight: 50
-          }}>
+        render: rowData => (
+          <div
+            style={{
+              // backgroundColor: "red",
+              display: `flex`,
+              alignItems: `center`,
+              justifyContent: `space-evenly`
+              // marginRight: 50
+            }}
+          >
             <Tooltip title="Approve">
               <ThumbUpIcon
-                  onClick={e => setApproving({ open: true, data: rowData })}
+                onClick={e => setApproving({ open: true, data: rowData })}
               />
             </Tooltip>
             <Tooltip title="Disapprove">
               <ThumbDownIcon
-              onClick={e => setDisapproving({ open: true, data: rowData })}
+                onClick={e => setDisapproving({ open: true, data: rowData })}
               />
             </Tooltip>
           </div>
-          
-            
-           
-              
-           
         )
       }
     ],
-    data: [],
-  });
 
-  const [approving, setApproving] = useState({
-    open: false,
-    data: ""
-  })
-  const [disapproving, setDisapproving] = useState({
-    open: false,
-    data: ""
-  })
+    mobileColumns: [
+      {
+        title: "Users",
+        field: "firstname",
+        render: rowData => (
+          <div style={{ display: `flex` }}>
+            <Badger obj={rowData} />
+            <div>
+              <p style={{ margin: 0 }}>
+                {rowData.firstname} {rowData.lastname}
+              </p>
+              <div style={{ margin: 0, fontSize: 10 }}>
+                <span>{rowData.email}</span>
+                <br />
+              </div>
+            </div>
+          </div>
+        )
+      },
+      {
+        field: "Action",
+        width: 50,
+        cellStyle: { textAlign: "right" },
+        headerStyle: { textAlign: "right" },
+        render: rowData => (
+          <PopupState variant="popover" popupId="demo-popup-menu">
+            {popupState => (
+              <React.Fragment>
+                <MoreVertIcon {...bindTrigger(popupState)} />
+
+                <Menu {...bindMenu(popupState)}>
+                  <MenuItem
+                    onClick={e => setApproving({ open: true, data: rowData })}
+                  >
+                    Approve
+                  </MenuItem>
+
+                  <MenuItem
+                    onClick={e =>
+                      setDisapproving({ open: true, data: rowData })
+                    }
+                  >
+                    Disapprove
+                  </MenuItem>
+                </Menu>
+              </React.Fragment>
+            )}
+          </PopupState>
+        )
+      }
+    ],
+    data: []
+  });
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -90,24 +153,23 @@ export default function Pending() {
   useEffect(() => {
     let isCancelled = false;
 
-    if (!isCancelled)
-      renderPending();
+    if (!isCancelled) renderPending();
 
     return () => {
-      isCancelled = true
-    }
+      isCancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     socket.on("fetchMentorRequest", () => {
       renderPending();
-    })
+    });
 
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  })
+  });
 
   // GET THE COHORT VALUES
   const renderPending = () => {
@@ -151,7 +213,7 @@ export default function Pending() {
 
       <MaterialTable
         title=""
-        columns={pending.columns}
+        columns={matches ? pending.columns : pending.mobileColumns}
         data={pending.data}
         options={{
           pageSize: 10,
