@@ -187,7 +187,7 @@ export default function StickyHeadTable() {
   }
 
   const getCohorts = row => {
-    console.log(row)
+
     axios({
       method: "get",
       url: `/api/getAttendingCohorts/'${row.user_id}'`,

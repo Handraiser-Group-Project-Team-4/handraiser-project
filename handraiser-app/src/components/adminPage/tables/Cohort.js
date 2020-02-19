@@ -83,7 +83,9 @@ export default function MaterialTableDemo() {
   const [subject, setSubject] = useState({
     title: "",
     created: "",
-    id: ""
+    id: "",
+    key: "",
+    status: ""
   });
   const [table, setTable] = useState({
     columns: [
@@ -294,18 +296,21 @@ export default function MaterialTableDemo() {
         .catch(err => console.log("object"));
     }
   };
-
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
       created: row.class_created,
-      id: row.class_id
+      id: row.class_id,
+      key : row.class_key,
+      status: row.class_status
     });
+   
     setCohortObj(row)
     renderViewStudentsTable(row.class_id);
   };
 
   const renderViewStudentsTable = id => {
+  
     axios({
       method: "get",
       url: `/api/viewJoinedStudents/${id}`,
@@ -404,7 +409,6 @@ export default function MaterialTableDemo() {
 
       {viewJoinedModal.open && (
         <CohortModal
-          cohortObj={cohortObj}
           open={viewJoinedModal.open}
           handleClose={() =>
             setViewJoinedModal({ ...viewJoinedModal, open: false })
@@ -412,6 +416,8 @@ export default function MaterialTableDemo() {
           data={viewJoinedModal.data}
           title={subject.title}
           id={subject.id}
+          classKey={subject.key}
+          status={subject.status}
           renderViewStudentsTable={renderViewStudentsTable}
           created={subject.created}
         />

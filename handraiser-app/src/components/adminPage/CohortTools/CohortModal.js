@@ -8,8 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button,
-  Tooltip
+  Button
 } from "@material-ui/core/";
 
 // COMPONENTS
@@ -31,14 +30,11 @@ export default function CohortModal({
   created,
   renderViewStudentsTable,
   id,
-  cohortObj
+
+
 }) {
   const [kickbool, setKickbool] = useState(false);
   const [kickobj, setKickobj] = useState({});
-  const [changeKey, setChangeKey] = useState({
-    open: false,
-    data: ""
-  });
   const [assign, setAssign] = useState({
     open: false,
     data: '',
@@ -87,6 +83,7 @@ export default function CohortModal({
   };
 
   const closeAssignModal = id => {
+
     setAssign({
       ...assign,
       open: false
@@ -116,19 +113,10 @@ export default function CohortModal({
     
   }
 
+
   return (
     <>
-      {changeKey.open && (
-        <PopupModal
-          title={"Change Key"}
-          data={changeKey.data}
-          open={changeKey.open}
-          handleClose={() => setChangeKey({ ...changeKey, open: false })}
-          render={renderViewStudentsTable}
-          type={"Change Key"}
-        />
-      )}
-
+      
       {kickbool && (
       
         <PopupModal 
@@ -162,16 +150,13 @@ export default function CohortModal({
           <div style={{display: 'flex', justifyContent: 'space-between'}}>
             
             <div>
-              <Tooltip title="Change Key">
-                <VpnKeyIcon
-                  onClick={e => setChangeKey({ open: true, data: cohortObj })}
-                />
-              </Tooltip>
+              
             </div>  
 
             <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
               <h4 style={{margin: `0`}}>{title}</h4>
               <h6 style={{margin: `0`}}>Created: {created}</h6>
+             
             </div>
 
             <CloseIcon onClick={handleClose}/>
