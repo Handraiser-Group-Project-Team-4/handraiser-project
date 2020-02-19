@@ -115,7 +115,6 @@ function CohortList({ classes, value, enqueueSnackbar }) {
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
           <TextField
-            id="outlined-search"
             label="Search field"
             type="search"
             size={"small"}

@@ -33,18 +33,17 @@ module.exports = {
       socket.join(`${user.room}`);
       callback();
     });
+    // io.socket.on("typing", ({ name }) => {
+    //   const user = users.find(user => user.id === socket.id);
 
-    socket.on("typing", ({ name }) => {
-      const user = users.find(user => user.id === socket.id);
+    //   socket.to(user.room).emit("displayTyping", { name });
+    // });
 
-      socket.to(user.room).emit("displayTyping", { name });
-    });
+    // socket.on("NotTyping", ({ name }) => {
+    //   const user = users.find(user => user.id === socket.id);
 
-    socket.on("NotTyping", ({ name }) => {
-      const user = users.find(user => user.id === socket.id);
-
-      socket.to(user.room).emit("displayNotTyping", { name });
-    });
+    //   socket.to(user.room).emit("displayNotTyping", { name });
+    // });
 
     socket.on("sendMessage", ({ message }, callback) => {
       const new_date = new Intl.DateTimeFormat("en-US", {

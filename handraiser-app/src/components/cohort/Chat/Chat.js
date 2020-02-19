@@ -25,9 +25,9 @@ import {
 } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
 // COMPONENTS
-import { UserContext } from "../cohort/cohortQueue/CohortPage";
-import jwtToken from "../tools/assets/jwtToken";
-import { DarkModeContext } from "../../App";
+import { UserContext } from "../cohortQueue/CohortPage";
+import jwtToken from "../../tools/assets/jwtToken";
+import { DarkModeContext } from "../../../App";
 // ICONS
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -104,17 +104,14 @@ const Chat = () => {
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
+
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit(
-      "join",
-      { chatroom },
-      () => {
-        socket.on("oldChat", data => {
-          setCurrentChat(data.data.messages);
-        });
-      }
-    );
+    socket.emit("join", { chatroom }, () => {
+      socket.on("oldChat", data => {
+        setCurrentChat(data.data.messages);
+      });
+    });
   }, [ENDPOINT, chatroom]);
 
   useEffect(() => {
@@ -172,7 +169,7 @@ const Chat = () => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={e => alert("Add Mentor")}>
+              <MenuItem onClick={e => console.log(chatroom)}>
                 {/* <ListItemIcon>
                       <HelpIcon />
                     </ListItemIcon> */}
