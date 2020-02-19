@@ -196,7 +196,7 @@ export default function CohortPage({ value = 0, match }) {
   };
 
   return (
-    <MainpageTemplate>
+    <MainpageTemplate tabIndex={'student-page'}>
       <div className={classes.parentDiv}>
         <UserContext.Provider
           value={{

@@ -19,7 +19,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
     const ENDPOINT = "localhost:3001";
     const [attending, setAttending] = useState({
         open: false,
@@ -155,7 +155,8 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                         (type === "Change Key") ? 'patch' :
                         (type === "users") ? 'patch' :
                         (type === 'Toggle Cohort') ? 'patch' : 
-                        (type === 'Delete Cohort') ? 'delete' : null 
+                        (type === 'Delete Cohort') ? 'delete' :
+                        (type === 'Kick Student')? 'delete': null
                             
         const URL = (type === 'updating')? `/api/updateTitleDesc/${data.class_id}`:
                     (type === 'approving')?`/api/toapprove/${data.user_id}`:
@@ -164,7 +165,8 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                     (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
                     (type === 'users')?`/api/assigning/${data.user_id}`:
                     (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
-                    (type === 'Delete Cohort') ? `/api/deleteClass/${id}`: null
+                    (type === 'Delete Cohort') ? `/api/deleteClass/${id}`:
+                    (type === 'Kick Student')? `/api/kickstud/${data.user_id}/${data.class_id}`: null
        
        if (type === 'users')
             axios({
@@ -196,16 +198,23 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                 data: body.data
             }) 
             .then(() => {
-                if(type === 'Create Cohort' || type === 'Toggle Cohort'){
-                    socket.emit("renderCohort", {data: body.data});
-                }
+                if(type === 'Change User Role')
+                        socket.emit("changeUserRole", { user_id: data.id, user_role_id: data.role });
 
-                if(type === 'approving' || type === 'disapproving'){
-                    socket.emit("handleRoleRequest", {user_id: data.user_id, approval_status: body.data});
-                }
+                if (type === 'Create Cohort' || type === 'Toggle Cohort')
+                    socket.emit("renderCohort", { data: body.data });
+                
+                if (type === 'approving' || type === 'disapproving') 
+                    socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
+                
 
-                handleClose();
-                render();
+                if (type === 'Kick Student')
+                    handleClose(data.class_id);
+                
+                else{ 
+                    render()
+                    handleClose()
+                }
             })
             .catch(err => console.log(err))
     };
@@ -223,13 +232,13 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
 
         <Dialog
             open={open}
-            onClose={handleClose}
+            onClose={(type === 'Kick Student') ? (e) => handleClose(data.class_id) : handleClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
             fullWidth={true}
             maxWidth='sm'
         >
-            {(type !== 'approving')?
+            {(type !== 'approving' || type === 'Kick Student')?
                 <form onSubmit={submitUserData}>
                     <DialogTitle id="alert-dialog-title" >
                         {title}
@@ -362,7 +371,7 @@ export default function PopupModal({ title, setTemp, temp, data, open, handleClo
                             : null}
 
                    
-                                    <Button onClick={handleClose} color="secondary">
+                                    <Button onClick={(type === "Kick Student") ? (e)=>handleClose(data.class_id) : handleClose} color="secondary">
                                         Close
                                     </Button>
                                 

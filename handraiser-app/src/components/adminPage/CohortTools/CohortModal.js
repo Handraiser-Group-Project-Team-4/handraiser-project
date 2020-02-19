@@ -13,12 +13,14 @@ import {
 
 // COMPONENTS
 
-import AdminModal from "../../tools/AdminModal";
+import PopupModal from "../../tools/PopupModal";
 import AssingMentor from "./AssignMentor";
 
 // ICONS
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import CloseIcon from '@material-ui/icons/Close';
+import VpnKeyIcon from "@material-ui/icons/VpnKey";
 
 export default function CohortModal({
   handleClose,
@@ -27,7 +29,9 @@ export default function CohortModal({
   title,
   created,
   renderViewStudentsTable,
-  id
+  id,
+
+
 }) {
   const [kickbool, setKickbool] = useState(false);
   const [kickobj, setKickobj] = useState({});
@@ -79,6 +83,7 @@ export default function CohortModal({
   };
 
   const closeAssignModal = id => {
+
     setAssign({
       ...assign,
       open: false
@@ -108,11 +113,13 @@ export default function CohortModal({
     
   }
 
+
   return (
     <>
+      
       {kickbool && (
-        // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
-        <AdminModal 
+      
+        <PopupModal 
           title={`Are you sure you want to kick ${kickobj.firstname} ${kickobj.lastname}`}
           open={kickbool} 
           handleClose={closeKickModal} 
@@ -140,9 +147,20 @@ export default function CohortModal({
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
-          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
-            <h4 style={{margin: `0`}}>{title}</h4>
-            <h6 style={{margin: `0`}}>Created: {created}</h6>
+          <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            
+            <div>
+              
+            </div>  
+
+            <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
+              <h4 style={{margin: `0`}}>{title}</h4>
+              <h6 style={{margin: `0`}}>Created: {created}</h6>
+             
+            </div>
+
+            <CloseIcon onClick={handleClose}/>
+          
           </div>
         </DialogTitle>
 

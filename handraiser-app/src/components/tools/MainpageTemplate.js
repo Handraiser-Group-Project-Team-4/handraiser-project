@@ -6,6 +6,7 @@ import axios from "axios";
 import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
 import WarningIcon from "@material-ui/icons/Warning";
+import TabsTemplate from "./TabsTemplate";
 
 // MATERIAL-UI
 import {
@@ -20,40 +21,27 @@ import {
   Toolbar,
   Typography,
   Tab,
-  Tabs,
-  Switch,
   makeStyles,
   useTheme,
   Chip,
   Card,
   CardContent,
-  Backdrop,
-  Button,
-	CircularProgress,Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,Slide
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { useSnackbar } from "notistack";
 
 // ICONS
-import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
-import Brightness7Icon from "@material-ui/icons/Brightness7";
+import GroupIcon from "@material-ui/icons/Group";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 
-export default function MainpageTemplate({
-  children,
-  container,
-  tabIndex = 0
-}) {
+export default function MainpageTemplate({ children, container, tabIndex }) {
   const userObj = jwtToken();
   const [user, setUser] = useState();
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-	const [open, setOpen] = React.useState(false);
-	const [modal, setModal] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const history = useHistory();
 
@@ -74,32 +62,6 @@ export default function MainpageTemplate({
 		}
   }, []);
   
-  const handleLogout = () => {
-    setModal(false);
-    setOpen(true);
-		setTimeout(() => {
-			setOpen(false);
-      axios({
-        method: `patch`,
-        url: `/api/logout/${userObj.user_id}`,
-        headers: {
-          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-        }
-      })
-        .then(res => {
-          console.log(res);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-      sessionStorage.clear();
-      sessionStorage.setItem(
-        'notification',
-        `Successfully logged out`
-      );
-      history.push('/');
-    }, 2000);
-  };
 
   useEffect(() => {
     let isCancelled = false;
@@ -123,20 +85,8 @@ export default function MainpageTemplate({
     };
   }, []);
 
-  const handleDarkMode = async () => {
-    let res = await axios({
-      method: "patch",
-      url: `/api/darkmode/${user.user_id}`,
-      data: { dark_mode: !darkMode },
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    });
-    setDarkMode(!darkMode);
-  };
-
   if (!userObj) return <Redirect to="/" />;
-
+  // console.log(tabIndex);
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
@@ -190,126 +140,157 @@ export default function MainpageTemplate({
           </>
         )}
       </div>
-      <Tabs
-        orientation="vertical"
-        value={tabIndex}
-        className={classes.tabs}
-        style={{ position: "relative", height: "calc(100vh - 250px)" }}
-      >
-        <Tab
-          label={
-            <ListItem
-              onClick={() => history.push("/student-page")}
-              button
-              className={classes.listItemButton}
+      {user
+        ? user.user_role_id === 1 && (
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={user}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
             >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Cohorts"
-                className={classes.listItemText}
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-cohorts"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-cohorts")}
               />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
-            <ListItem
-              onClick={() => history.push("/team")}
-              button
-              className={classes.listItemButton}
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-users"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/users")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <GroupIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Users"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-users")}
+              />
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-approval"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/approval")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <ThumbUpIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Approval"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-approval")}
+              />
+            </TabsTemplate>
+          )
+        : null}
+      {user
+        ? user.user_role_id !== 1 && (
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={user}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
             >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <PeopleOutlineIcon />
-              </ListItemIcon>
-              <ListItemText primary="Team" className={classes.listItemText} />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
-            <ListItem className={classes.listItemButton}>
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                {darkMode ? <Brightness4Icon /> : <Brightness7Icon />}
-              </ListItemIcon>
-              <ListItemText
-                className={classes.listItemText}
-                primary={darkMode ? "Dark" : "Light"}
+              <Tab
+                style={{ padding: 0 }}
+                value="student-page"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/student-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("student-page")}
               />
-              <Switch
-                checked={darkMode}
-                onChange={handleDarkMode}
-                value="checkedB"
-                color="default"
-              />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
-            <ListItem
-              to="/"
-              renderas={Link}
-              onClick={() => setModal(true)}
-              button
-              className={classes.listItemButton}
-            >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <ExitToAppIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" className={classes.listItemText} />
-            </ListItem>
-          }
-        />
-      </Tabs>
+            </TabsTemplate>
+          )
+        : null}
       <div
-          style={{
-            position: "absolute",
-            bottom: 10,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: 230
-          }}
-        >
-          <Card style={{ width: 220 }}>
-            <CardContent
-              style={{
-                paddingBottom: 16,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
+        style={{
+          position: "absolute",
+          bottom: 10,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 240
+        }}
+      >
+        <Card style={{ width: 220 }}>
+          <CardContent
+            style={{
+              paddingBottom: 16,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <WarningIcon />
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              component="p"
+              style={{ whiteSpace: "normal", paddingLeft: 10 }}
             >
-              <WarningIcon />
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{ whiteSpace: "normal", paddingLeft: 10 }}
-              >
-                Your request to be a mentor is still being processed.
-              </Typography>
-            </CardContent>
-          </Card>
-        </div>
+              Your request to be a mentor is still being processed.
+            </Typography>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 
@@ -373,46 +354,11 @@ export default function MainpageTemplate({
         </main>
       </div>
 
-      <Dialog
-        open={modal}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={() => setModal(false)}
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle id="alert-dialog-slide-title">{"Confirmation"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            Are you sure you want to logout?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModal(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleLogout} color="primary">
-            Log Out 
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-			<Backdrop
-				className={classes.backdrop}
-				open={open}
-				onClick={() => setOpen(true)}
-			>
-				<CircularProgress color="inherit" />
-			</Backdrop>
     </Fragment>
   );
 }
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const drawerWidth = 240;
+const drawerWidth = 245;
 const useStyles = makeStyles(theme => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -528,11 +474,12 @@ const useStyles = makeStyles(theme => ({
   },
   divider: {
     backgroundColor: "#ffe4c4"
-  },
-  tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
-    "& button": {
-      padding: 0
-    }
   }
 }));
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`
+  };
+}
