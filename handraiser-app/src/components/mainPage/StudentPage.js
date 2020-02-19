@@ -15,7 +15,7 @@ import UsersModal from "../tools/UsersModal";
 import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
-export default function StudentPage({ value }) {
+export default function StudentPage({ value, tabIndex }) {
   console.log(value);
   const [request, setRequest] = useState();
   const [open, setOpen] = useState(true);
@@ -90,7 +90,7 @@ export default function StudentPage({ value }) {
   } else return <Redirect to="/" />;
 
   return (
-    <MainpageTemplate>
+    <MainpageTemplate tabIndex={tabIndex}>
       {sessionStorage.getItem("newUser") === "pending" ||
       request === "pending" ||
       userObj.user_approval_status_id === 2 ? (
