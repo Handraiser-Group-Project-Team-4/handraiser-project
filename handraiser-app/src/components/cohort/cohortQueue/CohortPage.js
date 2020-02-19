@@ -111,23 +111,24 @@ export default function CohortPage({ value = 0, match }) {
   useEffect(() => {
     socket.emit("getChatroom", { id }, () => {
       socket.on("chatroomData", ({ data }) => {
-        data.length &&
-        (data[0].mentor_id === userObj.user_id ||
-          data[0].student_id === userObj.user_id)
-          ? setChatRoom({
-              room: data[0].concern_id,
-              concern: data[0].concern_title
-            })
-          : data.map(concern => {
-              concern.concern_status !== "pending" &&
-              (concern.student_id === userObj.user_id ||
-                concern.mentor_id === userObj.user_id)
-                ? setChatRoom({
-                    room: concern.concern_id,
-                    concern: concern.concern_title
-                  })
-                : setChatRoom();
-            });
+        data.length
+          ? data[0].mentor_id === userObj.user_id ||
+            data[0].student_id === userObj.user_id
+            ? setChatRoom({
+                room: data[0].concern_id,
+                concern: data[0].concern_title
+              })
+            : data.map(concern => {
+                concern.concern_status !== "pending" &&
+                (concern.student_id === userObj.user_id ||
+                  concern.mentor_id === userObj.user_id)
+                  ? setChatRoom({
+                      room: concern.concern_id,
+                      concern: concern.concern_title
+                    })
+                  : setChatRoom();
+              })
+          : setChatRoom();
       });
     });
 
@@ -150,7 +151,7 @@ export default function CohortPage({ value = 0, match }) {
       socket.emit("disconnectConcern", () => {});
       socket.off();
     };
-  }, [data]);
+  }, [data, enqueueSnackbar, id, logs, userObj.user_id]);
 
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);

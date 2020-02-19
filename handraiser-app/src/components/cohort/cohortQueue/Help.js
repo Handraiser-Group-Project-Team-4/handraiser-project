@@ -129,7 +129,7 @@ export default function Helps({ fab, classes }) {
       });
       setIsTrue(isNull);
     }
-  });
+  }, [data, user]);
   return user ? (
     !isTrue && user.user_role_id === 3 ? (
       <>
