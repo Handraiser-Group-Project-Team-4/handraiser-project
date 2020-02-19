@@ -32,6 +32,7 @@ import {
 	CircularProgress,Dialog,DialogActions,DialogContent,DialogContentText,DialogTitle,Slide
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
+import { useSnackbar } from "notistack";
 
 // ICONS
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
@@ -57,7 +58,22 @@ export default function MainpageTemplate({
   const history = useHistory();
 
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
+  const { enqueueSnackbar } = useSnackbar();
 
+  useEffect(() => {
+    let login = sessionStorage.getItem('notification') ? true : false;
+		if (login) {
+      enqueueSnackbar(sessionStorage.getItem('notification'), {
+        variant: 'success',
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right"
+        }
+      });
+      sessionStorage.removeItem('notification');
+		}
+  }, []);
+  
   const handleLogout = () => {
     setModal(false);
     setOpen(true);
@@ -77,6 +93,10 @@ export default function MainpageTemplate({
           console.log(err);
         });
       sessionStorage.clear();
+      sessionStorage.setItem(
+        'notification',
+        `Successfully logged out`
+      );
       history.push('/');
     }, 2000);
   };
@@ -217,26 +237,6 @@ export default function MainpageTemplate({
         />
         <Tab
           label={
-            <ListItem
-              to="/"
-              renderas={Link}
-              onClick={() => setModal(true)}
-              button
-              className={classes.listItemButton}
-            >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <ExitToAppIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" className={classes.listItemText} />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
             <ListItem className={classes.listItemButton}>
               <ListItemIcon
                 style={{
@@ -258,7 +258,26 @@ export default function MainpageTemplate({
             </ListItem>
           }
         />
-        
+        <Tab
+          label={
+            <ListItem
+              to="/"
+              renderas={Link}
+              onClick={() => setModal(true)}
+              button
+              className={classes.listItemButton}
+            >
+              <ListItemIcon
+                style={{
+                  color: "white"
+                }}
+              >
+                <ExitToAppIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" className={classes.listItemText} />
+            </ListItem>
+          }
+        />
       </Tabs>
       <div
           style={{

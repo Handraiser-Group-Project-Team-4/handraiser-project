@@ -15,6 +15,7 @@ import Chat from "../../Chat/Chat";
 import jwtToken from "../../tools/assets/jwtToken";
 import { DarkModeContext } from "../../../App";
 import Search from "./CohortFilter";
+import Logs from "../cohortLogs/Logs";
 
 // MATERIAL-UI
 import {
@@ -64,6 +65,7 @@ export default function CohortPage({ value = 0, match }) {
   const history = useHistory();
   const userObj = jwtToken();
   const { id } = match.params;
+  const [logs, setLogs] = useState([]);
   const [data, setData] = useState([]);
   const [user, setUser] = useState();
   const [search, setSearch] = useState();
@@ -116,21 +118,39 @@ export default function CohortPage({ value = 0, match }) {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {});
+    socket.emit("joinConcern", { id }, () => {
+      socket.on("fetchOldLogs", ({ data }) => {
+        setLogs(data);
+      });
+    });
   }, [ENDPOINT]);
 
   useEffect(() => {
     socket.emit("getChatroom", { id }, () => {
       socket.on("chatroomData", ({ data }) => {
-        data.length &&
-        (data[0].mentor_id === userObj.user_id ||
-          data[0].student_id === userObj.user_id)
-          ? setChatRoom({
-              room: data[0].concern_id,
-              concern: data[0].concern_title
-            })
+        data.length
+          ? data[0].mentor_id === userObj.user_id ||
+            data[0].student_id === userObj.user_id
+            ? setChatRoom({
+                room: data[0].concern_id,
+                concern: data[0].concern_title
+              })
+            : data.map(concern => {
+                concern.concern_status !== "pending" &&
+                (concern.student_id === userObj.user_id ||
+                  concern.mentor_id === userObj.user_id)
+                  ? setChatRoom({
+                      room: concern.concern_id,
+                      concern: concern.concern_title
+                    })
+                  : setChatRoom();
+              })
           : setChatRoom();
       });
+    });
+
+    socket.on("newLog", ({ log }) => {
+      setLogs([log, ...logs]);
     });
 
     socket.on("concernData", ({ concern, alert }) => {
@@ -148,7 +168,7 @@ export default function CohortPage({ value = 0, match }) {
       socket.emit("disconnectConcern", () => {});
       socket.off();
     };
-  }, [data]);
+  }, [data, enqueueSnackbar, id, logs, userObj.user_id]);
 
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);
@@ -659,7 +679,7 @@ export default function CohortPage({ value = 0, match }) {
                                   <Chip
                                     icon={<FaceIcon />}
                                     label="Student"
-                                    color="Primary"
+                                    color="primary"
                                   />
                                 </div>
                                 <div>
@@ -741,188 +761,13 @@ export default function CohortPage({ value = 0, match }) {
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
               >
-                <Paper className={classes.paperr} elevation={2}>
-                  <Grid
-                    container
-                    spacing={0}
-                    className={classes.gridContainerr + " " + classes.banner}
-                    style={{
-                      backgroundColor: darkMode ? "#333" : null,
-                      paddingTop: 0,
-                      marginTop: -40
-                    }}
-                  >
-                    <Grid container item xs={12} sm={12} md={5} lg={5}>
-                      <form
-                        noValidate
-                        autoComplete="off"
-                        className={classes.searchform}
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "flex-end",
-                          justifyContent: "flex-end",
-                          paddingBottom: 10
-                        }}
-                      >
-                        <TextField
-                          id="outlined-search"
-                          label="Search field"
-                          type="search"
-                          name="search"
-                          variant="outlined"
-                          onChange={changeHandler}
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <SearchIcon />
-                              </InputAdornment>
-                            )
-                          }}
-                        />
-                      </form>
-                      <Card className={classes.cardLogs}>
-                        <CardContent>
-                          <Timeline>
-                            <ul className={classes.timeline} >
-                              <li className="timeline-item" >
-                                <div className="timeline-info">
-                                  <span>March 12, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <Avatar
-                                    alt="Remy Sharp"
-                                    src="/static/images/avatar/1.jpg"
-                                  />
-                                  <h3 
-                                    className="timeline-title" 
-                                    style={{
-                                      color: darkMode ? "#fff" : null
-                                    }}
-                                  >
-                                    <b>Jhon Michael Bolima</b> updated the
-                                    cohort details.
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>March 23, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <Avatar
-                                    alt="Remy Sharp"
-                                    src="/static/images/avatar/1.jpg"
-                                  />
-                                  <h3 className="timeline-title">
-                                    <b>Noe Restum</b> joined the cohort.
-                                  </h3>
-                                </div>
-                              </li>
-                              {/* <li className="timeline-item period">
-                                <div className="timeline-info"></div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h2 className="timeline-title">April 2016</h2>
-                                </div>
-                              </li> */}
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 02, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Jake Balbedina left the cohort.
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 28, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Joven Bandagosa raised a concern
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 02, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Jake Balbedina left the cohort.
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 28, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Joven Bandagosa raised a concern
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 02, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Jake Balbedina left the cohort.
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 28, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Joven Bandagosa raised a concern
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 02, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Jake Balbedina left the cohort.
-                                  </h3>
-                                </div>
-                              </li>
-                              <li className="timeline-item">
-                                <div className="timeline-info">
-                                  <span>April 28, 2016</span>
-                                </div>
-                                <div className="timeline-marker"></div>
-                                <div className="timeline-content">
-                                  <h3 className="timeline-title">
-                                    Joven Bandagosa raised a concern
-                                  </h3>
-                                </div>
-                              </li>
-                            </ul>
-                          </Timeline>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
-                </Paper>
+                <Logs
+                  classes={classes}
+                  Timeline={Timeline}
+                  changeHandler={changeHandler}
+                  logs={logs}
+                  search={search}
+                />
               </TabPanel>
             </SwipeableViews>
           </div>
@@ -1229,7 +1074,7 @@ const useStyles = makeStyles(theme => ({
     "&::-webkit-scrollbar": {
       width: "5px",
       height: "8px",
-      backgroundColor: "#FFF",
+      // backgroundColor: "#FFF",
       borderTopRightRadius: 10,
       borderBottomRightRadius: 10
     },

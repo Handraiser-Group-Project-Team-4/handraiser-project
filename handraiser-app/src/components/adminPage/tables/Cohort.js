@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
 
 // COMPONENTS

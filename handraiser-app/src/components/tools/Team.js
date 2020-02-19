@@ -124,14 +124,9 @@ const useStyles = makeStyles(theme => ({
 			'box-shadow 0.2s ease, z-index 0s 0.2s ease, -webkit-transform 0.2s ease',
 		transition:
 			'box-shadow 0.2s ease, z-index 0s 0.2s ease, -webkit-transform 0.2s ease',
-		transition:
-			'box-shadow 0.2s ease, transform 0.2s ease, z-index 0s 0.2s ease',
-		transition:
-			'box-shadow 0.2s ease, transform 0.2s ease, z-index 0s 0.2s ease, -webkit-transform 0.2s ease',
 		'&:before': {
 			content: "''",
 			display: 'block'
-			// paddingTop: "80%"
 		},
 		'&:hover': {
 			zIndex: '1',
@@ -139,13 +134,7 @@ const useStyles = makeStyles(theme => ({
 			'-webkit-transform': 'scale(1.05)',
 			transform: 'scale(1.05)',
 			'-webkit-transition':
-				'box-shadow 0.2s ease, z-index 0s 0s ease, -webkit-transform 0.2s ease',
-			transition:
-				'box-shadow 0.2s ease, z-index 0s 0s ease, -webkit-transform 0.2s ease',
-			transition:
-				'box-shadow 0.2s ease, transform 0.2s ease, z-index 0s 0s ease',
-			transition:
-				'box-shadow 0.2s ease, transform 0.2s ease, z-index 0s 0s ease, -webkit-transform 0.2s ease'
+				'box-shadow 0.2s ease, z-index 0s 0s ease, -webkit-transform 0.2s ease'
 		}
 	}),
 	gridContainerBoxBox: {

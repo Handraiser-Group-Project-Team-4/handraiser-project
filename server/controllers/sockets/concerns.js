@@ -7,10 +7,17 @@ module.exports = {
 					alert: undefined
 				})
 			);
+			db.query(
+				`SELECT * FROM classroom_logs WHERE class_id  = ${id} ORDER BY classroom_logs_id DESC`
+			).then(res => {
+				io.to(`${id}`).emit('fetchOldLogs', {
+					data: res
+				});
+			});
+
 			socket.join(`${id}`);
 			callback();
 		});
-
 		socket.on('getChatroom', ({ id }, callback) => {
 			db.concern
 				.find({
@@ -37,6 +44,14 @@ module.exports = {
 					})
 				)
 			);
+			logs(
+				db,
+				io,
+				concern.class_id,
+				userObj.user_id,
+				`${userObj.name} requested for help`
+			);
+
 			callback();
 		});
 
@@ -66,6 +81,18 @@ module.exports = {
 						})
 					)
 				);
+				logs(
+					db,
+					io,
+					id,
+					userObj.user_id,
+					concern_status === 'done'
+						? `${userObj.name} finished a request`
+						: concern_status === 'onprocess'
+						? `${userObj.name} accepts a request`
+						: `${userObj.name} updates request back to queue`
+				);
+
 				callback();
 			}
 		);
@@ -88,7 +115,7 @@ module.exports = {
 						.catch()
 				);
 			});
-
+			logs(db, io, id, userObj.user_id, `${userObj.name} removes a concern`);
 			callback();
 		});
 
@@ -107,6 +134,7 @@ module.exports = {
 						})
 					)
 				);
+				logs(db, io, id, userObj.user_id, `${userObj.name} edit a concern`);
 				callback(text);
 			}
 		);
@@ -115,4 +143,31 @@ module.exports = {
 			console.log('user disconnected to concern');
 		});
 	}
+};
+
+const date = () => {
+	var new_date = new Intl.DateTimeFormat('en-US', {
+		year: 'numeric',
+		month: 'short',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit'
+	}).format(new Date());
+	return new_date;
+};
+
+const logs = (db, io, id, user_id, action) => {
+	db.classroom_logs
+		.insert({
+			class_id: id,
+			user_id: user_id,
+			action_made: action,
+			date_time: `${date()}`
+		})
+		.then(res =>
+			io.to(`${id}`).emit('newLog', {
+				log: res
+			})
+		);
 };

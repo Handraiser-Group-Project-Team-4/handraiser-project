@@ -5,7 +5,6 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import ReactHtmlParser from "react-html-parser";
 import ScrollableFeed from "react-scrollable-feed";
-
 // MATERIAL-UI
 import {
   makeStyles,
@@ -25,17 +24,14 @@ import {
   Menu
 } from "@material-ui/core";
 import { purple } from "@material-ui/core/colors";
-
 // COMPONENTS
 import { UserContext } from "../cohort/cohortQueue/CohortPage";
 import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
-
 // ICONS
 import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
-
 const useStyles = makeStyles(theme => ({
   root: {
     borderRadius: 10,
@@ -103,16 +99,13 @@ const Chat = () => {
     name: ""
   });
   const ENDPOINT = "localhost:3001";
-
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const handleClose = () => setAnchorEl(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = e => setAnchorEl(e.currentTarget);
-
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.off();
     socket.emit(
       "join",
       { username: userObj.name, chatroom: chatroom.room, userObj },
@@ -123,29 +116,23 @@ const Chat = () => {
       }
     );
   }, [ENDPOINT, chatroom]);
+
   useEffect(() => {
-    const handleTyping = () => {
-      socket.emit("typing", { name: userObj.name });
-    };
-    window.addEventListener("keypress", handleTyping);
-    return () => {
-      window.removeEventListener("keypress", handleTyping);
-    };
-  }, []);
-  useEffect(() => {
-    socket.on("displayTyping", ({ name }) => {
-      setTyping(true);
-    });
-  }, []);
-  useEffect(() => {
+    if (message.length <= 0) socket.emit("NotTyping", { name: userObj.name });
     socket.on("message", message => {
       setCurrentChat([...currentChat, message]);
+    });
+    socket.on("displayTyping", ({ name }) => {
+      setTyping({ isTyping: true, name });
+    });
+    socket.on("displayNotTyping", ({ name }) => {
+      setTyping({ isTyping: false, name: "" });
     });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [currentChat]);
+  }, [currentChat, chatroom]);
 
   const sendMessage = event => {
     setOpen(true);
@@ -154,12 +141,12 @@ const Chat = () => {
     const temp = message.replace(/\n/g, "<br />");
     if (message) {
       socket.emit("sendMessage", { message: temp }, () => setMessage(""));
+      socket.emit("NotTyping", { name: userObj.name });
     }
   };
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-
   const toggleEmoji = () => {
     setShowEmoji(!showEmoji);
   };
@@ -185,7 +172,7 @@ const Chat = () => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={e => alert("Add Mentor")}>
+              <MenuItem onClick={e => console.log(chatroom)}>
                 {/* <ListItemIcon>
                       <HelpIcon />
                     </ListItemIcon> */}
