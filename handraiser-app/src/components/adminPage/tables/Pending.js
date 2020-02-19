@@ -11,15 +11,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // Components
-import AdminModal from '../../tools/AdminModal';
+import PopupModal from '../../tools/PopupModal';
 import Badger from '../../tools/Badger';
 
 // Icons
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-
-
 
 let socket;
 export default function Pending() {
@@ -98,32 +96,32 @@ export default function Pending() {
           )
         },
         { field: "Action", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
-        render: (rowData) => (
-          <PopupState variant="popover" popupId="demo-popup-menu">
-            {popupState => (
-              <React.Fragment>
-                
-                  <MoreVertIcon {...bindTrigger(popupState)}/>
-             
-
-                <Menu {...bindMenu(popupState)}>
+          render: (rowData) => (
+            <PopupState variant="popover" popupId="demo-popup-menu">
+              {popupState => (
+                <React.Fragment>
+                  
+                    <MoreVertIcon {...bindTrigger(popupState)}/>
                 
 
-                <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
-                  Approve
-                </MenuItem>
+                  <Menu {...bindMenu(popupState)}>
+                  
 
-                <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
-                  Disapprove
-                </MenuItem>
-              
-              </Menu>
+                  <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
+                    Approve
+                  </MenuItem>
 
-              </React.Fragment>
-            )}
-          </PopupState>
-        )
-      } 
+                  <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
+                    Disapprove
+                  </MenuItem>
+                
+                </Menu>
+
+                </React.Fragment>
+              )}
+            </PopupState>
+          )
+        } 
     ],
     data: [],
   });
@@ -175,7 +173,7 @@ export default function Pending() {
   return (
     <React.Fragment>
       {approving.open && (
-        <AdminModal
+        <PopupModal
           title={`Are you sure you want to assign ${approving.data.firstname} ${approving.data.lastname} as a mentor?`}
           data={approving.data}
           open={approving.open}
@@ -186,7 +184,7 @@ export default function Pending() {
       )}
 
       {disapproving.open && (
-        <AdminModal
+        <PopupModal
           title={`Are you sure you want to disapprove ${disapproving.data.firstname} ${disapproving.data.lastname} as a mentor?`}
           data={disapproving.data}
           open={disapproving.open}

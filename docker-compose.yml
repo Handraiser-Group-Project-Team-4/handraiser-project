@@ -5,7 +5,7 @@ services:
     environment: # We can set shell environment variables that will be passed to process
       POSTGRES_PASSWORD: handraiser
     ports:
-      - 5435:5432 # this binds ports from the container to the host system (your computer)
+      - 5432:5432 # this binds ports from the container to the host system (your computer)
     volumes:
       - handraiser:/var/lib/postgresql/data # binds a folder in the container to a specified volume
 volumes:

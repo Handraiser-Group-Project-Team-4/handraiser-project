@@ -12,7 +12,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SchoolIcon from '@material-ui/icons/School';
 
-
 export default function PopupModal({ handleClose, open, data, userObj }) {
   
     const kick = (e, userObj, row) => {
@@ -20,7 +19,7 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
     e.preventDefault();
 
     row.map(x => {
-
+   
         axios({
             method: "delete",
             url: `/api/kickstud/${userObj.user_id}/${x.class_id}`,
@@ -29,9 +28,10 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
             }
           })
             .then(res => {
-              handleClose(userObj);
+             handleClose(userObj);
             })
             .catch(err => console.log(err));
+         
     })
     
   };

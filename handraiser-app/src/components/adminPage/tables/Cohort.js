@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
-import MaterialTable, { MTableToolbar } from "material-table";
+import MaterialTable from "material-table";
 import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
 
 // COMPONENTS
@@ -60,6 +60,7 @@ export default function MaterialTableDemo() {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [createCohort, setCreateCohort] = useState(false);
+  const [cohortObj, setCohortObj] = useState({})
   const [updateTitleDesc, setUpdateTitleDesc] = useState({
     open: false,
     data: "",
@@ -82,7 +83,9 @@ export default function MaterialTableDemo() {
   const [subject, setSubject] = useState({
     title: "",
     created: "",
-    id: ""
+    id: "",
+    key: "",
+    status: ""
   });
   const [table, setTable] = useState({
     columns: [
@@ -215,12 +218,12 @@ export default function MaterialTableDemo() {
                     View Joined Users
                   </MenuItem>
 
-                  <MenuItem  onClick={e => openViewStudentsModal(rowData)} >
-                    View Joined Users
+                  <MenuItem  onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: rowData})} >
+                    Update Cohort
                   </MenuItem>
 
                   <MenuItem  onClick={e => deleteCohort(rowData)} >
-                  Delete Cohort
+                   Delete Cohort
                   </MenuItem>
               
               </Menu>
@@ -293,17 +296,21 @@ export default function MaterialTableDemo() {
         .catch(err => console.log("object"));
     }
   };
-
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
       created: row.class_created,
-      id: row.class_id
+      id: row.class_id,
+      key : row.class_key,
+      status: row.class_status
     });
+   
+    setCohortObj(row)
     renderViewStudentsTable(row.class_id);
   };
 
   const renderViewStudentsTable = id => {
+  
     axios({
       method: "get",
       url: `/api/viewJoinedStudents/${id}`,
@@ -357,6 +364,8 @@ export default function MaterialTableDemo() {
         <PopupModal
           open={updateTitleDesc.open}
           data={updateTitleDesc.data}
+          titleLen={updateTitleDesc.data.class_title.length}
+          descLen={updateTitleDesc.data.class_description.length}
           type={updateTitleDesc.type}
           handleClose={(e) => setUpdateTitleDesc({...updateTitleDesc, open: false})}
           render={renderCohorts}
@@ -407,6 +416,8 @@ export default function MaterialTableDemo() {
           data={viewJoinedModal.data}
           title={subject.title}
           id={subject.id}
+          classKey={subject.key}
+          status={subject.status}
           renderViewStudentsTable={renderViewStudentsTable}
           created={subject.created}
         />
@@ -426,7 +437,7 @@ export default function MaterialTableDemo() {
               startIcon={<SchoolIcon  style={{display: (matches) ? null: 'none'}} />}
               style={{fontSize: (matches) ? null: '10px'}}
             >
-              New Cohort
+              Add Cohort
             </Button>
           </div>
                 }
