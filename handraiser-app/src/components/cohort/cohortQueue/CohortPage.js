@@ -24,7 +24,6 @@ import {
   Hidden,
   Typography,
   IconButton,
-  Button,
   Paper,
   Avatar,
   Grid,
@@ -39,8 +38,12 @@ import {
   Tabs,
   Tab,
   Box,
-  CardMedia
+  CardMedia,
+  Button,
+  Fab
 } from "@material-ui/core";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import Menu from "@material-ui/core/Menu";
 import FaceIcon from "@material-ui/icons/Face";
@@ -48,8 +51,8 @@ import FaceIcon from "@material-ui/icons/Face";
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
 import cohort from "../../../images/cohort.png";
-import log from "../../../images/log.png";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 
 export const UserContext = createContext(null);
 let socket;
@@ -71,7 +74,6 @@ export default function CohortPage({ value = 0, match }) {
   const theme = useTheme();
   const inputLabel = React.useRef(null);
   const [anchorEl, setAnchorEl] = React.useState(null);
-
   const handleClick = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -178,7 +180,24 @@ export default function CohortPage({ value = 0, match }) {
           }}
         >
           <div className={classes.tabRoot}>
+            {/* <IconButton aria-label="back" style={{ position: "absolute" }}>
+              <ArrowBackIosIcon />
+            </IconButton> */}
+
             <AppBar position="static" color="default">
+              <Button
+                style={{
+                  position: "absolute",
+                  zIndex: 1,
+                  top: 5,
+                  marginLeft: 5
+                }}
+                color="default"
+                className={classes.button}
+                startIcon={<ArrowBackIosIcon />}
+              >
+                Back
+              </Button>
               <Tabs
                 value={value}
                 // onChange={handleChange}
@@ -203,6 +222,9 @@ export default function CohortPage({ value = 0, match }) {
             <SwipeableViews
               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
               index={value}
+              style={{
+                height: "calc(100vh - 48px)"
+              }}
               // onChangeIndex={handleChangeIndex}
             >
               <TabPanel
@@ -359,15 +381,32 @@ export default function CohortPage({ value = 0, match }) {
                         className={classes.gridDetails}
                       >
                         <h1>Computer Programming I</h1>
-                        <h6>
-                          Cohort Code: <Chip label="******" />
-                          <IconButton
-                            color="primary"
-                            aria-label="upload picture"
-                            component="span"
+                        <h6
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                            paddingBottom: 10
+                          }}
+                        >
+                          <span>
+                            Cohort Code: <Chip label="******" />
+                            <IconButton
+                              color="primary"
+                              aria-label="upload picture"
+                              component="span"
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </span>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="secondary"
+                            style={{ height: 30 }}
                           >
-                            <VisibilityIcon />
-                          </IconButton>
+                            Leave Group
+                          </Button>
                         </h6>
                       </Grid>
                     </Grid>
@@ -388,6 +427,32 @@ export default function CohortPage({ value = 0, match }) {
                         lg={8}
                         className={classes.lest}
                       >
+                        <form
+                          noValidate
+                          autoComplete="off"
+                          className={classes.searchform}
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            alignItems: "center"
+                          }}
+                        >
+                          <TextField
+                            id="outlined-search"
+                            label="Search field"
+                            type="search"
+                            name="search"
+                            variant="outlined"
+                            onChange={changeHandler}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <SearchIcon />
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        </form>
                         {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
                         <Lest>
                           <ul className={classes.lestUl}>
@@ -658,82 +723,174 @@ export default function CohortPage({ value = 0, match }) {
                     spacing={0}
                     className={classes.gridContainerr + " " + classes.banner}
                     style={{
-                      backgroundColor: darkMode ? "#333" : null
+                      backgroundColor: darkMode ? "#333" : null,
+                      paddingTop: 0,
+                      marginTop: -40
                     }}
                   >
-                    <Grid
-                      container
-                      item
-                      xs={12}
-                      sm={12}
-                      md={8}
-                      lg={8}
-                      className={classes.logs}
-                    >
-                      <Timeline>
-                        <ul className={classes.timeline}>
-                          <li className="timeline-item">
-                            <div className="timeline-info">
-                              <span>March 12, 2016</span>
-                            </div>
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                              <Avatar
-                                alt="Remy Sharp"
-                                src="/static/images/avatar/1.jpg"
-                              />
-                              <h3 className="timeline-title">
-                                <b>Jhon Michael Bolima</b> updated the cohort
-                                details.
-                              </h3>
-                            </div>
-                          </li>
-                          <li className="timeline-item">
-                            <div className="timeline-info">
-                              <span>March 23, 2016</span>
-                            </div>
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                              <Avatar
-                                alt="Remy Sharp"
-                                src="/static/images/avatar/1.jpg"
-                              />
-                              <h3 className="timeline-title">
-                                <b>Noe Restum</b> joined the cohort.
-                              </h3>
-                            </div>
-                          </li>
-                          <li className="timeline-item period">
-                            <div className="timeline-info"></div>
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                              <h2 className="timeline-title">April 2016</h2>
-                            </div>
-                          </li>
-                          <li className="timeline-item">
-                            <div className="timeline-info">
-                              <span>April 02, 2016</span>
-                            </div>
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                              <h3 className="timeline-title">
-                                Jake Balbedina left the cohort.
-                              </h3>
-                            </div>
-                          </li>
-                          <li className="timeline-item">
-                            <div className="timeline-info">
-                              <span>April 28, 2016</span>
-                            </div>
-                            <div className="timeline-marker"></div>
-                            <div className="timeline-content">
-                              <h3 className="timeline-title">
-                                Joven Bandagosa raised a concern
-                              </h3>
-                            </div>
-                          </li>
-                        </ul>
-                      </Timeline>
+                    <Grid container item xs={12} sm={12} md={5} lg={5}>
+                      <form
+                        noValidate
+                        autoComplete="off"
+                        className={classes.searchform}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "flex-end",
+                          justifyContent: "flex-end",
+                          paddingBottom: 10
+                        }}
+                      >
+                        <TextField
+                          id="outlined-search"
+                          label="Search field"
+                          type="search"
+                          name="search"
+                          variant="outlined"
+                          onChange={changeHandler}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            )
+                          }}
+                        />
+                      </form>
+                      <Card className={classes.cardLogs}>
+                        <CardContent>
+                          <Timeline>
+                            <ul className={classes.timeline}>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>March 12, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <Avatar
+                                    alt="Remy Sharp"
+                                    src="/static/images/avatar/1.jpg"
+                                  />
+                                  <h3 className="timeline-title">
+                                    <b>Jhon Michael Bolima</b> updated the
+                                    cohort details.
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>March 23, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <Avatar
+                                    alt="Remy Sharp"
+                                    src="/static/images/avatar/1.jpg"
+                                  />
+                                  <h3 className="timeline-title">
+                                    <b>Noe Restum</b> joined the cohort.
+                                  </h3>
+                                </div>
+                              </li>
+                              {/* <li className="timeline-item period">
+                                <div className="timeline-info"></div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h2 className="timeline-title">April 2016</h2>
+                                </div>
+                              </li> */}
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 02, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Jake Balbedina left the cohort.
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 28, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Joven Bandagosa raised a concern
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 02, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Jake Balbedina left the cohort.
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 28, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Joven Bandagosa raised a concern
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 02, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Jake Balbedina left the cohort.
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 28, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Joven Bandagosa raised a concern
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 02, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Jake Balbedina left the cohort.
+                                  </h3>
+                                </div>
+                              </li>
+                              <li className="timeline-item">
+                                <div className="timeline-info">
+                                  <span>April 28, 2016</span>
+                                </div>
+                                <div className="timeline-marker"></div>
+                                <div className="timeline-content">
+                                  <h3 className="timeline-title">
+                                    Joven Bandagosa raised a concern
+                                  </h3>
+                                </div>
+                              </li>
+                            </ul>
+                          </Timeline>
+                        </CardContent>
+                      </Card>
                     </Grid>
                   </Grid>
                 </Paper>
@@ -1020,9 +1177,6 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column"
   },
-  logs: {
-    marginTop: 50
-  },
   lestUl: {
     padding: 0
   },
@@ -1037,6 +1191,22 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     "& h3": {
       lineHeight: "inherit"
+    }
+  },
+  cardLogs: {
+    width: "100%",
+    maxHeight: "75vh",
+    overflow: "scroll",
+    "&::-webkit-scrollbar": {
+      width: "5px",
+      height: "8px",
+      backgroundColor: "#FFF",
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "#673ab7" //'#23232F' //'#0595DD',
+      // borderTopRightRadius: 10
     }
   }
 }));

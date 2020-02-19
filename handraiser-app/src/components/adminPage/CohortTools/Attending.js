@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import axios from "axios";
 import MaterialTable from "material-table";
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import Button from '@material-ui/core/Button';
+import Button from "@material-ui/core/Button";
 
 // components
 import AttendingKickModal from "./AttendingKickModal";
@@ -77,24 +77,22 @@ export default function AttendingModal({open, data, handleClose}) {
 
    const renderDataTable = (data) => {
     axios({
-        method: "get",
-        url: `/api/getAttendingCohorts/'${data.user_id}'`,
-        headers: {
-          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-        }
+      method: "get",
+      url: `/api/getAttendingCohorts/'${data.user_id}'`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(data => {
+        setTable({
+          ...table,
+          data: data.data
+        });
       })
-        .then(data => {
-        
-          setTable({
-            ...table,
-            data: data.data
-          });
-        })
-        .catch(err => console.log(err));
+      .catch(err => console.log(err));
+  };
 
-   }
-
-   const getCohorts = data => {
+  const getCohorts = data => {
     // console.log(data)
     axios({
       method: "get",
@@ -104,48 +102,45 @@ export default function AttendingModal({open, data, handleClose}) {
       }
     })
       .then(data => {
-        
-        console.log(data.data)
+        console.log(data.data);
         setAssignCohortObj({
           open: true,
           data: data.data
         });
       })
       .catch(err => console.log(err));
+  };
 
-   }
+  const cloeseKickModal = data => {
+    renderDataTable(data);
+    setRemoveObj({ ...removeObj, open: false });
+  };
 
-   const cloeseKickModal = (data) => {
-        renderDataTable(data)
-        setRemoveObj({...removeObj, open: false})
-   }
+  const cloeseAssignModal = data => {
+    renderDataTable(data);
+    setAssignCohortObj({ ...assignCohortObj, open: false });
+  };
 
-   const cloeseAssignModal = (data) => {
-    renderDataTable(data)
-    setAssignCohortObj({...assignCohortObj, open: false})
-}
-
-  
-   return (
+  return (
     <>
       {removeObj.open && (
-          <AttendingKickModal
-            open = {removeObj.open}
-            data = {removeObj.data}
-            handleClose = {cloeseKickModal}
-            userObj = {data}
-         />
+        <AttendingKickModal
+          open={removeObj.open}
+          data={removeObj.data}
+          handleClose={cloeseKickModal}
+          userObj={data}
+        />
       )}
 
       {assignCohortObj.open && (
         <AssignCohort
           open={assignCohortObj.open}
           data={assignCohortObj.data}
-          handleClose={()=>cloeseAssignModal(data)}
+          handleClose={() => cloeseAssignModal(data)}
           userId={data.user_id}
           title={`${data.firstname} ${data.lastname}`}
-        />)}
-
+        />
+      )}
 
       <Dialog
         open={open}
@@ -203,9 +198,7 @@ export default function AttendingModal({open, data, handleClose}) {
                 />
         </DialogContent>
 
-        <DialogActions>
-         
-        </DialogActions>
+        <DialogActions></DialogActions>
       </Dialog>
     </>
   );
