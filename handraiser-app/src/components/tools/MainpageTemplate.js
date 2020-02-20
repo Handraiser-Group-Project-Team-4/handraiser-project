@@ -28,6 +28,7 @@ import {
   CardContent
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
+import { useSnackbar } from "notistack";
 
 // ICONS
 import DnsIcon from "@material-ui/icons/Dns";
@@ -45,6 +46,21 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
   const history = useHistory();
 
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    let login = sessionStorage.getItem("notification") ? true : false;
+    if (login) {
+      enqueueSnackbar(sessionStorage.getItem("notification"), {
+        variant: "success",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right"
+        }
+      });
+      sessionStorage.removeItem("notification");
+    }
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -80,8 +96,15 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
             </Typography>
             <Chip
               // icon={<FaceIcon />}
-              label="*Student"
-              color="black"
+              label={
+                user.user_role_id === 1
+                  ? "Admin"
+                  : user.user_role_id === 2
+                  ? "Mentor"
+                  : user.user_role_id === 3
+                  ? "Student"
+                  : null
+              }
               style={{
                 backgroundColor: "white",
                 color: darkMode ? "#000" : null
@@ -337,6 +360,10 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
 
 const drawerWidth = 245;
 const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff"
+  },
   tabPanel: {
     "&>div": {
       padding: 0

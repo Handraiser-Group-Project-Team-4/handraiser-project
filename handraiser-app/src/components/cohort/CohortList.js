@@ -11,22 +11,34 @@ import CohortContainer from "./CohortContainer";
 import UsersModal from "../tools/UsersModal";
 
 // MATERIAL-UI
-import { useTheme, useMediaQuery, Typography, Box } from "@material-ui/core";
+import {
+  Container,
+  useTheme,
+  useMediaQuery,
+  Typography,
+  Box,
+  TextField,
+  InputAdornment
+} from "@material-ui/core";
+
+//ICONS
+import SearchIcon from "@material-ui/icons/Search";
 
 let socket;
 export default function CohortList({ classes, value }) {
+  const { darkMode } = useContext(DarkModeContext);
   const theme = useTheme();
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const history = useHistory();
   const [cohorts, setCohorts] = useState([]);
+  const [search, setSearch] = useState();
   const [isKey, setIsKey] = useState({
     key: "",
     open: false,
     classroomObj: {},
     error: false
   });
-  const { darkMode } = useContext(DarkModeContext);
 
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const handleClose = () => {
@@ -120,6 +132,10 @@ export default function CohortList({ classes, value }) {
         setIsKey({ ...isKey, error: true });
       });
   };
+
+  const changeHandler = event => {
+    event.target.name === "search" && setSearch(event.target.value);
+  };
   return (
     <>
       <SwipeableViews
@@ -129,13 +145,37 @@ export default function CohortList({ classes, value }) {
           backgroundColor: darkMode ? "#333" : null,
           height: "calc(100vh - 48px)"
         }}
-        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
+          <Container
+            maxWidth="xl"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              paddingRight: 100
+            }}
+          >
+            <TextField
+              label="Search field"
+              type="search"
+              size={"small"}
+              name="search"
+              variant="outlined"
+              onChange={changeHandler}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Container>
           <CohortContainer
             classes={classes}
             handleCohort={handleCohort}
             cohorts={cohorts}
+            search={search}
           />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>

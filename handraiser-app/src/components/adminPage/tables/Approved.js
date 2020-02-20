@@ -21,6 +21,7 @@ export default function Approved() {
           <div style={{ display: `flex` }}>
             <img
               src={rowData.avatar}
+              alt={rowData.firstname}
               width="50"
               height="50"
               style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}

@@ -132,6 +132,13 @@ const useStyles = makeStyles(theme => ({
       font: "700 24px/1.2 'Poppins', sans-serif",
       marginBottom: 0
     },
+    "& > div > p": {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      "-webkit-line-clamp": "2",
+      display: "-webkit-box",
+      "-webkit-box-orient": "vertical"
+    },
     "& > div:last-of-type > span": {
       display: "flex",
       paddingTop: 5

@@ -1,4 +1,4 @@
-import React, { useState, createContext } from "react";
+import React, { createContext } from "react";
 import { HashRouter } from "react-router-dom";
 import Routes from "./routes";
 import { SnackbarProvider } from "notistack";
