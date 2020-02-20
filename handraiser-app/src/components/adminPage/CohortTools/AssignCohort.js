@@ -52,7 +52,7 @@ export default function PopupModal({ handleClose, open, data, title, userId}) {
         let newDate = date.toLocaleString();
   
         data.map(x => {
-            axios({
+            return axios({
                 method: "post",
                 url: `/api/enroll/`,
                 headers: {
@@ -81,8 +81,8 @@ export default function PopupModal({ handleClose, open, data, title, userId}) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth="sm"
+        fullwidth='true'
+        maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>

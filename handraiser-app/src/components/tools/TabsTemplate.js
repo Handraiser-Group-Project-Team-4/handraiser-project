@@ -1,9 +1,11 @@
-import React, { useContext } from "react";
+import React, {useEffect, useContext} from "react";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
+import io from "socket.io-client";
 
+import { newUserContext } from "../../routes";
 import jwtToken from "../tools/assets/jwtToken";
-import { DarkModeContext } from "../../App";
+// import { DarkModeContext } from "../../App";
 
 import {
   Tabs,
@@ -18,6 +20,7 @@ import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 
+let socket;
 export default function TabsTemplate({
   children,
   tabIndex,
@@ -26,11 +29,13 @@ export default function TabsTemplate({
   darkMode,
   setDarkMode
 }) {
+  const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const history = useHistory();
+  const { setActiveUsers } = useContext(newUserContext);
 
   const handleDarkMode = async () => {
-    let res = await axios({
+    await axios({
       method: "patch",
       url: `/api/darkmode/${user.user_id}`,
       data: { dark_mode: !darkMode },
@@ -55,8 +60,20 @@ export default function TabsTemplate({
       .catch(err => {
         console.log(err);
       });
+      socket.emit('activeUser', () => {
+        socket.on('displayActiveUser', ({userIsActive}) => {
+          console.log(userIsActive)
+          setActiveUsers(userIsActive)
+        })
+      })
+    history.push('/')
     sessionStorage.clear();
   };
+
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
+
   return (
     <Tabs
       orientation="vertical"

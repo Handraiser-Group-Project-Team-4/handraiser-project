@@ -1,6 +1,6 @@
 import React from 'react'
 import Badge from '@material-ui/core/Badge';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 
 
@@ -65,17 +65,17 @@ const StyledBadge = withStyles(theme => ({
   }))(Badge);
   
   
-  const useStyles = makeStyles(theme => ({
-    root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
-  }));
+  // const useStyles = makeStyles(theme => ({
+  //   root: {
+  //     display: 'flex',
+  //     '& > *': {
+  //       margin: theme.spacing(1),
+  //     },
+  //   },
+  // }));
 
 function Badger({obj}) {
-    const classes = useStyles();
+    // const classes = useStyles();
     return (
       <>
       {(obj.user_status )

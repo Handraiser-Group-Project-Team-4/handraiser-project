@@ -1,29 +1,32 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import io from "socket.io-client";
+
+// COMPONENTS
 import keyGenerator from './assets/keyGenerator'
+import Attending from '../adminPage/CohortTools/Attending'
 
-//Material UI 
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
+// MATERIAL-UI
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    TextField,
+    InputAdornment,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText
+} from "@material-ui/core/";
+
+//  ICONS
 import EditIcon from "@material-ui/icons/Edit";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import SchoolIcon from '@material-ui/icons/School';
-import InputAdornment from '@material-ui/core/InputAdornment';
-
-//Component 
-import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-
-export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen}) {
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen }) {
     const ENDPOINT = "localhost:3001";
     const [attending, setAttending] = useState({
         open: false,
@@ -80,13 +83,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             } : null   
     });
 
-    const closeAttending = () => {
-        setAttending({
-          ...attending,
-          open: false
-        })
-        getCohorts()
-    }
+  
 
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -97,6 +94,14 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         };
     }, [ENDPOINT]);
 
+    const closeAttending = () => {
+        setAttending({
+          ...attending,
+          open: false
+        })
+        getCohorts()
+    }
+    
     const handleReason = (e) => {
         setBody({
             data: {
@@ -111,9 +116,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
     const handleInputs = e => {
         let date = new Date();
         let newDate = date.toLocaleString();
-
         let key = keyGenerator();
-
         setBody({
         data: {
             ...body.data,
@@ -123,17 +126,14 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             class_status: "true"
         }
         });
-
         const bawas = e.target.value
         const newBawas = bawas.length
-
         if(e.target.name === 'class_title'){
             setCounter({
                 ...counter,
                 title: 30-newBawas
             })
         }
-
         else if(e.target.name === 'class_description'){
             setCounter({
                 ...counter,
@@ -142,18 +142,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         }
     };
 
-    const generateKey = () => {
-        var result = keyGenerator();
-
-        setBody({
-            data:{
-                class_id: data.class_id,
-                class_key: result
-            }
-        })
-       
-    }
-
     const updateCohort = e => {
         setBody({
             data:{
@@ -161,7 +149,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 [e.target.name]: e.target.value
             }
         })
-
         const bawas = e.target.value
         const newBawas = bawas.length
 
@@ -171,14 +158,25 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 updatingTitle: 30-newBawas
             })
         }
-
         else if(e.target.name === 'class_description'){
             setCounter({
                 ...counter,
                 updatingDescription: 50-newBawas
             })
         }
-    } 
+    }
+
+    const generateKey = () => {
+        var result = keyGenerator();
+
+        setBody({
+            data: {
+                class_id: data.class_id,
+                class_key: result
+            }
+        })
+       
+    }
 
     const submitUserData = e => {
         e.preventDefault();
@@ -198,7 +196,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                     (type === 'Create Cohort') ? `/api/class` :
                     (type === 'Change Key') ? `/api/class/${data.classroom_id}` :
                     (type === 'Change User Role') ? `/api/assigning/${data.user_id}` :
-                    (type === 'Toggle Cohort') ? `/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
                     (type === 'Kick Student') ? `/api/kickstud/${data.user_id}/${data.class_id}` : null
         axios({
             method: METHOD,

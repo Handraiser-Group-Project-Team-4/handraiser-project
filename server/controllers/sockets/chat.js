@@ -1,14 +1,14 @@
 module.exports = {
   chatSockets: (socket, io, db) => {
     const users = [];
-    socket.on("join", ({ username, chatroom, userObj }, callback) => { 
+    socket.on("join", ({ chatroom }, callback) => {
       console.log("a user connected to chat");
       const user = {
         id: socket.id,
-        name: username,
-        room: chatroom,
-        user_id: userObj.user_id,
-        avatar: userObj.avatar
+        name: chatroom.name,
+        room: chatroom.room,
+        user_id: chatroom.user_id,
+        avatar: chatroom.avatar
       };
       users.push(user);
       let chatUsers = {};
@@ -33,18 +33,17 @@ module.exports = {
       socket.join(`${user.room}`);
       callback();
     });
+    // io.socket.on("typing", ({ name }) => {
+    //   const user = users.find(user => user.id === socket.id);
 
-    socket.on("typing", ({name}) => {
-      const user = users.find(user => user.id === socket.id);
+    //   socket.to(user.room).emit("displayTyping", { name });
+    // });
 
-      socket.to(user.room).emit("displayTyping", {name})
-    });
+    // socket.on("NotTyping", ({ name }) => {
+    //   const user = users.find(user => user.id === socket.id);
 
-    socket.on("NotTyping", ({name}) => {
-      const user = users.find(user => user.id === socket.id);                                                         
-    
-      socket.to(user.room).emit("displayNotTyping", {name})                  
-    });
+    //   socket.to(user.room).emit("displayNotTyping", { name });
+    // });
 
     socket.on("sendMessage", ({ message }, callback) => {
       const new_date = new Intl.DateTimeFormat("en-US", {
@@ -56,7 +55,7 @@ module.exports = {
         second: "2-digit"
       }).format(new Date());
       const user = users.find(user => user.id === socket.id);
-      socket.to(user.room).emit("displayNotTyping", {name: user.name})
+      socket.to(user.room).emit("displayNotTyping", { name: user.name });
       db.messages
         .insert({
           concern_id: user.room,
@@ -81,9 +80,7 @@ module.exports = {
         });
       callback();
     });
-    socket.on("saveChat", currentChat => {
-      messages = Object.assign([], currentChat);
-    });
+
     socket.on("disconnect", () => {
       console.log("user disconnected to chat");
     });

@@ -121,7 +121,7 @@ export default function CohortModal({
     <>
       
       {kickbool && (
-      
+        // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
         <PopupModal 
           title={`Are you sure you want to kick ${kickobj.firstname} ${kickobj.lastname}`}
           open={kickbool} 
@@ -146,7 +146,7 @@ export default function CohortModal({
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
+        fullwidth='true'
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">

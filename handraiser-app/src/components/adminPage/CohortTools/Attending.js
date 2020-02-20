@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import MaterialTable from "material-table";
 
@@ -55,12 +55,7 @@ export default function AttendingModal({open, data, handleClose}) {
         data: [],
       });
 
-
-   useEffect(() => {
-     renderDataTable(data)  
-   }, [])
-
-   const renderDataTable = (data) => {
+   const renderDataTable = useCallback((data) => {
     axios({
       method: "get",
       url: `/api/getAttendingCohorts/'${data.user_id}'`,
@@ -69,13 +64,18 @@ export default function AttendingModal({open, data, handleClose}) {
       }
     })
       .then(data => {
-        setTable({
-          ...table,
+        setTable(prevState => {
+          return {
+          ...prevState,
           data: data.data
-        });
+        }});
       })
       .catch(err => console.log(err));
-  };
+  }, []);
+
+  useEffect(() => {
+    renderDataTable(data);
+  }, [renderDataTable, data]);
 
   const getCohorts = data => {
     // console.log(data)
@@ -132,13 +132,13 @@ export default function AttendingModal({open, data, handleClose}) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
+        fullwidth='true'
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title" onClose={handleClose}>
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
               <div style={{display: 'flex'}}>
-                  <img src={data.avatar} width="50" height="50" style={{ borderRadius: `50%`, margin: `0 10px 0 0`, border: `5px solid #673ab7` }} />
+                  <img src={data.avatar} width="50" height="50" alt="avatar" style={{ borderRadius: `50%`, margin: `0 10px 0 0`, border: `5px solid #673ab7` }} />
                   
                   <div>
                       <h5 style={{margin:`0`}}> {data.firstname} {data.lastname}</h5>

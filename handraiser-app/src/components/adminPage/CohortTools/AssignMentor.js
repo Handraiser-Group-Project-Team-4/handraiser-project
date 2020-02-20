@@ -1,17 +1,13 @@
 import React from "react";
 import axios from "axios";
-
 // Material UI
 import MaterialTable from "material-table";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-
 // Material UI Icons
 import AddCircleIcon from '@material-ui/icons/AddCircle';
-
-
 export default function PopupModal({ handleClose, open, data, title, id}) {
     const columns = [
         
@@ -24,15 +20,12 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         )
         },
         { title: "Email", field: "email" },
-        
       ]
-  
     const assign = (data, id) => {
         let date = new Date();
         let newDate = date.toLocaleString();
-  
         data.map(x => {
-            axios({
+            return axios({
                 method: "post",
                 url: `/api/enroll/`,
                 headers: {
@@ -48,12 +41,8 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
                 handleClose(id)
             })
             .catch(err => console.log("err"))
-    
-
         })
-       
   };
-
   return (
     <>
       <Dialog
@@ -62,7 +51,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}
-        maxWidth="sm"
+        maxWidth="xs"
       >
         <DialogTitle id="alert-dialog-title">
          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
@@ -70,9 +59,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
             <h6 style={{margin: `0`}}>Assign Mentor</h6>
           </div>
         </DialogTitle>
-
         <DialogContent>
-
         <MaterialTable
             title="Mentors"
             columns={columns}
@@ -91,9 +78,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         ]}
           />
         </DialogContent>
-
         <DialogActions>
-          
         </DialogActions>
       </Dialog>
     </>

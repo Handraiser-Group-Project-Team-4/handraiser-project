@@ -24,9 +24,10 @@ export default function UsersModal({
 }) {
   return (
     <Dialog
-      fullScreen={fullScreen}
+      // fullScreen={fullScreen}
       open={open}
       onClose={handleClose}
+      disableBackdropClick={(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove" || type === "New User")?true:false}
       maxWidth="sm"
       aria-labelledby="max-width-dialog-title"
     >
@@ -39,8 +40,7 @@ export default function UsersModal({
             autoFocus
             label="Cohort Key"
             id="outlined-full-width"
-            helperText=""
-            fullWidth
+            fullwidth="true"
             margin="normal"
             InputLabelProps={{
               shrink: true
@@ -58,11 +58,10 @@ export default function UsersModal({
           <TextField
             id="outlined-multiline-static"
             label="Concern"
-            multiline
             rows="4"
             variant="outlined"
             helperText=""
-            fullWidth
+            fullwidth="true"
             multiline
             margin="normal"
             InputLabelProps={{
@@ -72,17 +71,40 @@ export default function UsersModal({
             value={data}
             onChange={e => setData(e)}
           />
-        ) : null}
+        ) : type === "Leave Cohort" ? (
+          <TextField
+            autoFocus
+            label="Leave Cohort"
+            id="outlined-full-width"
+            fullwidth="true"
+            margin="normal"
+            InputLabelProps={{
+              shrink: true
+            }}
+            variant="outlined"
+            value={data.data}
+            onChange={e => setData(e)}
+            helperText={
+              data.err ? "Invalid Confirmation." : ""
+            }
+            error={data.err}
+            required
+          />
+        ): null}
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleSubmit} color="primary">
-          {buttonText}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+        <DialogActions>
+          {(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove")?null:
+            <Button onClick={handleClose} color="primary">
+             Cancel
+            </Button>
+          }
+       
+          <Button onClick={handleSubmit} color="primary">
+            {buttonText}
+          </Button>
+        </DialogActions>
+
+      </Dialog>
+    )
 }

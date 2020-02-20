@@ -11,8 +11,9 @@ import Team from "./components/tools/Team";
 export const newUserContext = createContext(null);
 const Routes = props => {
   const [isNew, setisNew] = useState(false);
+
   return (
-    <newUserContext.Provider value={{ isNew, setisNew }}>
+    <newUserContext.Provider value={{isNew, setisNew}}>
       <Switch>
         <Route exact path="/" component={LoginPage} />
         <Route
@@ -49,7 +50,7 @@ const Routes = props => {
         <Route
           path="/student-page/my-cohort"
           render={() => (
-            <StudentPage value={1} tabIndex={"student-page"} location={props} />
+            <StudentPage value={1} tabIndex={"student-page"} location={props}/>
           )}
         />
         <Route exact path="/cohort/:id" component={CohortPage} />

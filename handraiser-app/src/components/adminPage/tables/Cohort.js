@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from "react";
-import copy from "clipboard-copy";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { useTheme } from '@material-ui/core/styles';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import io from "socket.io-client";
 import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
 
 // MATERIAL-UI
 import MaterialTable from "material-table";
-import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
+import {
+  Switch,
+  Tooltip,
+  Button,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem,
+} from "@material-ui/core/";
 
 // COMPONENTS
 import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
+import CopyToClipBoard from '../../tools/CopyToClipBoard'
 
 // ICONS
-import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from '@material-ui/icons/School';
@@ -24,42 +28,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 // import PopupModal from "../CohortTools/AssignCohort";
 
-export function ToolTipCopy({ data }) {
-  const [open, setOpen] = useState(false);
-
-
-  return (
-    <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <div>
-        <Tooltip
-          PopperProps={{
-            disablePortal: true
-          }}
-          onClose={() => setOpen(false)}
-          open={open}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          title="Copied to Clipboard"
-        >
-          <FileCopyIcon
-            style={{ cursor: `pointer`, width: `20px` }}
-            onClick={() => {
-              copy(data);
-              setOpen(true);
-            }}
-          />
-        </Tooltip>
-      </div>
-    </ClickAwayListener>
-  );
-}
-
-export default function MaterialTableDemo() {
+let socket;
+export default function Cohort() {
+  const ENDPOINT = "localhost:3001";
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [createCohort, setCreateCohort] = useState(false);
-  const [cohortObj, setCohortObj] = useState({})
+  // const [cohortObj, setCohortObj] = useState({})
   const [updateTitleDesc, setUpdateTitleDesc] = useState({
     open: false,
     data: "",
@@ -94,17 +69,18 @@ export default function MaterialTableDemo() {
         render: rowData => (
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
-            <ToolTipCopy data={rowData.class_key} />
+            <CopyToClipBoard data={rowData.class_key} />
           </div>
         )
       },
-      {title: "Status",
+      {
+        title: "Status",
         field: "class_status",
         render: (rowData) => ((rowData.class_status === 'true')
-        ?  <span style={{background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
-              active
-           </span>    
-        :<span style={{background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
+          ? <span style={{ background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
+            active
+           </span>
+          : <span style={{ background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
             close
          </span>
         )
@@ -117,7 +93,7 @@ export default function MaterialTableDemo() {
         },
         cellStyle: {
           textAlign: "center",
-         
+
         },
         render: row => (
           <div
@@ -149,50 +125,53 @@ export default function MaterialTableDemo() {
             </Tooltip>
 
             <Tooltip title="Update Cohort Title/Description">
-              <EditIcon onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: row})} />
+              <EditIcon onClick={e => setUpdateTitleDesc({ ...updateTitleDesc, open: true, data: row })} />
             </Tooltip>
             
           </div>
         )
       }
     ],
-    mobileColumns : [
-      { title: "Title", field: "class_title",
+    mobileColumns: [
+      {
+        title: "Title", field: "class_title",
         render: (rowData) => ((rowData.class_status === 'true')
-        ? 
-          <> 
-          <status-indicator active pulse positive />
-          <span> {rowData.class_title}</span>
-          </>    
-        :
+          ?
           <>
-         
-          <status-indicator active pulse negative />
-          <span> {rowData.class_title}</span>
+            <status-indicator active pulse positive />
+            <span> {rowData.class_title}</span>
+          </>
+          :
+          <>
+
+            <status-indicator active pulse negative />
+            <span> {rowData.class_title}</span>
           </>
         )
       },
-      {title: "Key", field: "class_key",
+      {
+        title: "Key", field: "class_key",
         render: (rowData) => (
-          <div style={{ display: `flex`, alignItems:`center` }}>
+          <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `90px` }}>{rowData.class_key}</p>
-            <ToolTipCopy data={rowData.class_key} />
+            <CopyToClipBoard data={rowData.class_key} />
           </div>
         )
       },
-      { field: "class_key", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
+      {
+        field: "class_key", width: 50, cellStyle: { textAlign: "right" }, headerStyle: { textAlign: "right" },
         render: (rowData) => (
           <PopupState variant="popover" popupId="demo-popup-menu">
             {popupState => (
               <React.Fragment>
-                
-                  <MoreVertIcon {...bindTrigger(popupState)}/>
-             
+
+                <MoreVertIcon {...bindTrigger(popupState)} />
+
 
                 <Menu {...bindMenu(popupState)}>
 
                   <MenuItem >
-                  Toggle Status
+                    Toggle Status
                     <Switch
                       checked={rowData.class_status === "true" ? true : false}
                       onChange={e => {
@@ -201,11 +180,11 @@ export default function MaterialTableDemo() {
                     />
                   </MenuItem>
 
-                  <MenuItem  onClick={e => setChangeKey({ open: true, data: rowData })} >
+                  <MenuItem onClick={e => setChangeKey({ open: true, data: rowData })} >
                     Change Key
                   </MenuItem>
 
-                  <MenuItem  onClick={e => openViewStudentsModal(rowData)} >
+                  <MenuItem onClick={e => openViewStudentsModal(rowData)} >
                     View Joined Users
                   </MenuItem>
 
@@ -225,13 +204,17 @@ export default function MaterialTableDemo() {
   });
 
 
-
   useEffect(() => {
-    renderCohorts();
-  }, []);
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  }, [ENDPOINT]);
 
   // GET THE COHORT VALUES
-  const renderCohorts = () => {
+  const renderCohorts = useCallback(() => {
     axios({
       method: "get",
       url: `/api/cohorts/`,
@@ -240,13 +223,17 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        setTable({
-          ...table,
+        setTable(prevState => {return{
+          ...prevState,
           data: data.data
-        });
+        }});
       })
       .catch(err => console.log(err));
-  };
+  }, []);
+
+  useEffect(() => {
+    renderCohorts();
+  }, [renderCohorts]);
 
   const toggleClassFn = row => {
 
@@ -288,7 +275,7 @@ export default function MaterialTableDemo() {
       status: row.class_status
     });
    
-    setCohortObj(row)
+    // setCohortObj(row)
     renderViewStudentsTable(row.class_id);
   };
 
@@ -312,7 +299,7 @@ export default function MaterialTableDemo() {
   };
 
   return (
-      <>
+    <>
       {updateTitleDesc.open && (
         <PopupModal
           open={updateTitleDesc.open}
@@ -320,7 +307,7 @@ export default function MaterialTableDemo() {
           titleLen={updateTitleDesc.data.class_title.length}
           descLen={updateTitleDesc.data.class_description.length}
           type={updateTitleDesc.type}
-          handleClose={(e) => setUpdateTitleDesc({...updateTitleDesc, open: false})}
+          handleClose={(e) => setUpdateTitleDesc({ ...updateTitleDesc, open: false })}
           render={renderCohorts}
           title={`Update Class Title/Description`}
         />
@@ -392,21 +379,21 @@ export default function MaterialTableDemo() {
               color="primary"
               size="large"
               onClick={() => setCreateCohort(true)}
-              startIcon={<SchoolIcon  style={{display: (matches) ? null: 'none'}} />}
-              style={{fontSize: (matches) ? null: '10px'}}
+              startIcon={<SchoolIcon style={{ display: (matches) ? null : 'none' }} />}
+              style={{ fontSize: (matches) ? null : '10px' }}
             >
               Add Cohort
             </Button>
           </div>
-                }
-        columns={(matches) ? table.columns : table.mobileColumns} 
+        }
+        columns={(matches) ? table.columns : table.mobileColumns}
         data={table.data}
         options={{
           pageSize: 10,
           headerStyle: { textTransform: `uppercase`, fontWeight: `bold` },
-          
+
         }}
       />
-      </>
+    </>
   );
 }

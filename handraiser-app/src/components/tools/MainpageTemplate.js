@@ -1,11 +1,13 @@
-import React, { useState, useEffect, Fragment, useContext } from "react";
-import { Redirect, Link, useHistory } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect, Fragment, useContext } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
+import axios from 'axios';
+import io from "socket.io-client";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
-import WarningIcon from "@material-ui/icons/Warning";
+
+import UsersModal from '../tools/UsersModal'
 import TabsTemplate from "./TabsTemplate";
 
 // MATERIAL-UI
@@ -21,109 +23,180 @@ import {
   Toolbar,
   Typography,
   Tab,
+  Card,
+  CardContent,
   makeStyles,
   useTheme,
   Chip,
-  Card,
-  CardContent
+  // Divider
 } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
+// import Skeleton from "@material-ui/lab/Skeleton";
 
 // ICONS
+// import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
+// import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
 import GroupIcon from "@material-ui/icons/Group";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import WarningIcon from "@material-ui/icons/Warning";
 
-export default function MainpageTemplate({ children, container, tabIndex }) {
+let socket;
+export default function MainpageTemplate({ children, container, tabIndex, request }) {
+  const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
-  const [user, setUser] = useState();
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  // const [value, setValue] = React.useState(0);
+  // const handleChanges = (e, newValue) => setValue(newValue);
   const history = useHistory();
-
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
+  const [notify, setNotify] = useState({ open: false, title: "", buttonText: "", type: "", modalTextContent: "" });
+  const [notifyNotLogout, setNotifyNotLogout] = useState({ open: false, title: "", buttonText: "", type: "", modalTextContent: "" });
 
-  useEffect(() => {
-    let isCancelled = false;
+  const handleLogout = () => {
+    setNotify({ ...notify, open: false })
     axios({
-      method: "get",
-      url: `/api/users/${userObj && userObj.user_id}`,
+      method: `patch`,
+      url: `/api/logout/${userObj.user_id}`,
       headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
       }
     })
       .then(res => {
-        // console.log(res.data)
-        if (!isCancelled) setUser(res.data);
+        console.log(res);
       })
       .catch(err => {
         console.log(err);
       });
+    sessionStorage.clear();
+  };
+  
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
+
+  useEffect(() => {
+    socket.on('notifyKicked', ({ user_id, classroom }) => {
+      if (userObj.user_id === user_id)
+        setNotifyNotLogout({
+          open: true,
+          title: `You just have been kick from ${classroom.class_title}!`,
+          buttonText: "Agree",
+          type: "studentKicked"
+        })
+    })
 
     return () => {
-      isCancelled = true;
+      socket.emit('disconnect');
+      socket.off();
     };
-  }, []);
+  })
+
+  useEffect(() => {
+    socket.on('mentorToStudent', user_id => {
+      if (userObj.user_id === user_id)
+        // alert(`Your role has been change to Student Please Logout to see the changes!`);
+        setNotify({
+          open: true,
+          title: "Your role has been change to Student.",
+          modalTextContent: "Please Logout to see the changes!",
+          buttonText: "Logout",
+          type: "mentorToStudent"
+        })
+    });
+
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    };
+  });
+  useEffect(() => {
+    socket.on("studentToMentor", user_id => {
+      if (userObj.user_id === user_id)
+        // alert(`Your role has been change to Mentor. Please Logout to see the changes!`);
+        setNotify({
+          open: true,
+          title: "Your role has been change to Mentor.",
+          modalTextContent: "Please Logout to see the changes!",
+          buttonText: "Logout",
+          type: "studentToMentor"
+        })
+    });
+    return () => {
+      socket.emit('disconnect');
+      socket.off();
+    };
+  });
+
+  useEffect(() => {
+    socket.on("notifyUser", ({ user_id, approval_status }) => {
+      if (userObj.user_id === user_id) {
+        if (approval_status.user_approval_status_id === 1)
+          // alert(`Your Request has been Approve. Please Logout to see the changes!`);
+          setNotify({
+            open: true,
+            title: "Your Request to be a Mentor has been Approve.",
+            modalTextContent: "Please Logout to see the changes!",
+            buttonText: "Logout",
+            type: "notifyUserApprove"
+          })
+
+        if (approval_status.user_approval_status_id === 3)
+          // alert(`Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`);
+          setNotifyNotLogout({
+            open: true,
+            title: `Your Request to be a Mentor has been Disapprove.`,
+            modalTextContent: `Reason: ${approval_status.reason_disapproved}`,
+            buttonText: "Agree",
+            type: "notifyUserDisapprove"
+          })
+      }
+    });
+
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  });
+
+  // const handleDarkMode = async () => {
+  //   await axios({
+  //     method: "patch",
+  //     url: `/api/darkmode/${userObj.user_id}`,
+  //     data: { dark_mode: !darkMode },
+  //     headers: {
+  //       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+  //     }
+  //   });
+  //   setDarkMode(!darkMode);
+  // };
 
   if (!userObj) return <Redirect to="/" />;
-  console.log(tabIndex);
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
-        {user ? (
-          <>
-            <img src={user.avatar} className={classes.studentImg} alt="" />
-            <Typography className={classes.studentImgButton}>
-              {user.firstname} {user.lastname}
-            </Typography>
-            <Chip
-              // icon={<FaceIcon />}
-              label="*Student"
-              color="black"
-              style={{
-                backgroundColor: "white",
-                color: darkMode ? "#000" : null
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Skeleton
-              variant="circle"
-              width={85}
-              height={85}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="text"
-              width={180}
-              height={45}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="rect"
-              width={80}
-              height={30}
-              style={{
-                borderRadius: 90,
-                backgroundColor: "#8154D1"
-              }}
-            />
-          </>
-        )}
+        <img src={userObj.avatar} className={classes.studentImg} alt="" />
+        <Typography className={classes.studentImgButton}>
+          {userObj.name}
+        </Typography>
+        <Chip
+          // icon={<FaceIcon />}
+          label={(userObj.user_role_id === 3) ? `Student` :
+            (userObj.user_role_id === 2) ? `Mentor` : `Admin`}
+          color="primary"
+          style={{
+            backgroundColor: "white",
+            color: "#000"
+          }}
+        />
       </div>
-      {user
-        ? user.user_role_id === 1 && (
+      {userObj.user_role_id === 1 && (
             <TabsTemplate
               tabIndex={tabIndex}
-              user={user}
+              user={userObj}
               darkMode={darkMode}
               setDarkMode={setDarkMode}
               classes={classes}
@@ -202,12 +275,11 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
               />
             </TabsTemplate>
           )
-        : null}
-      {user
-        ? user.user_role_id !== 1 && (
+        }
+      {userObj.user_role_id !== 1 && (
             <TabsTemplate
               tabIndex={tabIndex}
-              user={user}
+              user={userObj}
               darkMode={darkMode}
               setDarkMode={setDarkMode}
               classes={classes}
@@ -238,7 +310,7 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
               />
             </TabsTemplate>
           )
-        : null}
+        }
       <div
         style={{
           position: "absolute",
@@ -249,35 +321,38 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
           width: 240
         }}
       >
-        <Card style={{ width: 220 }}>
-          <CardContent
-            style={{
-              paddingBottom: 16,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <WarningIcon />
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              component="p"
-              style={{ whiteSpace: "normal", paddingLeft: 10 }}
+        {(userObj.user_approval_status_id === 2 || 
+        sessionStorage.getItem("newUser") === "pending" || 
+        request === "pending")&& 
+          <Card style={{ width: 220 }}>
+            <CardContent
+              style={{
+                paddingBottom: 16,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
             >
-              Your request to be a mentor is still being processed.
-            </Typography>
-          </CardContent>
-        </Card>
+              <WarningIcon />
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+              >
+                Your request to be a mentor is still being processed.
+              </Typography>
+            </CardContent>
+          </Card>
+        }
       </div>
     </div>
   );
-
   return (
     <Fragment>
       <CssBaseline />
       <div className={classes.mainDiv}>
-        <Hidden only={["lg", "md", "xl"]}>
+        <Hidden only={['lg', 'md', 'xl']}>
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
               <IconButton
@@ -291,7 +366,7 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
               </IconButton>
               <Typography variant="h6" noWrap>
                 Handraiser
-              </Typography>
+							</Typography>
             </Toolbar>
           </AppBar>
         </Hidden>
@@ -300,7 +375,7 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
             <Drawer
               container={container}
               variant="temporary"
-              anchor={theme.direction === "rtl" ? "right" : "left"}
+              anchor={theme.direction === 'rtl' ? 'right' : 'left'}
               open={mobileOpen}
               onClose={handleDrawerToggle}
               classes={{
@@ -326,12 +401,35 @@ export default function MainpageTemplate({ children, container, tabIndex }) {
           </Hidden>
         </nav>
         <main className={classes.content}>
-          <Hidden only={["lg", "md", "xl"]}>
+          <Hidden only={['lg', 'md', 'xl']}>
             <div className={classes.toolbar} />
           </Hidden>
           <div className={classes.tabPanel}>{children}</div>
         </main>
       </div>
+      {notify.open &&
+        <UsersModal
+          open={notify.open}
+          title={notify.title}
+          modalTextContent={notify.modalTextContent}
+          handleClose={() => setNotify({ ...notify, open: false })}
+          handleSubmit={handleLogout}
+          type={notify.type}
+          buttonText={notify.buttonText}
+        />
+      }
+
+      {notifyNotLogout.open &&
+        <UsersModal
+          open={notifyNotLogout.open}
+          title={notifyNotLogout.title}
+          modalTextContent={notifyNotLogout.modalTextContent}
+          handleClose={() => setNotifyNotLogout({ ...notifyNotLogout, open: false })}
+          handleSubmit={() => setNotifyNotLogout({ ...notifyNotLogout, open: false })}
+          type={notifyNotLogout.type}
+          buttonText={notifyNotLogout.buttonText}
+        />
+      }
     </Fragment>
   );
 }
@@ -412,6 +510,7 @@ const useStyles = makeStyles(theme => ({
   },
   studentImg: {
     borderRadius: "50%",
+    // border: "5px solid white",
     width: 90,
     height: 90,
     cursor: "pointer",

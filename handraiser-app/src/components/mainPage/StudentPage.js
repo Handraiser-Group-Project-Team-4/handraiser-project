@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Redirect, useHistory } from "react-router-dom";
 import io from "socket.io-client";
+import { useSnackbar } from "notistack";
 
 // COMPONENTS
 import { newUserContext } from "../../routes";
@@ -16,10 +17,10 @@ import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
 export default function StudentPage({ value, tabIndex }) {
-  console.log(value);
+  const { enqueueSnackbar } = useSnackbar();
   const [request, setRequest] = useState();
-  const [open, setOpen] = useState(true);
-  const { isNew } = useContext(newUserContext);
+  const [open, setOpen] = useState(false);
+  const { isNew, setisNew } = useContext(newUserContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -28,38 +29,49 @@ export default function StudentPage({ value, tabIndex }) {
   sessionStorage.setItem("newUser", isNew);
 
   useEffect(() => {
+    if(isNew)
+      setOpen(true)
+  }, [isNew])
+
+  useEffect(() => {
+    return () => {
+      setisNew(false)
+    }
+  }, [setisNew])
+
+  useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
 
-  useEffect(() => {
-    socket.on("studentToMentor", user_id => {
-      if (userObj.user_id === user_id)
-        alert(
-          `Your role has been change to Mentor. Please Logout to see the changes!`
-        );
-    });
-  });
+  // useEffect(() => {
+  //   socket.on("studentToMentor", user_id => {
+  //     if (userObj.user_id === user_id)
+  //       alert(
+  //         `Your role has been change to Mentor. Please Logout to see the changes!`
+  //       );
+  //   });
+  // });
 
-  useEffect(() => {
-    socket.on("notifyUser", ({ user_id, approval_status }) => {
-      if (userObj.user_id === user_id) {
-        if (approval_status.user_approval_status_id === 1)
-          alert(
-            `Your Request has been Approve. Please Logout to see the changes!`
-          );
+  // useEffect(() => {
+  //   socket.on("notifyUser", ({ user_id, approval_status }) => {
+  //     if (userObj.user_id === user_id) {
+  //       if (approval_status.user_approval_status_id === 1)
+  //         alert(
+  //           `Your Request has been Approve. Please Logout to see the changes!`
+  //         );
 
-        if (approval_status.user_approval_status_id === 3)
-          alert(
-            `Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`
-          );
-      }
-    });
+  //       if (approval_status.user_approval_status_id === 3)
+  //         alert(
+  //           `Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`
+  //         );
+  //     }
+  //   });
 
-    return () => {
-      socket.emit("disconnect");
-      socket.off();
-    };
-  });
+  //   return () => {
+  //     socket.emit("disconnect");
+  //     socket.off();
+  //   };
+  // });
 
   const handleMentor = () => {
     axios({
@@ -74,10 +86,9 @@ export default function StudentPage({ value, tabIndex }) {
         sessionStorage.setItem("newUser", "pending");
 
         socket.emit("mentorRequest", { data: userObj });
+        setOpen(false)
+        enqueueSnackbar(`Request Successfully Sent. Please Wait for the confirmation!`, {variant:`success`})
 
-        setTimeout(() => {
-          alert(`Request Successfully Sent.`);
-        }, 500);
 
         console.log(res);
       })
@@ -90,22 +101,24 @@ export default function StudentPage({ value, tabIndex }) {
   } else return <Redirect to="/" />;
 
   return (
-    <MainpageTemplate tabIndex={tabIndex}>
-      {sessionStorage.getItem("newUser") === "pending" ||
-      request === "pending" ||
-      userObj.user_approval_status_id === 2 ? (
-        <h3>Request Sent. Waiting for Confirmation!</h3>
-      ) : (
-        sessionStorage.getItem("newUser") === "true" && (
-          <UsersModal
-            open={open}
-            handleClose={() => setOpen(false)}
-            handleSubmit={handleMentor}
-            type="New User"
-            buttonText="I'am a Mentor"
-          />
-        )
-      )}
+    <MainpageTemplate tabIndex={tabIndex} request={request}>
+      {
+      // sessionStorage.getItem("newUser") === "pending" ||
+      // request === "pending" ||
+      // userObj.user_approval_status_id === 2 ? (
+      //   <h3>Request Sent. Waiting for Confirmation!</h3>
+      // ) : (
+        sessionStorage.getItem("newUser") === "true" && 
+        <UsersModal 
+          open={open}
+          title="Welcome to Handraiser App!"
+          modalTextContent=" Are you a Mentor?"
+          handleClose={() => setOpen(false)}
+          handleSubmit={handleMentor}
+          type="New User"
+          buttonText = "I'am a Mentor"
+        />
+      }
 
       <div className={classes.parentDiv}>
         <div className={classes.tabRoot}>
@@ -132,13 +145,6 @@ export default function StudentPage({ value, tabIndex }) {
       </div>
     </MainpageTemplate>
   );
-}
-
-function a11yProps(index) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`
-  };
 }
 
 const useStyles = makeStyles(theme => ({
@@ -230,13 +236,35 @@ const useStyles = makeStyles(theme => ({
   },
   profile__image: {
     padding: "30px 20px 20px",
-    "& > img": {
-      width: 120,
-      height: 120,
-      borderRadius: "50%",
-      border: "3px solid #fff",
-      boxShadow: "0 0 0 4px #673ab7"
-    }
+    // "& > img": {
+    //   width: 120,
+    //   height: 120,
+    //   borderRadius: "50%",
+    //   border: "3px solid #fff",
+    //   boxShadow: "0 0 0 4px #673ab7"
+    // }
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: "50%",
+    border: "3px solid #fff",
+    boxShadow: "0 0 0 4px #673ab7"
+  },
+  num_of_mentor: {
+    backgroundColor: `whitesmoke`,
+    borderRadius:`50%`,
+    color: `black`,
+    padding: `8px`,
+    border:`1px solid #212121`
+  },
+  num_text_mentor: {
+    backgroundColor: `#949090`,
+    borderRadius:`50%`,
+    color: `white`,
+    // padding: `8px`,
+    fontSize:`11px`, 
+    padding:`3px 5px`
   },
   tabRoot: {
     width: "100%",
