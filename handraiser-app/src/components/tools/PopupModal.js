@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import axios from 'axios'
 import io from "socket.io-client";
-
 import keyGenerator from './assets/keyGenerator'
+
+//Material UI 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -16,10 +17,13 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import SchoolIcon from '@material-ui/icons/School';
 import InputAdornment from '@material-ui/core/InputAdornment';
+
+//Component 
 import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
-export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
+
+export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen}) {
     const ENDPOINT = "localhost:3001";
     const [attending, setAttending] = useState({
         open: false,
@@ -27,10 +31,21 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
     })
     const [counter, setCounter] = useState({
         title: '30',
-        descriptiob: '50'
+        description: '50',
+        updatingTitle: 30 - titleLen,
+        updatingDescription: 50 - descLen,
     })
     const [body, setBody] = useState({
-        data: 
+        data:
+        (type === 'Toggle Cohort' && data.class_status === 'true')?
+            {
+                class_status: false,
+            }: 
+        (type === 'Toggle Cohort' && data.class_status === 'false')?
+            {
+                class_status: true,
+            }: 
+
         (type === 'updating')?
             {
                 class_title: data.class_title,
@@ -56,7 +71,13 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             {
                 class_id: data.class_id,
                 class_key: data.class_key
-            }: null
+            }: 
+        (type === 'Change User Role') ?
+            {
+                user_role_id: data.role,
+                user_approval_status_id: 4,
+                reason_disapproved: null
+            } : null   
     });
 
     const closeAttending = () => {
@@ -65,7 +86,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
           open: false
         })
         getCohorts()
-      }
+    }
 
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -87,14 +108,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         console.log(body)
     };
 
-    const manageEnrolled = data => {
-        
-        setAttending({ 
-            open: true, 
-            data: data 
-        })
-    }
-
     const handleInputs = e => {
         let date = new Date();
         let newDate = date.toLocaleString();
@@ -114,12 +127,19 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         const bawas = e.target.value
         const newBawas = bawas.length
 
-        {e.target.name === 'class_title' && (
-        setCounter({
-            ...counter,
-            title: 30-newBawas
-        })
-        )}
+        if(e.target.name === 'class_title'){
+            setCounter({
+                ...counter,
+                title: 30-newBawas
+            })
+        }
+
+        else if(e.target.name === 'class_description'){
+            setCounter({
+                ...counter,
+                description: 50-newBawas
+            })
+        }
     };
 
     const generateKey = () => {
@@ -131,7 +151,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 class_key: result
             }
         })
-        console.log(body)
+       
     }
 
     const updateCohort = e => {
@@ -141,292 +161,278 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 [e.target.name]: e.target.value
             }
         })
-        console.log(body)
+
+        const bawas = e.target.value
+        const newBawas = bawas.length
+
+        if(e.target.name === 'class_title'){
+            setCounter({
+                ...counter,
+                updatingTitle: 30-newBawas
+            })
+        }
+
+        else if(e.target.name === 'class_description'){
+            setCounter({
+                ...counter,
+                updatingDescription: 50-newBawas
+            })
+        }
     } 
 
     const submitUserData = e => {
         e.preventDefault();
-        const METHOD = 
-                        (type === "updating")? 'patch' :   
-                        (type === "Create Cohort")? 'post' :
-                        (type === "disapproving") ? 'patch' : 
-                        (type === "approving") ? 'patch' : 
-                        (type === "Create Cohort") ? 'patch':
+        const METHOD =  (type === "Toggle Cohort") ? 'patch' :
+                        (type === "updating") ? 'patch' :
+                        (type === "approving") ? 'patch' :
+                        (type === "disapproving") ? 'patch' :
+                        (type === "Create Cohort") ? 'post' :
                         (type === "Change Key") ? 'patch' :
-                        (type === "users") ? 'patch' :
-                        (type === 'Toggle Cohort') ? 'patch' : 
-                        (type === 'Delete Cohort') ? 'delete' :
-                        (type === 'Kick Student')? 'delete': null
-                            
-        const URL = (type === 'updating')? `/api/updateTitleDesc/${data.class_id}`:
-                    (type === 'approving')?`/api/toapprove/${data.user_id}`:
-                    (type === 'disapproving')?`/api/todisapprove/${data.user_id}`:
-                    (type === 'Create Cohort')?`/api/class`:
-                    (type === 'Change Key')?`/api/class/${data.classroom_id}`: 
-                    (type === 'users')?`/api/assigning/${data.user_id}`:
-                    (type === 'Toggle Cohort')?`/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
-                    (type === 'Delete Cohort') ? `/api/deleteClass/${id}`:
-                    (type === 'Kick Student')? `/api/kickstud/${data.user_id}/${data.class_id}`: null
-       
-       if (type === 'users')
-            axios({
-                method: METHOD,
-                url: URL,
-                headers: {
+                        (type === "Change User Role") ? 'patch' :
+                        (type === 'Toggle Cohort') ? 'patch' :
+                        (type === 'Kick Student') ? 'delete' : null
+        const URL = (type === 'Toggle Cohort') ? `/api/toggleCohort/${data.class_id}` :
+                    (type === 'updating') ? `/api/updateTitleDesc/${data.class_id}` :
+                    (type === 'approving') ? `/api/toapprove/${data.user_id}` :
+                    (type === 'disapproving') ? `/api/todisapprove/${data.user_id}` :
+                    (type === 'Create Cohort') ? `/api/class` :
+                    (type === 'Change Key') ? `/api/class/${data.classroom_id}` :
+                    (type === 'Change User Role') ? `/api/assigning/${data.user_id}` :
+                    (type === 'Toggle Cohort') ? `/api/toggleCohort/${data.row.class_id}?toggle_class_status=${data.toggle_class_status}` :
+                    (type === 'Kick Student') ? `/api/kickstud/${data.user_id}/${data.class_id}` : null
+        axios({
+            method: METHOD,
+            url: URL,
+            headers: {
                 Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
             },
-                data: {
-                    user_role_id: data.role,
-                    user_approval_status_id: 4,
-                    reason_disapproved: null
-                }
-            })
-                .then(() => {
-                    socket.emit("changeUserRole", {user_id: data.user_id, user_role_id: data.role});
-
-                    render()
-                    handleClose()
-                })
-                .catch(err => console.log("err"))
-        else
-            axios({
-                method: METHOD,
-                url: URL,
-                headers: {
-                    Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-                },
-                data: body.data
-            }) 
+            data: body.data
+        })
             .then(() => {
-                if(type === 'Change User Role')
-                        socket.emit("changeUserRole", { user_id: data.id, user_role_id: data.role });
-
-                if (type === 'Create Cohort' || type === 'Toggle Cohort')
+                if (type === 'Change User Role')
+                    socket.emit("changeUserRole", { user_id: data.user_id, user_role_id: data.role });
+                if (type === 'Create Cohort' || type === 'Toggle Cohort' || type === 'updating')
                     socket.emit("renderCohort", { data: body.data });
-                
-                if (type === 'approving' || type === 'disapproving') 
+                if (type === 'approving' || type === 'disapproving')
                     socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
-                
-
-                if (type === 'Kick Student')
+                if (type === 'Kick Student') {
+                    socket.emit("studentKicked", { user_id: data.user_id, class_id: data.class_id });
                     handleClose(data.class_id);
-                
-                else{ 
+                }
+                else {
                     render()
                     handleClose()
                 }
             })
             .catch(err => console.log(err))
     };
-
+    
     return (
         <>
-        {attending.open && (
-            <Attending
-              open={attending.open}
-              handleClose={closeAttending}
-              data={attending.data} 
-              type={'assigning'}
-            />
-        )}
-
-        <Dialog
-            open={open}
-            onClose={(type === 'Kick Student') ? (e) => handleClose(data.class_id) : handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            fullWidth={true}
-            maxWidth='sm'
-        >
-            {(type !== 'approving' || type === 'Kick Student')?
-                <form onSubmit={submitUserData}>
-                    <DialogTitle id="alert-dialog-title" >
-                        {title}
-                        {(type === 'users') ? 
-                            <List component="nav" aria-label="main mailbox folders">
-                            {cohorts.map(row => (
-                                <ListItem key={row.class_id}>
-                                    <ListItemIcon>
-                                    <SchoolIcon/>
-                                    </ListItemIcon>
-                                    <ListItemText primary={row.class_title} />
-                                </ListItem>
-                            ))
-
-                            }
-            
-                            </List>
-                    
-                        :
-                        null}
-                    </DialogTitle>
-
-                    <DialogContent>
-                        {(type === 'updating')?
-                        <div style={{display: `flex`, flexDirection: `column`}}>
-                            
-                            <TextField
-                                id="outlined-textarea2"
-                                label="Class Title"
-                                name="class_title"
-                                onChange={updateCohort}
-                                defaultValue={body.data.class_title}
-                                variant="outlined"
-                            />
-                            <br/>
-                            <TextField
-                                id="outlined-textarea1"
-                                label="Class Description"
-                                multiline
-                                name="class_description"
-                                rows="3"
-                                defaultValue={body.data.class_description}
-                                onChange={updateCohort}
-                                variant="outlined"
-                            />
-                              </div>
-                         :
-                            
-                        (type === 'disapproving')?
-                        <div style={{display: `flex`, flexDirection: `column`}}>
-                            <TextField
-                                id="outlined-textarea"
-                                label="Reason"
-                                multiline
-                                name="reason_disapproved"
-                                rows="3"
-                                onChange={handleReason}
-                                variant="outlined"
-                            />
-                              </div>
-                         :(type === 'Create Cohort')?
-                            <div style={{display: `flex`, flexDirection: `column`}}>
-                               
-                                <TextField
-                                    id="outlined-textarea2"
-                                    name="class_title"
-                                    label="Title"
-                                    variant="outlined"
-                                    onChange={handleInputs}
-                                    InputProps={{
-                                        endAdornment: <InputAdornment 
-                                                        style={{
-                                                            color:(counter.title < 5) ? "red" : null,
-                                                            opacity: '0.5'
-                                                        }} 
-                                                        position="end">{counter.title}/30</InputAdornment>
-                                    }}
-                                    inputProps={{
-                                        maxLength: 30,
-                                    }}
-                                />
-                
-                                <br/>
-                                <TextField
-                                    id="outlined-textarea"
-                                    name="class_description"
-                                    label="Class Description"
-                                    onChange={handleInputs}
-                                    variant="outlined"
-                                    multiline
-                                    rows="3"
-                                />
-                            </div>
-                         : (type === 'Change Key')?
-                            <>
-                                <TextField
-                                    id="standard-basic1"
-                                    value={body.data.class_key}
-                                    label="Key"
-                                    InputProps={{
-                                    readOnly: true
-                                    }}
-                                />
-                            
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    startIcon={<EditIcon />}
-                                    onClick={generateKey}
-                                >
-                                    Generate New Key
-                                </Button>
-                            </>
-                         
-                         : null
-                        }
-                    </DialogContent>
-
-                    <DialogActions >
-                        {(type !== 'Delete Cohort')
-                        
-                        ?
-                            <>
-              
-                            {(type === 'users') ? 
-                                <Button onClick={(e)=>manageEnrolled(data)} color="secondary" style={{float: 'right'}} autoFocus>
+            {attending.open && (
+                <Attending
+                    open={attending.open}
+                    handleClose={closeAttending}
+                    data={attending.data} 
+                    type={'assigning'}
+                />
+            )}
+            <Dialog
+                open={open}
+                onClose={(type === 'Kick Student') ? ()=>handleClose(data.class_id) : handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                fullwidth=""
+                maxWidth='sm'
+            >
+                {(type === 'approving' || type === 'Kick Student' || type === 'Change User Role' || type === 'Toggle Cohort') ?
+                    <>
+                        <DialogTitle id="alert-dialog-title" >
+                            {title}
+                            {(type === 'Change User Role') ? 
+                                <List component="nav" aria-label="main mailbox folders">
+                                {cohorts.map(row => (
+                                    <ListItem key={row.class_id}>
+                                        <ListItemIcon>
+                                        <SchoolIcon/>
+                                        </ListItemIcon>
+                                        <ListItemText primary={row.class_title} />
+                                    </ListItem>
+                                ))
+                                }
+                                </List>
+                            :
+                            null}
+                        </DialogTitle>
+                        <DialogContent>
+                        </DialogContent>
+                        <DialogActions>
+                             
+                            {(type === 'Change User Role') ?
+                                <Button onClick={(e)=>setAttending({ open: true, data: data })} color="secondary" style={{float: 'right'}} autoFocus>
                                     Manage Enrolled Cohorts
                                 </Button>
-                            : null}
+                            : null}   
 
-                   
-                                    <Button onClick={(type === "Kick Student") ? (e)=>handleClose(data.class_id) : handleClose} color="secondary">
-                                        Close
-                                    </Button>
-                                
-                                    <Button type="submit" color="secondary">
-                                        Confirm
-                                    </Button>
-                               
-                            </>
-                        
-                        :
-
-                            <>
-                            <Button onClick={handleClose} color="secondary">
-                                Close
+                            <Button onClick={(type === 'Kick Student') ? ()=>handleClose(data.class_id) : handleClose} color="secondary">
+                                Disagree
                             </Button>
-                                {(canDelete === "yes")
-                                ?
-                                <Button type="submit" color="secondary" autoFocus>
-                                    Confirm
-                                </Button>
-                                :
-                                <Button onClick={handleClose}  color="secondary" autoFocus>
-                                    Confirm
-                                </Button>
+
+                            <Button onClick={e => { submitUserData(e) }} color="secondary" autoFocus>
+                                Confirm
+                        </Button>
+                        </DialogActions>
+                    </>
+                    : (type !== 'approving') ?
+                        <form onSubmit={submitUserData}>
+                            <DialogTitle id="alert-dialog-title">
+                                {title}
+                            </DialogTitle>
+                            <DialogContent>
+                                {(type === 'updating') ?
+                                    <div style={{ display: `flex`, flexDirection: `column` }}>
+                                        <TextField
+                                            required
+                                            id="outlined-textarea2"
+                                            label="Class Title"
+                                            name="class_title"
+                                            onChange={updateCohort}
+                                            defaultValue={body.data.class_title}
+                                            variant="outlined"
+                                            InputProps={{
+                                                endAdornment: <InputAdornment
+                                                    style={{
+                                                        color: (counter.updatingTitle < 5) ? "red" : null,
+                                                        opacity: '0.5'
+                                                    }}
+                                                    position="end">{counter.updatingTitle}/30</InputAdornment>
+                                            }}
+                                            inputProps={{
+                                                maxLength: 30,
+                                            }}
+                                        />
+                                        <br />
+                                        <TextField
+                                            required
+                                            id="outlined-textarea1"
+                                            label="Class Description"
+                                            multiline
+                                            name="class_description"
+                                            rows="3"
+                                            defaultValue={body.data.class_description}
+                                            onChange={updateCohort}
+                                            variant="outlined"
+                                            InputProps={{
+                                                endAdornment: <InputAdornment
+                                                    style={{
+                                                        color: (counter.updatingDescription < 10) ? "red" : null,
+                                                        opacity: '0.5'
+                                                    }}
+                                                    position="end">{counter.updatingDescription}/50</InputAdornment>
+                                            }}
+                                            inputProps={{
+                                                maxLength: 50,
+                                            }}
+                                        />
+                                    </div>
+                                    : (type === 'disapproving') ?
+                                        <TextField
+                                            required
+                                            id="outlined-multiline-static"
+                                            label="Reason"
+                                            multiline
+                                            name="reason_disapproved"
+                                            rows="4"
+                                            onChange={handleReason}
+                                            variant="outlined"
+                                        />
+                                        : (type === 'Create Cohort') ?
+                                        <div style={{ display: `flex`, flexDirection: `column` }}>
+                                                <TextField
+                                                    required
+                                                    id="standard-basic1"
+                                                    name="class_title"
+                                                    variant="outlined"
+                                                    label="title"
+                                                    onChange={handleInputs}
+                                                    InputProps={{
+                                                        endAdornment: <InputAdornment
+                                                            style={{
+                                                                color: (counter.title < 5) ? "red" : null,
+                                                                opacity: '0.5'
+                                                            }}
+                                                            position="end">{counter.title}/30</InputAdornment>
+                                                    }}
+                                                    inputProps={{
+                                                        maxLength: 30,
+                                                    }}
+                                                />
+                                                <br />
+                                                <TextField
+                                                    required
+                                                    id="standard-basic2"
+                                                    variant="outlined"
+                                                    multiline
+                                                    rows="3"
+                                                    name="class_description"
+                                                    label="class_description"
+                                                    onChange={handleInputs}
+                                                    InputProps={{
+                                                        endAdornment: <InputAdornment
+                                                            style={{
+                                                                color: (counter.description < 10) ? "red" : null,
+                                                                opacity: '0.5'
+                                                            }}
+                                                            position="end">{counter.description}/50</InputAdornment>
+                                                    }}
+                                                    inputProps={{
+                                                        maxLength: 50,
+                                                    }}
+                                                />
+                                           </div>
+                                            : (type === 'Change Key') ?
+                                                <div style={{ display: `flex`, flexDirection: `column` }}>
+                                                    <TextField
+                                                        id="standard-basic1"
+                                                        value={body.data.class_key}
+                                                        label="Key"
+                                                        variant="outlined"
+                                                        InputProps={{
+                                                            readOnly: true
+                                                        }}
+                                                    />
+                                                    <br/>
+                                                    <Button
+                                                        variant="contained"
+                                                        color="primary"
+                                                        size="small"
+                                                        startIcon={<EditIcon />}
+                                                        onClick={generateKey}
+                                                    >
+                                                        Generate New Key
+                                                    </Button>
+                                                </div>
+                                            : null
                                 }
-                            </>
-                        }
-                       
-                    </DialogActions>
-                </form>
-                :
-                <>  
-                    
-                    <DialogTitle id="alert-dialog-title"> Are you sure you want to approve {data.firstname} {data.lastname} as a mentor?</DialogTitle>
-
-                    <DialogContent>
-
-                    </DialogContent>
-
-                    <DialogActions>
-                        <Button onClick={handleClose} color="secondary">
-                            Close
-                    </Button>
-            
-                
-                        <Button onClick={e => submitUserData(e)} color="secondary" autoFocus>
-                            Approve
-                    </Button>
-                          
-                       
-                    </DialogActions>
-                </>
-            }
-
-        </Dialog>
+                            </DialogContent>
+                            <DialogActions >
+                                
+                                    <>
+                                        
+                                        <Button onClick={(type === "Kick Student") ? (e) => handleClose(data.class_id) : handleClose} color="secondary">
+                                            Close
+                                            </Button>
+                                        <Button type="submit" color="secondary">
+                                            Confirm
+                                            </Button>
+                                    </>
+                                  
+                                
+                            </DialogActions>
+                        </form>
+                        : null
+                }
+            </Dialog>
         </>
     )
 }

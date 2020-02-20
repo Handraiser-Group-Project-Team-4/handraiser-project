@@ -171,7 +171,6 @@ export default function StickyHeadTable() {
     data: ''
   })
 
-  
 
   const openAssignModal = (row, role) => {
    
@@ -233,7 +232,7 @@ export default function StickyHeadTable() {
 
 
   }
- 
+  
   return (
     <>
       {assignModal && (
@@ -246,7 +245,7 @@ export default function StickyHeadTable() {
           render={renderUsers}
           cohorts={cohorts}
           handleClose={ () => setAssignModal(false)}
-          type={'users'}
+          type={'Change User Role'}
           getCohorts={() =>getCohorts(assignObj)}
         />
       )}
@@ -256,7 +255,6 @@ export default function StickyHeadTable() {
           open={attending.open}
           handleClose={closeAttending}
           data={attending.data} 
-         
         />
       )}
 

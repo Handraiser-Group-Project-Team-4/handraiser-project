@@ -20,7 +20,6 @@ import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from '@material-ui/icons/School';
-import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 // import PopupModal from "../CohortTools/AssignCohort";
@@ -66,12 +65,10 @@ export default function MaterialTableDemo() {
     data: "",
     type: "updating"
   })
-  const [deleteCohortObj, setDeleteCohortObj] = useState({
-    open: false,
-    title: "",
-    id: "",
-    canDelete: ""
-  });
+
+  const [toggleCohort, setToggleCohort] = useState({
+    open: false
+  })
   const [changeKey, setChangeKey] = useState({
     open: false,
     data: ""
@@ -154,13 +151,7 @@ export default function MaterialTableDemo() {
             <Tooltip title="Update Cohort Title/Description">
               <EditIcon onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: row})} />
             </Tooltip>
-
-            <Tooltip title="Delete Cohort">
-              <DeleteIcon onClick={e => deleteCohort(row)} />
-            </Tooltip>
-
             
-
           </div>
         )
       }
@@ -221,10 +212,6 @@ export default function MaterialTableDemo() {
                   <MenuItem  onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: rowData})} >
                     Update Cohort
                   </MenuItem>
-
-                  <MenuItem  onClick={e => deleteCohort(rowData)} >
-                   Delete Cohort
-                  </MenuItem>
               
               </Menu>
 
@@ -261,41 +248,37 @@ export default function MaterialTableDemo() {
       .catch(err => console.log(err));
   };
 
-  const toggleClassFn = data => {
-    console.log(data);
+  const toggleClassFn = row => {
 
-    if (data.class_status === "true") {
-      axios({
-        method: "patch",
-        url: `/api/toggleCohort/${data.class_id}`,
-        headers: {
-          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-        },
-        data: {
-          class_status: false
+    axios({
+      method: "get",
+      url: `/api/viewJoinedStudents/${row.class_id}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(data => {
+        if (data.data.length === 0) {
+          setToggleCohort({
+            ...toggleClassFn,
+            open: true,
+            data: row,
+            hasUsers: false
+          });
+        } else {
+          setToggleCohort({
+            ...toggleClassFn,
+            open: true,
+            data: row,
+            hasUsers: true
+          });
+         
         }
       })
-        .then(() => {
-          renderCohorts();
-        })
-        .catch(err => console.log("object"));
-    } else {
-      axios({
-        method: "patch",
-        url: `/api/toggleCohort/${data.class_id}`,
-        headers: {
-          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-        },
-        data: {
-          class_status: true
-        }
-      })
-        .then(() => {
-          renderCohorts();
-        })
-        .catch(err => console.log("object"));
-    }
-  };
+      .catch(err => console.log("object"));
+  }
+  
+  
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
@@ -328,36 +311,6 @@ export default function MaterialTableDemo() {
       .catch(err => console.log("object"));
   };
 
-  // DELETE
-  const deleteCohort = row => {
-    axios({
-      method: "get",
-      url: `/api/viewJoinedStudents/${row.class_id}`,
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    })
-      .then(data => {
-        if (data.data.length === 0) {
-          setDeleteCohortObj({
-            ...deleteCohortObj,
-            open: true,
-            title: `Are you you want to delete ${row.class_title}`,
-            id: row.class_id,
-            canDelete: "yes"
-          });
-        } else {
-          setDeleteCohortObj({
-            ...deleteCohortObj,
-            open: true,
-            title: ` ${row.class_title} still has a users on it.`,
-            canDelete: "no"
-          });
-        }
-      })
-      .catch(err => console.log("object"));
-  };
-
   return (
       <>
       {updateTitleDesc.open && (
@@ -370,19 +323,24 @@ export default function MaterialTableDemo() {
           handleClose={(e) => setUpdateTitleDesc({...updateTitleDesc, open: false})}
           render={renderCohorts}
           title={`Update Class Title/Description`}
-        />)}
+        />
+      )}
 
-      {deleteCohortObj.open && (
+      {toggleCohort.open && (
         <PopupModal
-          title={deleteCohortObj.title}
-          open={deleteCohortObj.open}
-          handleClose={e =>
-            setDeleteCohortObj({ ...deleteCohort, open: false })
+          title={
+            (toggleCohort.data.class_status === 'true'  && toggleCohort.hasUsers === true) ? `${toggleCohort.data.class_title} still have users on it. Are you sure you want to close this Cohort ?` : 
+            (toggleCohort.data.class_status === 'false') ? `Are you sure you want to open ${toggleCohort.data.class_title} Cohort ?` : 
+            (toggleCohort.data.class_status === 'true' && toggleCohort.hasUsers === false ) ? `Are you sure you want to close ${toggleCohort.data.class_title} Cohort ?` : null
           }
-          id={deleteCohortObj.id}
+          open={toggleCohort.open}
+          handleClose={e =>
+            setToggleCohort({ ...toggleCohort, open: false })
+          }
+          data={toggleCohort.data}
           render={renderCohorts}
-          type={"Delete Cohort"}
-          canDelete={deleteCohortObj.canDelete}
+          type={'Toggle Cohort'}
+          message={toggleCohort.message}
         />
       )}
 

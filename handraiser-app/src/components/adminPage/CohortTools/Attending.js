@@ -102,7 +102,7 @@ export default function AttendingModal({open, data, handleClose}) {
       }
     })
       .then(data => {
-        console.log(data.data);
+
         setAssignCohortObj({
           open: true,
           data: data.data
@@ -159,7 +159,7 @@ export default function AttendingModal({open, data, handleClose}) {
                       <h5 style={{margin:`0`}}> {data.firstname} {data.lastname}</h5>
                       <div style={{display: 'flex', alignItems: 'baseline'}}>
                       { (data.user_status)? <status-indicator active pulse positive /> : <status-indicator active pulse negative />}
-                      {(data.user_role_id === 3 ) ? <h6 style={{margin:`0 0 0 10px`}}>Student</h6> : <h6 style={{margin: `0 0 0 10px`}}>Mentor</h6>}
+                      {(data.user_role_id === 3 || data.role === 2) ? <h6 style={{margin:`0 0 0 10px`}}>Student</h6> : <h6 style={{margin: `0 0 0 10px`}}>Mentor</h6>}
                       </div>
                       
                   </div>
@@ -177,7 +177,8 @@ export default function AttendingModal({open, data, handleClose}) {
                   onClick={(e) => getCohorts(data)}
                   startIcon={<SchoolIcon />}
                 >
-                  Assign in a Cohort
+                  {(data.user_role_id === 3 || data.role === 2) ? 'Join a Cohort' : 'Assign a Cohort'}
+                  
                 </Button>}
                 columns={table.columns}
                 data={table.data}
