@@ -3,9 +3,9 @@ const keyGenerator = require("../keyGenerator");
 module.exports = {
   list: (req, res) => {
     const db = req.app.get("db");
-    const {value, user_id} = req.query;
+    const { value, user_id } = req.query;
 
-    if(value != 1)
+    if (value != 1)
       db.query(
         `select cd.class_id, cd.class_title, cd.class_description, cd.class_created, cd.class_ended, cd.class_status,
         c.classroom_id, c.class_id, c.class_key
@@ -18,11 +18,13 @@ module.exports = {
           console.error(err);
           res.status(500).end();
         });
-    else{
-      db.query(`SELECT * FROM classroom_students, classroom, classroom_details WHERE classroom_students.user_id = '${user_id}' 
+    else {
+      db.query(
+        `SELECT * FROM classroom_students, classroom, classroom_details WHERE classroom_students.user_id = '${user_id}' 
               AND classroom_students.class_id = classroom.class_id 
               AND classroom_students.class_id = classroom_details.class_id 
-              AND classroom.class_id = classroom_details.class_id `)
+              AND classroom.class_id = classroom_details.class_id `
+      )
         .then(get => res.status(200).json(get))
         .catch(err => {
           console.error(err);
@@ -35,16 +37,18 @@ module.exports = {
     const db = req.app.get("db");
 
     db.query(
-      `select classroom_students.date_joined, users.firstname, users.lastname,
-       users.email, users.avatar, users.user_status, users.user_id, 
-       classroom_details.class_title, classroom_details.class_created, 
-       classroom_students.class_id, users.user_role_id 
-      from classroom_students
-      inner join users
-      on classroom_students.user_id = users.user_id
-      inner join classroom_details
-      on  classroom_details.class_id = classroom_students.class_id
-      where classroom_students.class_id = ${req.params.id}`
+      `select cs.date_joined, u.firstname, u.lastname,
+      u.email, u.avatar, u.user_status, u.user_id, 
+      cd.class_title, cd.class_created, 
+      cs.class_id, u.user_role_id, c.class_id, c.student_id, c.concern_title, c.concern_status
+      from classroom_students cs
+      inner join users u
+      on cs.user_id = u.user_id
+      inner join classroom_details cd
+      on  cd.class_id = cs.class_id
+      inner join concern c
+      on cd.class_id = c.class_id
+      where cs.class_id = ${req.params.id}`
     )
       .then(get => res.status(200).json(get))
       .catch(err => {
@@ -264,13 +268,11 @@ module.exports = {
     const db = req.app.get("db");
     const { class_id, user_id, date_joined } = req.body;
     db.classroom_students
-      .save(
-        {
-          class_id,
-          user_id,
-          date_joined,
-        }
-      )
+      .save({
+        class_id,
+        user_id,
+        date_joined
+      })
       .then(post => res.status(201).json(post))
       .catch(err => {
         console.error(err);
@@ -290,6 +292,5 @@ module.exports = {
         console.error(err);
         res.status(500).end();
       });
-  },
-
+  }
 };

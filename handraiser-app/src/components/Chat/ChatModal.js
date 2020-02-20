@@ -1,71 +1,91 @@
-import React from 'react';
-import ChatIcon from '@material-ui/icons/Chat';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItem from '@material-ui/core/ListItem';
-import List from '@material-ui/core/List';
-import Divider from '@material-ui/core/Divider';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close';
-import Slide from '@material-ui/core/Slide';
-import Fab from '@material-ui/core/Fab';
-import Chat from './Chat';
+import React, { useEffect } from 'react';
+import io from 'socket.io-client';
 
-export default function ChatModal() {
-	const classes = useStyles();
-	const [open, setOpen] = React.useState(false);
+//MATERIAL UI
+import MaterialTable from 'material-table';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
+
+let socket;
+const ChatModal = ({
+	modal,
+	handleModal,
+	mentors,
+	currentConcern,
+	userObj,
+	id
+}) => {
+	smsmodal;
+	const ENDPOINT = 'localhost:3001';
+
+	useEffect(() => {
+		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+	}, [ENDPOINT]);
+
+	const sendConcern = (evt, data) => {
+		evt.preventDefault();
+
+		const concern = {
+			class_id: id,
+			mentor_id: `${data.user_id}`,
+			student_id: `${currentConcern.student_id}`,
+			concern_title: currentConcern.concern_title,
+			concern_status: currentConcern.concern_status
+		};
+		socket.emit('sendConcern', { concern, userObj }, () => {});
+	};
+
 	return (
-		<div>
-			<Fab color="primary" aria-label="add" className={classes.fab}>
-				<ChatIcon onClick={() => setOpen(true)} />
-			</Fab>
-			<Dialog
-				fullScreen
-				open={open}
-				onClose={() => setOpen(false)}
-				TransitionComponent={Transition}
-			>
-				<AppBar className={classes.appBar}>
-					<Toolbar>
-						<IconButton
-							edge="start"
-							color="inherit"
-							onClick={() => setOpen(false)}
-							aria-label="close"
-						>
-							<CloseIcon />
-						</IconButton>
-						<Typography variant="h6" className={classes.title}>
-							Chat
-						</Typography>
-					</Toolbar>
-				</AppBar>
-				<Chat modal={true} />
-			</Dialog>
-		</div>
+		<Dialog
+			open={modal}
+			onClose={handleModal}
+			fullWidth={true}
+			maxWidth="md"
+			aria-labelledby="alert-dialog-title"
+			aria-describedby="alert-dialog-description"
+		>
+			<DialogTitle id="alert-dialog-title">
+				{'Request Help to Other Mentor/s'}
+			</DialogTitle>
+			<DialogContent>
+				<MaterialTable
+					title=""
+					columns={[
+						{
+							title: 'Name',
+							field: 'name',
+							render: rowData => (
+								<React.Fragment>
+									<div style={{ display: `flex` }}>
+										<img
+											src={rowData.avatar}
+											width="50"
+											height="50"
+											style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}
+										/>
+										<p>
+											{rowData.firstname} {rowData.lastname}
+										</p>
+									</div>
+								</React.Fragment>
+							)
+						},
+						{ title: 'Status', field: 'user_status' }
+					]}
+					data={mentors}
+					options={{
+						selection: true
+					}}
+					actions={[
+						{
+							tooltip: 'Send a help to selected mentor/s',
+							icon: 'send',
+							onClick: (evt, data) => sendConcern(evt, ...data)
+						}
+					]}
+				/>
+			</DialogContent>
+		</Dialog>
 	);
-}
-const useStyles = makeStyles(theme => ({
-	appBar: {
-		position: 'relative'
-	},
-	title: {
-		marginLeft: theme.spacing(2),
-		flex: 1
-	},
-	fab: {
-		// backgroundColor: '#333',
-		right: 20,
-		bottom: 50,
-		position: 'fixed'
-	}
-}));
+};
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-	return <Slide direction="up" ref={ref} {...props} />;
-});
+export default ChatModal;

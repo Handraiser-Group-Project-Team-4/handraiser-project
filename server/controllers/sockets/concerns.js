@@ -31,6 +31,16 @@ module.exports = {
 			callback();
 		});
 
+		socket.on('fetchMentors', ({ id }, callback) => {
+			db.users.find({ user_role_id: 2 }).then(user => {
+				db.concern.find({ concern_id: id }).then(concern => {
+					io.to(`${id}`).emit('assignMentors', { user, concern });
+				});
+			});
+
+			callback();
+		});
+
 		socket.on('sendConcern', ({ concern, userObj }, callback) => {
 			db.concern.insert(concern).then(() =>
 				db.concern.find({ class_id: concern.class_id }).then(res =>

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import io from "socket.io-client";
-import Axios from "axios";
+import axios from "axios";
 import SwipeableViews from "react-swipeable-views";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -55,7 +55,7 @@ import cohort from "../../../images/cohort.png";
 import cohortDark from "../../../images/cohortdark.jpg";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
-import ChatModal from "../../Chat/ChatModal";
+import ChatResponsive from "../../Chat/ChatResponsive";
 
 export const UserContext = createContext(null);
 let socket;
@@ -87,7 +87,7 @@ export default function CohortPage({ value = 0, match }) {
     setAnchorEl(null);
   };
   useEffect(() => {
-    Axios({
+    axios({
       method: "get",
       url: `/api/users/${userObj.user_id}`,
       headers: {
@@ -101,7 +101,7 @@ export default function CohortPage({ value = 0, match }) {
         console.log(err);
       });
        // ACCESS KEY
-       Axios({
+       axios({
       	method: `get`,
       	url: `/api/cohort-check/${id}?user_id=${userObj.user_id}`,
       	headers: {
@@ -120,11 +120,7 @@ export default function CohortPage({ value = 0, match }) {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {
-      socket.on("fetchOldLogs", ({ data }) => {
-        setLogs(data);
-      });
-    });
+    socket.emit("joinConcern", { id }, () => {});
   }, [ENDPOINT]);
 
   useEffect(() => {
@@ -135,7 +131,11 @@ export default function CohortPage({ value = 0, match }) {
             data[0].student_id === userObj.user_id
             ? setChatRoom({
                 room: data[0].concern_id,
-                concern: data[0].concern_title
+                concern: data[0].concern_title,
+                concern_status: data[0].concern_status,
+                user_id: userObj.user_id,
+                avatar: userObj.avatar,
+                name: userObj.name
               })
             : data.map(concern => {
                 concern.concern_status !== "pending" &&
@@ -143,7 +143,11 @@ export default function CohortPage({ value = 0, match }) {
                   concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
                       room: concern.concern_id,
-                      concern: concern.concern_title
+                      concern: concern.concern_title,
+                      concern_status: concern.concern_status,
+                      user_id: userObj.user_id,
+                      avatar: userObj.avatar,
+                      name: userObj.name
                     })
                   : setChatRoom();
               })
@@ -361,12 +365,12 @@ export default function CohortPage({ value = 0, match }) {
                               className={classes.gridItemm}
                             >
                               <section className={classes.rootq}>
-                                  <Chat modal={false}/>
+                                  <Chat chatResponsive={false}/>
                               </section>
                             </Grid>
                           </Hidden>
                           <Hidden lgUp>
-                            <ChatModal/>
+                            <ChatResponsive/>
                           </Hidden>
                        </>
                           ) : (
@@ -785,6 +789,8 @@ export default function CohortPage({ value = 0, match }) {
                   changeHandler={changeHandler}
                   logs={logs}
                   search={search}
+                  id={id}
+                  setLogs={setLogs}
                 />
               </TabPanel>
             </SwipeableViews>
@@ -847,7 +853,7 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     marginRight: 10,
-    minWidth: '30%',
+    minWidth: '20%',
     [theme.breakpoints.down("md")]: {
       marginBottom: 10
     }
@@ -942,7 +948,7 @@ const useStyles = makeStyles(theme => ({
   },
   topNavi: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     marginBottom: 10,
     alignItems: "center"
   },
