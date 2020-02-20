@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import io from "socket.io-client";
-import { DarkModeContext } from "../../App";
+import { withSnackbar } from 'notistack';
+// import io from "socket.io-client";
 
 // COMPONENTS
+// import encryptDecrypt from '../tools/assets/encryptDecrypt'
 import jwtToken from "../tools/assets/jwtToken";
-import CohortContainer from "./CohortContainer";
-import UsersModal from "../tools/UsersModal";
+import CohortContainer from './CohortContainer'
+import UsersModal from '../tools/UsersModal'
+import {DarkModeContext} from '../../App'
 
 // MATERIAL-UI
 import {
+  Container,
   useTheme,
   useMediaQuery,
   Typography,
@@ -23,14 +26,12 @@ import {
 //ICONS
 import SearchIcon from "@material-ui/icons/Search";
 
-let socket;
-export default function CohortList({ classes, value }) {
+// let socket;
+function CohortList({ classes, value, enqueueSnackbar }) {
   const { darkMode } = useContext(DarkModeContext);
   const theme = useTheme();
-  const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const history = useHistory();
-  const [cohorts, setCohorts] = useState([]);
   const [search, setSearch] = useState();
   const [isKey, setIsKey] = useState({
     key: "",
@@ -40,46 +41,6 @@ export default function CohortList({ classes, value }) {
   });
 
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const handleClose = () => {
-    setIsKey({ key: "", open: false, classroomObj: {}, error: false });
-  };
-
-  useEffect(() => {
-    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-  }, [ENDPOINT]);
-
-  useEffect(() => {
-    socket.on("fetchCohort", data => {
-      renderCohorts();
-    });
-
-    return () => {
-      socket.emit("disconnect");
-      socket.off();
-    };
-  });
-
-  useEffect(() => {
-    renderCohorts(value);
-    return () => {};
-  }, [value]);
-
-  const renderCohorts = () => {
-    axios({
-      method: `get`,
-      url: `/api/cohorts?user_id=${userObj.user_id}&&value=${value}`,
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    })
-      .then(res => {
-        // console.log(res.data)
-        setCohorts(res.data);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  };
 
   const handleCohort = x => {
     axios({
@@ -93,6 +54,11 @@ export default function CohortList({ classes, value }) {
         if (res.data.length === 0) {
           setIsKey({ ...isKey, open: true, classroomObj: x });
         } else {
+          // const encryptURL = encryptDecrypt('encrypt', `${x.class_id}`)
+          // setTimeout(() => {
+          //   history.push(`/cohort/${encryptURL}`);
+          // }, 600)
+                            
           history.push(`/cohort/${x.class_id}`);
         }
       })
@@ -123,7 +89,8 @@ export default function CohortList({ classes, value }) {
     })
       .then(res => {
         setIsKey({ ...isKey, open: false });
-        alert("Congrats you enter the correct Key!");
+        // alert(`Welcome to ${isKey.classroomObj.class_title}!`);
+        enqueueSnackbar(`Welcome to ${isKey.classroomObj.class_title}!`, {variant: 'success'})
         history.push(`/cohort/${class_id}`);
       })
       .catch(err => {
@@ -138,43 +105,48 @@ export default function CohortList({ classes, value }) {
   return (
     <>
       <SwipeableViews
+        // style={{backgroundColor:darkMode?'#333':null,height:'100%'}}
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
         style={{
           backgroundColor: darkMode ? "#333" : null,
           height: "calc(100vh - 48px)"
         }}
-        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          <TextField
-            label="Search field"
-            type="search"
-            size={"small"}
-            name="search"
-            variant="outlined"
-            onChange={changeHandler}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              )
+          <Container
+            maxWidth="xl"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              paddingRight: 100
             }}
-          />
+          >
+            <TextField
+              label="Search field"
+              type="search"
+              size={"small"}
+              name="search"
+              variant="outlined"
+              onChange={changeHandler}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Container>
           <CohortContainer
             classes={classes}
             handleCohort={handleCohort}
-            cohorts={cohorts}
             search={search}
+            value={value}
           />
         </TabPanel>
         <TabPanel value={value} index={1} dir={theme.direction}>
-          <CohortContainer
-            classes={classes}
-            handleCohort={handleCohort}
-            cohorts={cohorts}
-          />
+          <CohortContainer classes={classes} handleCohort={handleCohort} value={value} />
         </TabPanel>
       </SwipeableViews>
       {/* Dialog for creation of Cohort. Do Not delete */}
@@ -192,7 +164,7 @@ export default function CohortList({ classes, value }) {
               id="outlined-full-width"
               label="Label"
               helperText=""
-              fullWidth
+              fullwidth
               margin="normal"
               InputLabelProps={{
                 shrink: true
@@ -206,7 +178,7 @@ export default function CohortList({ classes, value }) {
               rows="4"
               variant="outlined"
               helperText=""
-              fullWidth
+              fullwidth
               multiline
               margin="normal"
               InputLabelProps={{
@@ -231,8 +203,8 @@ export default function CohortList({ classes, value }) {
           data={isKey}
           setData={e => setIsKey({ ...isKey, key: e.target.value })}
           title={`Join ${isKey.classroomObj.class_title}`}
-          modalTextContent="To join to this cohort, please enter the cohort key given by your Mentor."
-          handleClose={handleClose}
+          modalTextContent = "To join to this cohort, please enter the cohort key given by your Mentor."
+          handleClose={() => setIsKey({ key: "", open: false, classroomObj: {}, error: false })}
           handleSubmit={() => handleSubmitKey(isKey)}
           type="Enter Key"
           buttonText="Join"
@@ -241,6 +213,8 @@ export default function CohortList({ classes, value }) {
     </>
   );
 }
+
+export default withSnackbar(CohortList);
 
 function TabPanel({ children, value, index, ...other }) {
   return (

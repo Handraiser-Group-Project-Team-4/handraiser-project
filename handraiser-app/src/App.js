@@ -21,15 +21,15 @@ export default function App() {
     [darkMode]
   );
 
-  return (
-    <ThemeProvider theme={theme}>
-      <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-        <SnackbarProvider maxSnack={5} hideIconVariant={false}>
-          <HashRouter>
-            <Routes />
-          </HashRouter>
-        </SnackbarProvider>
-      </DarkModeContext.Provider>
-    </ThemeProvider>
-  );
+	return (
+		<ThemeProvider theme={theme}>
+			<DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
+				<SnackbarProvider maxSnack={5} hideIconVariant={false} anchorOrigin={{vertical: "top",horizontal: "right"}} autoHideDuration={3000}>
+					<HashRouter>
+						<Routes />
+					</HashRouter>
+				</SnackbarProvider>
+			</DarkModeContext.Provider>
+		</ThemeProvider>
+	);
 }
