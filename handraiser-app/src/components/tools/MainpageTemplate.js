@@ -41,7 +41,7 @@ export default function MainpageTemplate({
   children,
   container,
   tabIndex,
-  requests
+  request
 }) {
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
@@ -368,40 +368,42 @@ export default function MainpageTemplate({
           />
         </TabsTemplate>
       )}
-      {requests && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 10,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            width: 240
-          }}
-        >
-          <Card style={{ width: 220 }}>
-            <CardContent
-              style={{
-                paddingBottom: 16,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <WarningIcon />
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                component="p"
-                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+      {sessionStorage.getItem("newUser") === "pending" ||
+        request === "pending" ||
+        (userObj.user_approval_status_id === 2 && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 10,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: 240
+            }}
+          >
+            <Card style={{ width: 220 }}>
+              <CardContent
+                style={{
+                  paddingBottom: 16,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
               >
-                Request Sent. Your request to be a mentor is still being
-                processed.
-              </Typography>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+                <WarningIcon />
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  component="p"
+                  style={{ whiteSpace: "normal", paddingLeft: 10 }}
+                >
+                  Request Sent. Your request to be a mentor is still being
+                  processed.
+                </Typography>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
     </div>
   );
 
