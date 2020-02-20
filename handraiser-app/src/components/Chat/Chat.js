@@ -33,17 +33,19 @@ import SendIcon from "@material-ui/icons/Send";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import InsertEmoticonIcon from "@material-ui/icons/InsertEmoticon";
 const useStyles = makeStyles(theme => ({
-  root: {
+  root: modal => ({
     borderRadius: 10,
     boxShadow: "4px 4px 12px 1px rgba(0, 0, 0, 0.2)",
     lineHeight: 1.5,
     overflowY: "auto",
     // minHeight: "80vh",
-    width: "80%"
-  },
-  media: {
-    height: "100%",
+    width: modal ? '100%' : '80%',
+		height: '100%'
+  }),
+  media: modal => ({
+    height: modal ? '73%' : '100%',
     minHeight: "500px",
+    // minHeight: "500px",
     padding: "0px!important",
     "& > div > div::-webkit-scrollbar": {
       width: "5px",
@@ -56,7 +58,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: "#673ab7" //'#23232F' //'#0595DD',
       // borderTopRightRadius: 10
     }
-  },
+  }),
   expand: {
     transform: "rotate(0deg)",
     marginLeft: "auto",
@@ -86,8 +88,8 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 let socket;
-const Chat = () => {
-  const classes = useStyles();
+const Chat = ({modal}) => {
+  const classes = useStyles(modal);
   const userObj = jwtToken();
   const { chatroom } = useContext(UserContext);
   const { darkMode } = useContext(DarkModeContext);

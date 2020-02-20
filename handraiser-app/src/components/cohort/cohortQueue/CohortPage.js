@@ -55,6 +55,7 @@ import cohort from "../../../images/cohort.png";
 import cohortDark from "../../../images/cohortdark.jpg";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import ChatModal from "../../Chat/ChatModal";
 
 export const UserContext = createContext(null);
 let socket;
@@ -70,6 +71,7 @@ export default function CohortPage({ value = 0, match }) {
   const [user, setUser] = useState();
   const [search, setSearch] = useState();
   const [filter, setFilter] = useState();
+  const [isTrue, setIsTrue] = useState(false);
   const [chatroom, setChatRoom] = useState();
   const { enqueueSnackbar } = useSnackbar();
   const { darkMode } = useContext(DarkModeContext);
@@ -210,7 +212,9 @@ export default function CohortPage({ value = 0, match }) {
             chatHandler,
             search,
             filter,
-						setFilter,
+            setFilter,
+            isTrue,
+            setIsTrue,
             handleConcernCount
           }}
         >
@@ -220,19 +224,22 @@ export default function CohortPage({ value = 0, match }) {
             </IconButton> */}
 
             <AppBar position="static" color="default">
-              <Button
-                style={{
-                  position: "absolute",
-                  zIndex: 1,
-                  top: 5,
-                  marginLeft: 5
-                }}
-                color="default"
-                className={classes.button}
-                startIcon={<ArrowBackIosIcon />}
-              >
-                Back
-              </Button>
+              <Hidden mdDown>
+                <Button
+                  style={{
+                    position: "absolute",
+                    zIndex: 1,
+                    top: 5,
+                    marginLeft: 5
+                  }}
+                  color="default"
+                  className={classes.button}
+                  startIcon={<ArrowBackIosIcon />}
+                  onClick={() => history.push(`/student-page`)}
+                >
+                  Back
+                </Button>
+              </Hidden>
               <Tabs
                 value={value}
                 // onChange={handleChange}
@@ -241,7 +248,7 @@ export default function CohortPage({ value = 0, match }) {
                 centered
               >
                 <Tab
-                  label="Handraiser"
+                  label="Handraiser Queue"
                   onClick={() => history.push(`/cohort/${id}`)}
                 />
                 <Tab
@@ -286,17 +293,6 @@ export default function CohortPage({ value = 0, match }) {
                       className={classes.gridItemm}
                     >
                       <Grid container spacing={0} className={classes.topNavi}>
-                        <Typography
-                          variant="h4"
-                          noWrap
-                          className={classes.typoTitle}
-                        >
-                          Handraiser Queue
-                          <Chip
-                            className={classes.largeChip}
-                            label={handleConcernCount("allConcern")}
-                          />
-                        </Typography>
                         <FormControl
                           variant="outlined"
                           className={classes.formControl}
@@ -353,28 +349,50 @@ export default function CohortPage({ value = 0, match }) {
                         )}
                       </div>
                     </Grid>
-                    <Hidden mdDown>
-                      <Grid
-                        item
-                        sm={12}
-                        xs={12}
-                        md={12}
-                        lg={6}
-                        className={classes.gridItemm}
-                      >
-                        <section className={classes.rootq}>
-                          {chatroom ? (
-                            <Chat />
+                      {chatroom ? (
+                       <>
+                        <Hidden mdDown>
+                            <Grid
+                              item
+                              sm={12}
+                              xs={12}
+                              md={12}
+                              lg={6}
+                              className={classes.gridItemm}
+                            >
+                              <section className={classes.rootq}>
+                                  <Chat modal={false}/>
+                              </section>
+                            </Grid>
+                          </Hidden>
+                          <Hidden lgUp>
+                            <ChatModal/>
+                          </Hidden>
+                       </>
                           ) : (
-                            userObj.user_role_id === 3 && <Helps />
+                            userObj.user_role_id === 3 && (
+                              <>
+                                <Hidden mdDown>
+                                  <Grid
+                                    item
+                                    sm={12}
+                                    xs={12}
+                                    md={12}
+                                    lg={6}
+                                    className={classes.gridItemm}
+                                  >
+                                    <section className={classes.rootq}>
+                                        <Helps />
+                                    </section>
+                                  </Grid>
+                                </Hidden>
+                                <Hidden lgUp>
+                                  <Helps fab={true} classes={classes} />
+                                </Hidden>
+                              </>
+                            )
                           )}
-                        </section>
-                      </Grid>
-                    </Hidden>
                   </Grid>
-                  <Hidden lgUp>
-                    <Helps fab={true} classes={classes} />
-                  </Hidden>
                 </Paper>
               </TabPanel>
               <TabPanel
@@ -829,7 +847,7 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     marginRight: 10,
-    minWidth: 120,
+    minWidth: '30%',
     [theme.breakpoints.down("md")]: {
       marginBottom: 10
     }
