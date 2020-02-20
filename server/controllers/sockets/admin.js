@@ -1,5 +1,7 @@
 module.exports = {
   adminSockets: (socket, io, db) => {
+    let userIsActive=[];
+
     socket.on(`mentorRequest`, ({ data }) => {
       io.emit("fetchMentorRequest");
     });
@@ -37,5 +39,25 @@ module.exports = {
       })
       
     });
+
+    // socket.on('activeUser', (callback) => {
+    //   let temp=[];
+    //   db.users.find({user_status: "t"}, {"fields":[`user_id`]})
+    //   .then(active => {
+    //     active.map(x => {
+    //       temp.push(x.user_id)
+    //     })
+    //     io.emit('displayActiveUser', {userIsActive: temp})
+    //   })
+    //   .catch(err => console.log(err))
+
+    //   callback();
+    // });
+
+    // socket.on('logOutUser', ({user_id}) => {
+    //   // userIsActive.splice(userIsActive.indexOf(user_id), 1)
+    //   // io.emit('renderActiveUser', {userIsActive})
+    //   // console.log(userIsActive)
+    // })
   }
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
 import { useHistory } from "react-router-dom";
-import { withSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
 
 // COMPONENTS
 import CopyToClipBoard from '../../tools/CopyToClipBoard'
@@ -27,7 +27,8 @@ import {
 import FaceIcon from "@material-ui/icons/Face";
 import SearchIcon from "@material-ui/icons/Search";
 
-function CohortDetails({ classes, class_id, Lest, changeHandler, enqueueSnackbar }) {
+export default function CohortDetails({ classes, class_id, Lest, changeHandler }) {
+    const { enqueueSnackbar } = useSnackbar();
     const userObj = jwtToken();
     const history = useHistory();
     const [classDetails, setClassDetails] = useState([]);
@@ -377,5 +378,3 @@ function CohortDetails({ classes, class_id, Lest, changeHandler, enqueueSnackbar
         </>
     )
 }
-
-export default withSnackbar(CohortDetails);

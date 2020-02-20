@@ -12,9 +12,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 // Components
+import Attending from '../CohortTools/Attending'
+import Badger from "../../tools/Badger"
 import PopupModal from "../../tools/PopupModal";
-import Attending from "../CohortTools/Attending";
-import Badger from "../../tools/Badger";
 
 // Icons
 import VisibilityIcon from "@material-ui/icons/Visibility";
@@ -22,7 +22,7 @@ import WorkIcon from "@material-ui/icons/Work";
 import WorkOutlineIcon from "@material-ui/icons/WorkOutline";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
-export default function StickyHeadTable() {
+export default function Users() {
   const [users, setUsers] = useState({
     columns: [
       {
@@ -76,11 +76,11 @@ export default function StickyHeadTable() {
         title: "Status",
         field: "user_status",
         render: rowData =>
-          rowData.user_status ? (
-            <status-indicator active pulse positive />
-          ) : (
-            <status-indicator active pulse negative />
-          ),
+          (rowData.user_status) ? (
+              <status-indicator active pulse positive />
+            ) : (
+              <status-indicator active pulse negative />
+            ),
         export: false
       },
       {
@@ -184,6 +184,7 @@ export default function StickyHeadTable() {
 
     data: []
   });
+  // const [activeUsers, setActiveUsers] = useState([])
   const [assignModal, setAssignModal] = useState(false);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
@@ -191,8 +192,9 @@ export default function StickyHeadTable() {
   const [cohorts, setCohorts] = useState("");
   const [attending, setAttending] = useState({
     open: false,
-    data: ""
-  });
+    data: ''
+  })
+
 
   const openAssignModal = (row, role) => {
     setAssignObj({
@@ -251,26 +253,22 @@ export default function StickyHeadTable() {
     });
   };
 
+  
+  
   return (
     <>
       {assignModal && (
         <PopupModal
-          title={
-            cohorts.length === 0
-              ? `Assign ${assignObj.firstname} ${assignObj.lastname} as a ${
-                  assignObj.role === 3 ? "student" : "mentor"
-                }?`
-              : `${assignObj.firstname} ${assignObj.lastname} will be a ${
-                  assignObj.role === 3 ? "student" : "mentor"
-                } to the following cohort:`
-          }
+          title={(cohorts.length === 0)
+              ? `Assign ${assignObj.firstname} ${assignObj.lastname} as a ${assignObj.role === 3 ? 'student' : 'mentor'}?`
+              :`${assignObj.firstname} ${assignObj.lastname} will be a ${assignObj.role === 3 ? 'student' : 'mentor'} to the following cohort:`}
           data={assignObj}
           open={assignModal}
           render={renderUsers}
           cohorts={cohorts}
-          handleClose={() => setAssignModal(false)}
-          type={"users"}
-          getCohorts={() => getCohorts(assignObj)}
+          handleClose={ () => setAssignModal(false)}
+          type={'Change User Role'}
+          getCohorts={() =>getCohorts(assignObj)}
         />
       )}
 
@@ -278,7 +276,7 @@ export default function StickyHeadTable() {
         <Attending
           open={attending.open}
           handleClose={closeAttending}
-          data={attending.data}
+          data={attending.data} 
         />
       )}
 

@@ -11,7 +11,7 @@ import MainpageTemplate from "../tools/MainpageTemplate";
 import CohortList from "../cohort/CohortList";
 
 // let socket;
-export default function MentorPage({ value, tabIndex }) {
+export default function MentorPage({value, tabIndex}) {
   // const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();

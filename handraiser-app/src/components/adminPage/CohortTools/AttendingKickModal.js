@@ -38,8 +38,7 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
         onClose={() => handleClose(userObj)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullwidth={false}
-        maxWidth="sm"
+   
       >
         <DialogTitle id="alert-dialog-title">
           Are you sure you want to kick {userObj.firstname} {userObj.lastname}{" "}

@@ -308,7 +308,7 @@ const Chat = () => {
             rowsMax="5"
             style={{ margin: 8 }}
             placeholder="Send a message here"
-            fullwidth
+            fullwidth="true"
             margin="normal"
             variant="outlined"
             value={message}

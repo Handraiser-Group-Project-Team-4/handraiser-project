@@ -27,7 +27,7 @@ export default function UsersModal({
       // fullScreen={fullScreen}
       open={open}
       onClose={handleClose}
-      disableBackdropClick={(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove")?true:false}
+      disableBackdropClick={(type === "mentorToStudent" || type === "studentToMentor" || type === "notifyUserApprove" || type === "New User")?true:false}
       maxWidth="sm"
       aria-labelledby="max-width-dialog-title"
     >

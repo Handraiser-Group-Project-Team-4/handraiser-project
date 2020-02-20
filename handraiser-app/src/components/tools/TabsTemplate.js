@@ -1,8 +1,12 @@
-import React, { useContext } from "react";
+import React, {useEffect, useContext} from "react";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
-import { GoogleLogout } from "react-google-login";
+import io from "socket.io-client";
+
+// import { newUserContext } from "../../routes";
 import { DarkModeContext } from "../../App";
+
+import { GoogleLogout } from "react-google-login";
 import jwtToken from "../tools/assets/jwtToken";
 import {
   Tabs,
@@ -26,6 +30,7 @@ import Brightness4Icon from "@material-ui/icons/Brightness4";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 
+let socket;
 export default function TabsTemplate({
   children,
   tabIndex,
@@ -36,9 +41,11 @@ export default function TabsTemplate({
   setOpen,
   handleLogout
 }) {
-  const history = useHistory();
+  const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
+  const history = useHistory();
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
+
   const handleDarkMode = async () => {
     await axios({
       method: "patch",
@@ -50,6 +57,34 @@ export default function TabsTemplate({
     });
     setDarkMode(!darkMode);
   };
+
+  // const handleLogout = () => {
+  //   axios({
+  //     method: `patch`,
+  //     url: `/api/logout/${userObj.user_id}`,
+  //     headers: {
+  //       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+  //     }
+  //   })
+  //     .then(res => {
+  //       console.log(res);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  //     socket.emit('activeUser', () => {
+  //       socket.on('displayActiveUser', ({userIsActive}) => {
+  //         console.log(userIsActive)
+  //         setActiveUsers(userIsActive)
+  //       })
+  //     })
+  //   history.push('/')
+  //   sessionStorage.clear();
+  // };
+
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+  }, [ENDPOINT]);
 
   return (
     <>

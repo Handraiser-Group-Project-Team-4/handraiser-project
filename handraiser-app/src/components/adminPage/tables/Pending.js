@@ -10,17 +10,14 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
-// COMPONENTS
-import PopupModal from "../../tools/PopupModal";
-import Badger from "../../tools/Badger";
-
-// ICONS
-// import EditIcon from "@material-ui/icons/Edit";
+// Components
+import PopupModal from '../../tools/PopupModal';
+import Badger from '../../tools/Badger';
 
 // Icons
-import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 let socket;
 export default function Pending() {
@@ -108,40 +105,36 @@ export default function Pending() {
                 <br />
               </div>
             </div>
-          </div>
-        )
-      },
-      {
-        field: "Action",
-        width: 50,
-        cellStyle: { textAlign: "right" },
-        headerStyle: { textAlign: "right" },
-        render: rowData => (
-          <PopupState variant="popover" popupId="demo-popup-menu">
-            {popupState => (
-              <React.Fragment>
-                <MoreVertIcon {...bindTrigger(popupState)} />
+            </div>
+          )
+        },
+        { field: "Action", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
+          render: (rowData) => (
+            <PopupState variant="popover" popupId="demo-popup-menu">
+              {popupState => (
+                <React.Fragment>
+                  
+                    <MoreVertIcon {...bindTrigger(popupState)}/>
+                
 
-                <Menu {...bindMenu(popupState)}>
-                  <MenuItem
-                    onClick={e => setApproving({ open: true, data: rowData })}
-                  >
+                  <Menu {...bindMenu(popupState)}>
+                  
+
+                  <MenuItem  onClick={e => setApproving({ open: true, data: rowData })}>
                     Approve
                   </MenuItem>
 
-                  <MenuItem
-                    onClick={e =>
-                      setDisapproving({ open: true, data: rowData })
-                    }
-                  >
+                  <MenuItem    onClick={e => setDisapproving({ open: true, data: rowData })}>
                     Disapprove
                   </MenuItem>
+                
                 </Menu>
-              </React.Fragment>
-            )}
-          </PopupState>
-        )
-      }
+
+                </React.Fragment>
+              )}
+            </PopupState>
+          )
+        } 
     ],
     data: []
   });

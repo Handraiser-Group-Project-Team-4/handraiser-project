@@ -1,13 +1,15 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { Redirect, useHistory } from "react-router-dom";
+import React, { useState, useEffect, Fragment, useContext } from 'react';
+import { Redirect, useHistory } from 'react-router-dom';
+import axios from 'axios';
 import io from "socket.io-client";
-import axios from "axios";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
-import UsersModal from "../tools/UsersModal";
-import WarningIcon from "@material-ui/icons/Warning";
+import { DarkModeContext } from "../../App";
+
+import UsersModal from '../tools/UsersModal'
 import TabsTemplate from "./TabsTemplate";
+
 // MATERIAL-UI
 import {
   AppBar,
@@ -21,28 +23,26 @@ import {
   Toolbar,
   Typography,
   Tab,
+  Card,
+  CardContent,
   makeStyles,
   useTheme,
   Chip,
-  Card,
-  CardContent
 } from "@material-ui/core";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { useSnackbar } from "notistack";
 
 // ICONS
+// import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
+// import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
 import GroupIcon from "@material-ui/icons/Group";
 import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import WarningIcon from "@material-ui/icons/Warning";
 
 let socket;
-export default function MainpageTemplate({
-  children,
-  container,
-  tabIndex,
-  request
-}) {
+export default function MainpageTemplate({ children, container, tabIndex, request }) {
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -50,6 +50,7 @@ export default function MainpageTemplate({
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
   const history = useHistory();
+  const { darkMode, setDarkMode } = useContext(DarkModeContext);
   const { enqueueSnackbar } = useSnackbar();
   const [notify, setNotify] = useState({
     open: false,
@@ -68,6 +69,24 @@ export default function MainpageTemplate({
   const [open, setOpen] = React.useState(false);
   const [modal, setModal] = React.useState(false);
 
+  // const handleLogout = () => {
+  //   setNotify({ ...notify, open: false })
+  //   axios({
+  //     method: `patch`,
+  //     url: `/api/logout/${userObj.user_id}`,
+  //     headers: {
+  //       Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+  //     }
+  //   })
+  //     .then(res => {
+  //       console.log(res);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  //   sessionStorage.clear();
+  // };
+  
   useEffect(() => {
     let login = sessionStorage.getItem("notification") ? true : false;
     if (login) {
@@ -168,6 +187,19 @@ export default function MainpageTemplate({
       socket.off();
     };
   });
+
+  // const handleDarkMode = async () => {
+  //   await axios({
+  //     method: "patch",
+  //     url: `/api/darkmode/${userObj.user_id}`,
+  //     data: { dark_mode: !darkMode },
+  //     headers: {
+  //       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+  //     }
+  //   });
+  //   setDarkMode(!darkMode);
+  // };
+
   const handleLogout = () => {
     setNotify({ ...notify, open: false });
     setModal(false);
@@ -196,214 +228,174 @@ export default function MainpageTemplate({
   const drawer = (
     <div>
       <div className={classes.firstToolbar}>
-        {userObj ? (
-          <>
-            <img src={userObj.avatar} className={classes.studentImg} alt="" />
-            <Typography className={classes.studentImgButton}>
-              {userObj.name}
-            </Typography>
-            <Chip
-              // icon={<FaceIcon />}
-              label={
-                userObj.user_role_id === 3
-                  ? `Student`
-                  : userObj.user_role_id === 2
-                  ? `Mentor`
-                  : `Admin`
-              }
-              color="primary"
-              style={{
-                backgroundColor: "white",
-                color: "#000"
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Skeleton
-              variant="circle"
-              width={85}
-              height={85}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="text"
-              width={180}
-              height={45}
-              style={{
-                backgroundColor: "#8154D1"
-              }}
-            />
-            <Skeleton
-              variant="rect"
-              width={80}
-              height={30}
-              style={{
-                borderRadius: 90,
-                backgroundColor: "#8154D1"
-              }}
-            />
-          </>
-        )}
+        <img src={userObj.avatar} className={classes.studentImg} alt="" />
+        <Typography className={classes.studentImgButton}>
+          {userObj.name}
+        </Typography>
+        <Chip
+          // icon={<FaceIcon />}
+          label={(userObj.user_role_id === 3) ? `Student` :
+            (userObj.user_role_id === 2) ? `Mentor` : `Admin`}
+          color="primary"
+          style={{
+            backgroundColor: "white",
+            color: "#000"
+          }}
+        />
       </div>
       {userObj.user_role_id === 1 && (
-        <TabsTemplate
-          tabIndex={tabIndex}
-          classes={classes}
-          setModal={setModal}
-          open={open}
-          setOpen={setOpen}
-          modal={modal}
-          handleLogout={handleLogout}
-        >
-          <Tab
-            style={{ padding: 0 }}
-            value="admin-cohorts"
-            label={
-              <ListItem
-                onClick={() => history.push("/admin-page")}
-                button
-                className={classes.listItemButton}
-              >
-                <ListItemIcon
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  <DnsIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Cohorts"
-                  className={classes.listItemText}
-                />
-              </ListItem>
-            }
-            {...a11yProps("admin-cohorts")}
-          />
-          <Tab
-            style={{ padding: 0 }}
-            value="admin-users"
-            label={
-              <ListItem
-                onClick={() => history.push("/admin-page/users")}
-                button
-                className={classes.listItemButton}
-              >
-                <ListItemIcon
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  <GroupIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Users"
-                  className={classes.listItemText}
-                />
-              </ListItem>
-            }
-            {...a11yProps("admin-users")}
-          />
-          <Tab
-            style={{ padding: 0 }}
-            value="admin-approval"
-            label={
-              <ListItem
-                onClick={() => history.push("/admin-page/approval")}
-                button
-                className={classes.listItemButton}
-              >
-                <ListItemIcon
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  <ThumbUpIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Approval"
-                  className={classes.listItemText}
-                />
-              </ListItem>
-            }
-            {...a11yProps("admin-approval")}
-          />
-        </TabsTemplate>
-      )}
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={userObj}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
+            >
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-cohorts"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-cohorts")}
+              />
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-users"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/users")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <GroupIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Users"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-users")}
+              />
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-approval"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/approval")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <ThumbUpIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Approval"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-approval")}
+              />
+            </TabsTemplate>
+          )
+        }
       {userObj.user_role_id !== 1 && (
-        <TabsTemplate
-          tabIndex={tabIndex}
-          classes={classes}
-          open={open}
-          modal={modal}
-          setModal={setModal}
-          setOpen={setOpen}
-          handleLogout={handleLogout}
-        >
-          <Tab
-            style={{ padding: 0 }}
-            value="student-page"
-            label={
-              <ListItem
-                onClick={() => history.push("/student-page")}
-                button
-                className={classes.listItemButton}
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={userObj}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
+            >
+              <Tab
+                style={{ padding: 0 }}
+                value="student-page"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/student-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("student-page")}
+              />
+            </TabsTemplate>
+          )
+        }
+      <div
+        style={{
+          position: "absolute",
+          bottom: 10,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 240
+        }}
+      >
+        {(userObj.user_approval_status_id === 2 || 
+        sessionStorage.getItem("newUser") === "pending" || 
+        request === "pending")&& 
+          <Card style={{ width: 220 }}>
+            <CardContent
+              style={{
+                paddingBottom: 16,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <WarningIcon />
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ whiteSpace: "normal", paddingLeft: 10 }}
               >
-                <ListItemIcon
-                  style={{
-                    color: "white"
-                  }}
-                >
-                  <DnsIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Cohorts"
-                  className={classes.listItemText}
-                />
-              </ListItem>
-            }
-            {...a11yProps("student-page")}
-          />
-        </TabsTemplate>
-      )}
-      {sessionStorage.getItem("newUser") === "pending" ||
-        request === "pending" ||
-        (userObj.user_approval_status_id === 2 && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: 10,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: 240
-            }}
-          >
-            <Card style={{ width: 220 }}>
-              <CardContent
-                style={{
-                  paddingBottom: 16,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <WarningIcon />
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  component="p"
-                  style={{ whiteSpace: "normal", paddingLeft: 10 }}
-                >
-                  Request Sent. Your request to be a mentor is still being
-                  processed.
-                </Typography>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
+                Your request to be a mentor is still being processed.
+              </Typography>
+            </CardContent>
+          </Card>
+        }
+      </div>
     </div>
   );
 

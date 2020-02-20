@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import MaterialTable from "material-table";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
-import Popper from "@material-ui/core/Popper";
-import PopupState, { bindToggle, bindPopper } from "material-ui-popup-state";
-import Fade from "@material-ui/core/Fade";
-import Paper from "@material-ui/core/Paper";
+import MaterialTable from 'material-table';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Popper from '@material-ui/core/Popper';
+import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+
 
 // components
-import Badger from "../../tools/Badger";
+import Badger from '../../tools/Badger';
 
 import VisibilityIcon from "@material-ui/icons/Visibility";
 
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 export default function Disapproved() {
   const classes = useStyles();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
 
   const [disapproved, setDisapproved] = useState({
     columns: [
@@ -74,7 +74,7 @@ export default function Disapproved() {
               </div>
             </div>
           </div>
-        )
+          )
       },
       {
         title: "Reason",
@@ -102,8 +102,8 @@ export default function Disapproved() {
               </div>
             )}
           </PopupState>
-        )
-      }
+          )
+      } 
     ],
     data: []
   });

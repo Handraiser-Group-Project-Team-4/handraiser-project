@@ -79,8 +79,8 @@ export default function PopupModal({ handleClose, open, data, title, userId }) {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth={true}
-        maxWidth="sm"
+        fullwidth='true'
+        maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
           <div
