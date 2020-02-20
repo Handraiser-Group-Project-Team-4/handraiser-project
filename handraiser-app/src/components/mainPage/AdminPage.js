@@ -12,7 +12,6 @@ export default function AdminPage({ tabIndex }) {
     if (userObj.user_role_id === 2) return <Redirect to="/mentor-page" />;
     else if (userObj.user_role_id === 3) return <Redirect to="/student-page" />;
   } else return <Redirect to="/" />;
-  console.log(tabIndex);
   return (
     <MainpageTemplate tabIndex={tabIndex}>
       <Tabs value={tabIndex} />

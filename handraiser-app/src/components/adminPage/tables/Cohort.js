@@ -1,22 +1,26 @@
-import React, { useEffect, useState } from "react";
-import copy from "clipboard-copy";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import io from "socket.io-client";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 // MATERIAL-UI
 import MaterialTable from "material-table";
-import { Switch, Tooltip, Button, ClickAwayListener } from "@material-ui/core/";
+import {
+  Switch,
+  Tooltip,
+  Button,
+  useMediaQuery,
+  useTheme,
+  Menu,
+  MenuItem
+} from "@material-ui/core/";
 
 // COMPONENTS
 import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
+import CopyToClipBoard from "../../tools/CopyToClipBoard";
 
 // ICONS
-import FileCopyIcon from "@material-ui/icons/FileCopy";
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from "@material-ui/icons/School";
@@ -25,37 +29,9 @@ import EditIcon from "@material-ui/icons/Edit";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 // import PopupModal from "../CohortTools/AssignCohort";
 
-export function ToolTipCopy({ data }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <ClickAwayListener onClickAway={() => setOpen(false)}>
-      <div>
-        <Tooltip
-          PopperProps={{
-            disablePortal: true
-          }}
-          onClose={() => setOpen(false)}
-          open={open}
-          disableFocusListener
-          disableHoverListener
-          disableTouchListener
-          title="Copied to Clipboard"
-        >
-          <FileCopyIcon
-            style={{ cursor: `pointer`, width: `20px` }}
-            onClick={() => {
-              copy(data);
-              setOpen(true);
-            }}
-          />
-        </Tooltip>
-      </div>
-    </ClickAwayListener>
-  );
-}
-
-export default function MaterialTableDemo() {
+let socket;
+export default function Cohort() {
+  const ENDPOINT = "localhost:3001";
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [createCohort, setCreateCohort] = useState(false);
@@ -96,7 +72,7 @@ export default function MaterialTableDemo() {
         render: rowData => (
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
-            <ToolTipCopy data={rowData.class_key} />
+            <CopyToClipBoard data={rowData.class_key} />
           </div>
         )
       },
@@ -208,7 +184,7 @@ export default function MaterialTableDemo() {
         render: rowData => (
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `90px` }}>{rowData.class_key}</p>
-            <ToolTipCopy data={rowData.class_key} />
+            <CopyToClipBoard data={rowData.class_key} />
           </div>
         )
       },
@@ -244,16 +220,8 @@ export default function MaterialTableDemo() {
                     View Joined Users
                   </MenuItem>
 
-                  <MenuItem
-                    onClick={e =>
-                      setUpdateTitleDesc({
-                        ...updateTitleDesc,
-                        open: true,
-                        data: rowData
-                      })
-                    }
-                  >
-                    Update Cohort
+                  <MenuItem onClick={e => openViewStudentsModal(rowData)}>
+                    View Joined Users
                   </MenuItem>
 
                   <MenuItem onClick={e => deleteCohort(rowData)}>
@@ -270,11 +238,16 @@ export default function MaterialTableDemo() {
   });
 
   useEffect(() => {
-    renderCohorts();
-  }, []);
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  }, [ENDPOINT]);
 
   // GET THE COHORT VALUES
-  const renderCohorts = () => {
+  const renderCohorts = useCallback(() => {
     axios({
       method: "get",
       url: `/api/cohorts/`,
@@ -283,13 +256,19 @@ export default function MaterialTableDemo() {
       }
     })
       .then(data => {
-        setTable({
-          ...table,
-          data: data.data
+        setTable(prevState => {
+          return {
+            ...prevState,
+            data: data.data
+          };
         });
       })
       .catch(err => console.log(err));
-  };
+  }, []);
+
+  useEffect(() => {
+    renderCohorts();
+  }, [renderCohorts]);
 
   const toggleClassFn = data => {
     console.log(data);
@@ -307,6 +286,7 @@ export default function MaterialTableDemo() {
       })
         .then(() => {
           renderCohorts();
+          socket.emit("renderCohort");
         })
         .catch(err => console.log("object"));
     } else {
@@ -322,6 +302,7 @@ export default function MaterialTableDemo() {
       })
         .then(() => {
           renderCohorts();
+          socket.emit("renderCohort");
         })
         .catch(err => console.log("object"));
     }

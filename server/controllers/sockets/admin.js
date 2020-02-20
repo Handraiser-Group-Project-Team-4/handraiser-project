@@ -11,8 +11,8 @@ module.exports = {
       // })
     });
 
-    socket.on(`renderCohort`, ({ data }) => {
-      io.emit("fetchCohort", data);
+    socket.on(`renderCohort`, () => {
+      io.emit("fetchCohort");
     });
 
     socket.on(`changeUserRole`, ({ user_id, user_role_id }) => {
@@ -22,6 +22,20 @@ module.exports = {
       if (user_role_id === 2) io.emit("studentToMentor", user_id);
       else if (user_role_id === 3) io.emit("mentorToStudent", user_id);
       // })
+    });
+
+    socket.on(`studentKicked`, ({user_id, class_id}) => {
+      db.classroom_details.find(class_id)
+      .then(classroom => {
+        io.emit("notifyKicked", {
+          user_id, 
+          classroom:{
+            class_id: classroom.class_id,
+            class_title: classroom.class_title
+          }
+        })
+      })
+      
     });
   }
 };
