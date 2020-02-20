@@ -7,6 +7,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Button from "@material-ui/core/Button";
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useTheme } from '@material-ui/core/styles';
 
 // components
 import AttendingKickModal from "./AttendingKickModal";
@@ -16,9 +18,12 @@ import AssignCohort from "./AssignCohort";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import SchoolIcon from '@material-ui/icons/School';
 import CloseIcon from '@material-ui/icons/Close';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 
 export default function AttendingModal({open, data, handleClose}) {
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.up('sm'));
     const [removeObj, setRemoveObj] = useState({
         open: false,
         data: ''
@@ -32,36 +37,16 @@ export default function AttendingModal({open, data, handleClose}) {
           { title: 'Title', field: 'class_title' },
           { title: 'Description', field: 'class_description' },
           { title: 'Date Joined', field: 'date_joined' },
-          {
-            title: "Status",
+          {title: "Status",
             field: "class_status",
-            lookup: {
-              true: (
-                <span
-                  style={{
-                    background: `green`,
-                    color: `white`,
-                    padding: `2px 4px`,
-                    borderRadius: `3px`
-                  }}
-                >
+            render: (rowData) => ((rowData.class_status === 'true')
+            ?  <span style={{background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
                   active
-                </span>
-              ),
-              false: (
-                <span
-                  style={{
-                    background: `red`,
-                    color: `white`,
-                    padding: `2px 4px`,
-                    borderRadius: `3px`
-                  }}
-                >
-                  close
-                </span>
-              )
-            },
-            export: false
+              </span>    
+            :<span style={{background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>
+                close
+            </span>
+            )
           },
           { title: 'Date Cohort Created', field: 'class_created' },  
           
@@ -170,16 +155,19 @@ export default function AttendingModal({open, data, handleClose}) {
 
         <DialogContent>
             <MaterialTable
-                title={<Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  onClick={(e) => getCohorts(data)}
-                  startIcon={<SchoolIcon />}
-                >
-                  {(data.user_role_id === 3 || data.role === 2) ? 'Join a Cohort' : 'Assign a Cohort'}
-                  
-                </Button>}
+                title={(matches)
+                  ?
+                    <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    onClick={(e) => getCohorts(data)}
+                    startIcon={<SchoolIcon />}
+                    >
+                      {(data.user_role_id === 3 || data.role === 2) ? 'Join a Cohort' : 'Assign a Cohort'}
+                    </Button>
+                  : <AddCircleIcon onClick={(e) => getCohorts(data)}/>
+                }
                 columns={table.columns}
                 data={table.data}
                 options={{

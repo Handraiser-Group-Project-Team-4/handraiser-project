@@ -3,12 +3,14 @@ import axios from 'axios';
 
 // MATERIAL-UI
 import MaterialTable from "material-table";
+import { useTheme } from '@material-ui/core/styles';
 import {
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Button
+  Button,
+  useMediaQuery
 } from "@material-ui/core/";
 
 // COMPONENTS
@@ -20,7 +22,6 @@ import AssingMentor from "./AssignMentor";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
-import VpnKeyIcon from "@material-ui/icons/VpnKey";
 
 export default function CohortModal({
   handleClose,
@@ -33,6 +34,8 @@ export default function CohortModal({
 
 
 }) {
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
   const [kickbool, setKickbool] = useState(false);
   const [kickobj, setKickobj] = useState({});
   const [assign, setAssign] = useState({
@@ -60,14 +63,14 @@ export default function CohortModal({
         lookup: { 3: "Student", 2: "Mentor" }
       },
       { title: "Email", field: "email" },
-      {
-        title: "Status",
-        field: "user_status",
-        export: false,
-        lookup: {
-          true: <status-indicator active pulse positive />,
-          false: <status-indicator active pulse negative />
-        }
+      { title: "Status", field: "user_status",
+        render: (rowData) => (
+          (rowData.user_status)? 
+            <status-indicator active pulse positive />
+          :
+            <status-indicator active pulse negative />
+        ),
+        export: false
       }
     ]
   };
@@ -166,15 +169,19 @@ export default function CohortModal({
 
         <DialogContent>
           <MaterialTable
-            title={<Button
+            title={(matches) 
+                ? <Button
                   variant="contained"
                   color="primary"
                   size="large"
                   onClick={e => getMentors(e, id)}
                   startIcon={<AddCircleIcon />}
-                >
-                  Assign a Mentor
-                </Button>}
+                  >
+                    Assign a Mentor
+                  </Button>
+                : <AddCircleIcon  onClick={e => getMentors(e, id)}/> 
+                  }
+
             columns={students.columns}
             data={data}
             actions={[

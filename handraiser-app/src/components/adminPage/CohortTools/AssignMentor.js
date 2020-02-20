@@ -15,7 +15,7 @@ import AddCircleIcon from '@material-ui/icons/AddCircle';
 export default function PopupModal({ handleClose, open, data, title, id}) {
     const columns = [
         
-        { title: 'Avatar', field: 'avatar',
+        { title: 'Avatar', field: 'firstname',
         render: (rowData) => (
           <div style={{display: `flex`}}>
             <img src={rowData.avatar} alt='pic' width="50" height="50" style={{ borderRadius: `50%`, margin: `0 30px 0 0` }} />
