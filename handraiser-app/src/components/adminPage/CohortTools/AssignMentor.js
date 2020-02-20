@@ -1,11 +1,13 @@
 import React from "react";
 import axios from "axios";
+
 // Material UI
 import MaterialTable from "material-table";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+
 // Material UI Icons
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 export default function PopupModal({ handleClose, open, data, title, id}) {

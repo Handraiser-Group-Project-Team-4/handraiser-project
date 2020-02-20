@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import io from "socket.io-client";
-import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 
 // MATERIAL-UI
 import MaterialTable from "material-table";
@@ -12,13 +12,13 @@ import {
   useMediaQuery,
   useTheme,
   Menu,
-  MenuItem,
+  MenuItem
 } from "@material-ui/core/";
 
 // COMPONENTS
 import PopupModal from "../../tools/PopupModal";
 import CohortModal from "../CohortTools/CohortModal";
-import CopyToClipBoard from '../../tools/CopyToClipBoard'
+import CopyToClipBoard from "../../tools/CopyToClipBoard";
 
 // ICONS
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
@@ -32,7 +32,7 @@ let socket;
 export default function Cohort() {
   const ENDPOINT = "localhost:3001";
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [createCohort, setCreateCohort] = useState(false);
   // const [cohortObj, setCohortObj] = useState({})
   const [updateTitleDesc, setUpdateTitleDesc] = useState({
@@ -76,14 +76,30 @@ export default function Cohort() {
       {
         title: "Status",
         field: "class_status",
-        render: (rowData) => ((rowData.class_status === 'true')
-          ? <span style={{ background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
-            active
-           </span>
-          : <span style={{ background: `red`, color: `white`, padding: `2px 4px`, borderRadius: `3px` }}>
-            close
-         </span>
-        )
+        render: rowData =>
+          rowData.class_status === "true" ? (
+            <span
+              style={{
+                background: `green`,
+                color: `white`,
+                padding: `2px 4px`,
+                borderRadius: `3px`
+              }}
+            >
+              active
+            </span>
+          ) : (
+            <span
+              style={{
+                background: `red`,
+                color: `white`,
+                padding: `2px 4px`,
+                borderRadius: `3px`
+              }}
+            >
+              close
+            </span>
+          )
       },
       {
         title: "Actions",
@@ -92,8 +108,7 @@ export default function Cohort() {
           textAlign: "center"
         },
         cellStyle: {
-          textAlign: "center",
-
+          textAlign: "center"
         },
         render: row => (
           <div
@@ -125,7 +140,15 @@ export default function Cohort() {
             </Tooltip>
 
             <Tooltip title="Update Cohort Title/Description">
-              <EditIcon onClick={e => setUpdateTitleDesc({ ...updateTitleDesc, open: true, data: row })} />
+              <EditIcon
+                onClick={e =>
+                  setUpdateTitleDesc({
+                    ...updateTitleDesc,
+                    open: true,
+                    data: row
+                  })
+                }
+              />
             </Tooltip>
             
           </div>
@@ -134,24 +157,25 @@ export default function Cohort() {
     ],
     mobileColumns: [
       {
-        title: "Title", field: "class_title",
-        render: (rowData) => ((rowData.class_status === 'true')
-          ?
-          <>
-            <status-indicator active pulse positive />
-            <span> {rowData.class_title}</span>
-          </>
-          :
-          <>
-
-            <status-indicator active pulse negative />
-            <span> {rowData.class_title}</span>
-          </>
-        )
+        title: "Title",
+        field: "class_title",
+        render: rowData =>
+          rowData.class_status === "true" ? (
+            <>
+              <status-indicator active pulse positive />
+              <span> {rowData.class_title}</span>
+            </>
+          ) : (
+            <>
+              <status-indicator active pulse negative />
+              <span> {rowData.class_title}</span>
+            </>
+          )
       },
       {
-        title: "Key", field: "class_key",
-        render: (rowData) => (
+        title: "Key",
+        field: "class_key",
+        render: rowData => (
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `90px` }}>{rowData.class_key}</p>
             <CopyToClipBoard data={rowData.class_key} />
@@ -159,18 +183,18 @@ export default function Cohort() {
         )
       },
       {
-        field: "class_key", width: 50, cellStyle: { textAlign: "right" }, headerStyle: { textAlign: "right" },
-        render: (rowData) => (
+        field: "class_key",
+        width: 50,
+        cellStyle: { textAlign: "right" },
+        headerStyle: { textAlign: "right" },
+        render: rowData => (
           <PopupState variant="popover" popupId="demo-popup-menu">
             {popupState => (
               <React.Fragment>
-
                 <MoreVertIcon {...bindTrigger(popupState)} />
 
-
                 <Menu {...bindMenu(popupState)}>
-
-                  <MenuItem >
+                  <MenuItem>
                     Toggle Status
                     <Switch
                       checked={rowData.class_status === "true" ? true : false}
@@ -180,11 +204,13 @@ export default function Cohort() {
                     />
                   </MenuItem>
 
-                  <MenuItem onClick={e => setChangeKey({ open: true, data: rowData })} >
+                  <MenuItem
+                    onClick={e => setChangeKey({ open: true, data: rowData })}
+                  >
                     Change Key
                   </MenuItem>
 
-                  <MenuItem onClick={e => openViewStudentsModal(rowData)} >
+                  <MenuItem onClick={e => openViewStudentsModal(rowData)}>
                     View Joined Users
                   </MenuItem>
 
@@ -202,7 +228,6 @@ export default function Cohort() {
     ],
     data: []
   });
-
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -223,10 +248,12 @@ export default function Cohort() {
       }
     })
       .then(data => {
-        setTable(prevState => {return{
-          ...prevState,
-          data: data.data
-        }});
+        setTable(prevState => {
+          return {
+            ...prevState,
+            data: data.data
+          };
+        });
       })
       .catch(err => console.log(err));
   }, []);
@@ -271,7 +298,7 @@ export default function Cohort() {
       title: row.class_title,
       created: row.class_created,
       id: row.class_id,
-      key : row.class_key,
+      key: row.class_key,
       status: row.class_status
     });
    
@@ -280,7 +307,6 @@ export default function Cohort() {
   };
 
   const renderViewStudentsTable = id => {
-  
     axios({
       method: "get",
       url: `/api/viewJoinedStudents/${id}`,
@@ -307,7 +333,9 @@ export default function Cohort() {
           titleLen={updateTitleDesc.data.class_title.length}
           descLen={updateTitleDesc.data.class_description.length}
           type={updateTitleDesc.type}
-          handleClose={(e) => setUpdateTitleDesc({ ...updateTitleDesc, open: false })}
+          handleClose={e =>
+            setUpdateTitleDesc({ ...updateTitleDesc, open: false })
+          }
           render={renderCohorts}
           title={`Update Class Title/Description`}
         />
@@ -369,29 +397,29 @@ export default function Cohort() {
       )}
 
       <MaterialTable
-
         title={
           <div>
-            {(matches) && <h3>Cohorts</h3>}
+            {matches && <h3>Cohorts</h3>}
 
             <Button
               variant="contained"
               color="primary"
               size="large"
               onClick={() => setCreateCohort(true)}
-              startIcon={<SchoolIcon style={{ display: (matches) ? null : 'none' }} />}
-              style={{ fontSize: (matches) ? null : '10px' }}
+              startIcon={
+                <SchoolIcon style={{ display: matches ? null : "none" }} />
+              }
+              style={{ fontSize: matches ? null : "10px" }}
             >
               Add Cohort
             </Button>
           </div>
         }
-        columns={(matches) ? table.columns : table.mobileColumns}
+        columns={matches ? table.columns : table.mobileColumns}
         data={table.data}
         options={{
           pageSize: 10,
-          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` },
-
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}
       />
     </>

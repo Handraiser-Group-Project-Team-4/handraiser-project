@@ -225,8 +225,6 @@ export default function Users() {
       .catch(err => console.log(err));
   };
 
-
-
   // GET THE Users VALUES
   const renderUsers = useCallback(() => {
     axios({
@@ -237,7 +235,9 @@ export default function Users() {
       }
     })
       .then(data => {
-        setUsers(prevState => {return {...prevState, data: data.data}});
+        setUsers(prevState => {
+          return { ...prevState, data: data.data };
+        });
       })
       .catch(err => console.log("err"));
   }, []);

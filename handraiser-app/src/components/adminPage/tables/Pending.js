@@ -175,11 +175,13 @@ export default function Pending() {
     })
       .then(data => {
         // console.log(data.data);
-        setPending(prevState => {return{ ...prevState, data: data.data }});
+        setPending(prevState => {
+          return { ...prevState, data: data.data };
+        });
       })
       .catch(err => console.log("object"));
   };
-  
+
   return (
     <React.Fragment>
       {approving.open && (

@@ -28,9 +28,9 @@ import {
   makeStyles,
   useTheme,
   Chip,
-  // Divider
 } from "@material-ui/core";
-// import Skeleton from "@material-ui/lab/Skeleton";
+import Skeleton from "@material-ui/lab/Skeleton";
+import { useSnackbar } from "notistack";
 
 // ICONS
 // import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
@@ -49,54 +49,80 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-  // const [value, setValue] = React.useState(0);
-  // const handleChanges = (e, newValue) => setValue(newValue);
   const history = useHistory();
   const { darkMode, setDarkMode } = useContext(DarkModeContext);
-  const [notify, setNotify] = useState({ open: false, title: "", buttonText: "", type: "", modalTextContent: "" });
-  const [notifyNotLogout, setNotifyNotLogout] = useState({ open: false, title: "", buttonText: "", type: "", modalTextContent: "" });
+  const { enqueueSnackbar } = useSnackbar();
+  const [notify, setNotify] = useState({
+    open: false,
+    title: "",
+    buttonText: "",
+    type: "",
+    modalTextContent: ""
+  });
+  const [notifyNotLogout, setNotifyNotLogout] = useState({
+    open: false,
+    title: "",
+    buttonText: "",
+    type: "",
+    modalTextContent: ""
+  });
+  const [open, setOpen] = React.useState(false);
+  const [modal, setModal] = React.useState(false);
 
-  const handleLogout = () => {
-    setNotify({ ...notify, open: false })
-    axios({
-      method: `patch`,
-      url: `/api/logout/${userObj.user_id}`,
-      headers: {
-        Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-      }
-    })
-      .then(res => {
-        console.log(res);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-    sessionStorage.clear();
-  };
+  // const handleLogout = () => {
+  //   setNotify({ ...notify, open: false })
+  //   axios({
+  //     method: `patch`,
+  //     url: `/api/logout/${userObj.user_id}`,
+  //     headers: {
+  //       Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+  //     }
+  //   })
+  //     .then(res => {
+  //       console.log(res);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  //   sessionStorage.clear();
+  // };
   
+  useEffect(() => {
+    let login = sessionStorage.getItem("notification") ? true : false;
+    if (login) {
+      enqueueSnackbar(sessionStorage.getItem("notification"), {
+        variant: "success",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right"
+        }
+      });
+      sessionStorage.removeItem("notification");
+    }
+  }, []);
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
 
   useEffect(() => {
-    socket.on('notifyKicked', ({ user_id, classroom }) => {
+    socket.on("notifyKicked", ({ user_id, classroom }) => {
       if (userObj.user_id === user_id)
         setNotifyNotLogout({
           open: true,
           title: `You just have been kick from ${classroom.class_title}!`,
           buttonText: "Agree",
           type: "studentKicked"
-        })
-    })
+        });
+    });
 
     return () => {
-      socket.emit('disconnect');
+      socket.emit("disconnect");
       socket.off();
     };
-  })
+  });
 
   useEffect(() => {
-    socket.on('mentorToStudent', user_id => {
+    socket.on("mentorToStudent", user_id => {
       if (userObj.user_id === user_id)
         // alert(`Your role has been change to Student Please Logout to see the changes!`);
         setNotify({
@@ -105,11 +131,11 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
           modalTextContent: "Please Logout to see the changes!",
           buttonText: "Logout",
           type: "mentorToStudent"
-        })
+        });
     });
 
     return () => {
-      socket.emit('disconnect');
+      socket.emit("disconnect");
       socket.off();
     };
   });
@@ -123,10 +149,10 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
           modalTextContent: "Please Logout to see the changes!",
           buttonText: "Logout",
           type: "studentToMentor"
-        })
+        });
     });
     return () => {
-      socket.emit('disconnect');
+      socket.emit("disconnect");
       socket.off();
     };
   });
@@ -142,7 +168,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
             modalTextContent: "Please Logout to see the changes!",
             buttonText: "Logout",
             type: "notifyUserApprove"
-          })
+          });
 
         if (approval_status.user_approval_status_id === 3)
           // alert(`Your Request has been Disapprove. Reason: ${approval_status.reason_disapproved}`);
@@ -152,7 +178,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
             modalTextContent: `Reason: ${approval_status.reason_disapproved}`,
             buttonText: "Agree",
             type: "notifyUserDisapprove"
-          })
+          });
       }
     });
 
@@ -174,6 +200,30 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
   //   setDarkMode(!darkMode);
   // };
 
+  const handleLogout = () => {
+    setNotify({ ...notify, open: false });
+    setModal(false);
+    setOpen(true);
+    setTimeout(() => {
+      setOpen(false);
+      axios({
+        method: `patch`,
+        url: `/api/logout/${userObj.user_id}`,
+        headers: {
+          Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+        }
+      })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      sessionStorage.clear();
+      sessionStorage.setItem("notification", `Successfully logged out`);
+      history.push("/");
+    }, 2000);
+  };
   if (!userObj) return <Redirect to="/" />;
   const drawer = (
     <div>
@@ -348,11 +398,12 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
       </div>
     </div>
   );
+
   return (
     <Fragment>
       <CssBaseline />
       <div className={classes.mainDiv}>
-        <Hidden only={['lg', 'md', 'xl']}>
+        <Hidden only={["lg", "md", "xl"]}>
           <AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
               <IconButton
@@ -366,7 +417,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
               </IconButton>
               <Typography variant="h6" noWrap>
                 Handraiser
-							</Typography>
+              </Typography>
             </Toolbar>
           </AppBar>
         </Hidden>
@@ -375,7 +426,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
             <Drawer
               container={container}
               variant="temporary"
-              anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+              anchor={theme.direction === "rtl" ? "right" : "left"}
               open={mobileOpen}
               onClose={handleDrawerToggle}
               classes={{
@@ -401,13 +452,13 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
           </Hidden>
         </nav>
         <main className={classes.content}>
-          <Hidden only={['lg', 'md', 'xl']}>
+          <Hidden only={["lg", "md", "xl"]}>
             <div className={classes.toolbar} />
           </Hidden>
           <div className={classes.tabPanel}>{children}</div>
         </main>
       </div>
-      {notify.open &&
+      {notify.open && (
         <UsersModal
           open={notify.open}
           title={notify.title}
@@ -417,25 +468,33 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
           type={notify.type}
           buttonText={notify.buttonText}
         />
-      }
+      )}
 
-      {notifyNotLogout.open &&
+      {notifyNotLogout.open && (
         <UsersModal
           open={notifyNotLogout.open}
           title={notifyNotLogout.title}
           modalTextContent={notifyNotLogout.modalTextContent}
-          handleClose={() => setNotifyNotLogout({ ...notifyNotLogout, open: false })}
-          handleSubmit={() => setNotifyNotLogout({ ...notifyNotLogout, open: false })}
+          handleClose={() =>
+            setNotifyNotLogout({ ...notifyNotLogout, open: false })
+          }
+          handleSubmit={() =>
+            setNotifyNotLogout({ ...notifyNotLogout, open: false })
+          }
           type={notifyNotLogout.type}
           buttonText={notifyNotLogout.buttonText}
         />
-      }
+      )}
     </Fragment>
   );
 }
 
 const drawerWidth = 245;
 const useStyles = makeStyles(theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff"
+  },
   tabPanel: {
     "&>div": {
       padding: 0
@@ -510,7 +569,6 @@ const useStyles = makeStyles(theme => ({
   },
   studentImg: {
     borderRadius: "50%",
-    // border: "5px solid white",
     width: 90,
     height: 90,
     cursor: "pointer",

@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
-import { Redirect } from 'react-router-dom';
-import GoogleLogin from 'react-google-login';
-import googleIcon from '../../images/google-icon.svg';
-import axios from 'axios';
-import jwtToken from '../tools/assets/jwtToken';
-import { DarkModeContext } from '../../App';
-import {newUserContext} from "../../routes"
+import React, { useState, useContext } from "react";
+import { Redirect } from "react-router-dom";
+import GoogleLogin from "react-google-login";
+import googleIcon from "../../images/google-icon.svg";
+import axios from "axios";
+import jwtToken from "../tools/assets/jwtToken";
+import { DarkModeContext } from "../../App";
+import { newUserContext } from "../../routes";
 
 export default function LoginBtn() {
 	const userObj = jwtToken();

@@ -15,7 +15,7 @@ import Chat from "../Chat/Chat";
 import jwtToken from "../../tools/assets/jwtToken";
 import { DarkModeContext } from "../../../App";
 import Search from "./CohortFilter";
-import CohortDetails from '../cohortDetails/CohortDetails'
+import CohortDetails from "../cohortDetails/CohortDetails";
 import Logs from "../cohortLogs/Logs";
 
 // MATERIAL-UI
@@ -38,7 +38,7 @@ import {
   Tabs,
   Tab,
   Box,
-  Button,
+  Button
 } from "@material-ui/core";
 
 // ICONS
@@ -107,8 +107,8 @@ export default function CohortPage({ value = 0, match }) {
               })
             : data.map(concern => {
                 return concern.concern_status !== "pending" &&
-                (concern.student_id === userObj.user_id ||
-                  concern.mentor_id === userObj.user_id)
+                  (concern.student_id === userObj.user_id ||
+                    concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
                       room: concern.concern_id,
                       concern: concern.concern_title,
@@ -170,7 +170,7 @@ export default function CohortPage({ value = 0, match }) {
   };
 
   return (
-    <MainpageTemplate>
+    <MainpageTemplate tabIndex={"student-page"}>
       <div className={classes.parentDiv}>
         <UserContext.Provider
           value={{
@@ -184,6 +184,7 @@ export default function CohortPage({ value = 0, match }) {
             chatHandler,
             search,
             filter,
+            setFilter,
             handleConcernCount
           }}
         >
@@ -356,7 +357,12 @@ export default function CohortPage({ value = 0, match }) {
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
               >
-                <CohortDetails classes={classes} class_id={id} Lest={Lest} changeHandler={changeHandler}/>
+                <CohortDetails
+                  classes={classes}
+                  class_id={id}
+                  Lest={Lest}
+                  changeHandler={changeHandler}
+                />
               </TabPanel>
               <TabPanel
                 value={value}
@@ -674,7 +680,7 @@ const useStyles = makeStyles(theme => ({
     "&::-webkit-scrollbar": {
       width: "5px",
       height: "8px",
-      backgroundColor: "#FFF",
+      // backgroundColor: "#FFF",
       borderTopRightRadius: 10,
       borderBottomRightRadius: 10
     },

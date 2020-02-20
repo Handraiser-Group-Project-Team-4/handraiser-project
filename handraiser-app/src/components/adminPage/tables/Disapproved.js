@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import MaterialTable from 'material-table';
@@ -18,11 +18,11 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: 500,
+    width: 500
   },
   typography: {
-    padding: theme.spacing(2),
-  },
+    padding: theme.spacing(2)
+  }
 }));
 
 export default function Disapproved() {
@@ -41,7 +41,6 @@ export default function Disapproved() {
               src={rowData.avatar}
               width="50"
               height="50"
-              alt={rowData.firstname}
               style={{ borderRadius: `50%`, margin: `0 30px 0 0` }}
             />
             <p>
@@ -77,19 +76,25 @@ export default function Disapproved() {
           </div>
           )
       },
-      { title: 'Reason', field: "View", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
-          render: (rowData) => (
-            <PopupState variant="popper" popupId="demo-popup-popper">
+      {
+        title: "Reason",
+        field: "View",
+        width: 50,
+        cellStyle: { textAlign: "right" },
+        headerStyle: { textAlign: "right" },
+        render: rowData => (
+          <PopupState variant="popper" popupId="demo-popup-popper">
             {popupState => (
               <div>
-               
-                  <VisibilityIcon {...bindToggle(popupState)}/>
-              
+                <VisibilityIcon {...bindToggle(popupState)} />
+
                 <Popper {...bindPopper(popupState)} transition>
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>
                       <Paper>
-                        <Typography className={classes.typography}>{rowData.reason_disapproved}</Typography>
+                        <Typography className={classes.typography}>
+                          {rowData.reason_disapproved}
+                        </Typography>
                       </Paper>
                     </Fade>
                   )}
@@ -103,7 +108,17 @@ export default function Disapproved() {
     data: []
   });
 
-  const renderDisapproved = useCallback(() => {
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!isCancelled) renderDisapproved();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const renderDisapproved = () => {
     axios({
       method: "get",
       url: `/api/user_approval_fetch?user_approval_status_id=3`,
@@ -113,36 +128,24 @@ export default function Disapproved() {
     })
       .then(data => {
         console.log(data.data);
-        setDisapproved(prevState => {return { ...prevState, data: data.data }});
+        setDisapproved({ ...disapproved, data: data.data });
       })
       .catch(err => console.log("object"));
-  }, []);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    if (!isCancelled) renderDisapproved();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [renderDisapproved]);
+  };
 
   return (
     <>
- 
-
-    <MaterialTable
-      title=""
-      columns={matches ? disapproved.columns : disapproved.mobileColumns}
-      data={disapproved.data}
-      options={{
-        pageSize: 10,
-        actionsColumnIndex: -1,
-        exportButton: true,
-        headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
-      }}
-    />
+      <MaterialTable
+        title=""
+        columns={matches ? disapproved.columns : disapproved.mobileColumns}
+        data={disapproved.data}
+        options={{
+          pageSize: 10,
+          actionsColumnIndex: -1,
+          exportButton: true,
+          headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
+        }}
+      />
     </>
   );
 }

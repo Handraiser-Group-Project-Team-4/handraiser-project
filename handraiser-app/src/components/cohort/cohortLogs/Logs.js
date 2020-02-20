@@ -101,7 +101,12 @@ const Logs = ({ classes, Timeline, changeHandler, logs, search }) => {
                           <div className="timeline-marker"></div>
                           <div className="timeline-content">
                             {/* <Avatar alt="Remy Sharp" /> */}
-                            <h3 className="timeline-title">
+                            <h3
+                              className="timeline-title"
+                              style={{
+                                color: darkMode ? "#fff" : null
+                              }}
+                            >
                               {log.action_made}
                             </h3>
                           </div>

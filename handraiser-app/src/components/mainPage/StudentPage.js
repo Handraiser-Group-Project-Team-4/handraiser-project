@@ -90,6 +90,10 @@ export default function StudentPage({ value, tabIndex }) {
         enqueueSnackbar(`Request Successfully Sent. Please Wait for the confirmation!`, {variant:`success`})
 
 
+        // setTimeout(() => {
+        //   alert(`Request Successfully Sent. Please Wait for the confirmation!`);
+        // }, 500);
+        setOpen(true);
         console.log(res);
       })
       .catch(err => console.log(err));
@@ -116,7 +120,7 @@ export default function StudentPage({ value, tabIndex }) {
           handleClose={() => setOpen(false)}
           handleSubmit={handleMentor}
           type="New User"
-          buttonText = "I'am a Mentor"
+          buttonText="I'am a Mentor"
         />
       }
 
@@ -177,8 +181,7 @@ const useStyles = makeStyles(theme => ({
     padding: "20px 10px"
   },
   cardRoot: {
-    minWidth: 590,
-    maxWidth: 590,
+    width: 600,
     borderRadius: 10,
     "& > div:first-of-type": {
       paddingBottom: 10
@@ -216,6 +219,13 @@ const useStyles = makeStyles(theme => ({
       font: "700 24px/1.2 'Poppins', sans-serif",
       marginBottom: 0
     },
+    "& > div > p": {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      "-webkit-line-clamp": "2",
+      display: "-webkit-box",
+      "-webkit-box-orient": "vertical"
+    },
     "& > div:last-of-type > span": {
       display: "flex",
       paddingTop: 5
@@ -235,7 +245,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   profile__image: {
-    padding: "30px 20px 20px",
+    padding: "30px 20px 20px"
     // "& > img": {
     //   width: 120,
     //   height: 120,
@@ -253,18 +263,18 @@ const useStyles = makeStyles(theme => ({
   },
   num_of_mentor: {
     backgroundColor: `whitesmoke`,
-    borderRadius:`50%`,
+    borderRadius: `50%`,
     color: `black`,
     padding: `8px`,
-    border:`1px solid #212121`
+    border: `1px solid #212121`
   },
   num_text_mentor: {
     backgroundColor: `#949090`,
-    borderRadius:`50%`,
+    borderRadius: `50%`,
     color: `white`,
     // padding: `8px`,
-    fontSize:`11px`, 
-    padding:`3px 5px`
+    fontSize: `11px`,
+    padding: `3px 5px`
   },
   tabRoot: {
     width: "100%",

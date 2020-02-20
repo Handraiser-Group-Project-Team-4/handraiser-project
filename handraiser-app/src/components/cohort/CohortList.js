@@ -14,6 +14,7 @@ import {DarkModeContext} from '../../App'
 
 // MATERIAL-UI
 import {
+  Container,
   useTheme,
   useMediaQuery,
   Typography,
@@ -112,24 +113,32 @@ export default function CohortList({ classes, value }) {
           backgroundColor: darkMode ? "#333" : null,
           height: "calc(100vh - 48px)"
         }}
-        // onChangeIndex={handleChangeIndex}
       >
         <TabPanel value={value} index={0} dir={theme.direction}>
-          <TextField
-            label="Search field"
-            type="search"
-            size={"small"}
-            name="search"
-            variant="outlined"
-            onChange={changeHandler}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              )
+          <Container
+            maxWidth="xl"
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              paddingRight: 100
             }}
-          />
+          >
+            <TextField
+              label="Search field"
+              type="search"
+              size={"small"}
+              name="search"
+              variant="outlined"
+              onChange={changeHandler}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+            />
+          </Container>
           <CohortContainer
             classes={classes}
             handleCohort={handleCohort}
