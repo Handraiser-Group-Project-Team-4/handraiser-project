@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import SwipeableViews from "react-swipeable-views";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { withSnackbar } from 'notistack';
+import { useSnackbar } from "notistack";
 // import io from "socket.io-client";
 
 // COMPONENTS
@@ -26,7 +26,8 @@ import {
 import SearchIcon from "@material-ui/icons/Search";
 
 // let socket;
-function CohortList({ classes, value, enqueueSnackbar }) {
+export default function CohortList({ classes, value }) {
+  const { enqueueSnackbar } = useSnackbar();
   const { darkMode } = useContext(DarkModeContext);
   const theme = useTheme();
   const userObj = jwtToken();
@@ -204,8 +205,6 @@ function CohortList({ classes, value, enqueueSnackbar }) {
     </>
   );
 }
-
-export default withSnackbar(CohortList);
 
 function TabPanel({ children, value, index, ...other }) {
   return (

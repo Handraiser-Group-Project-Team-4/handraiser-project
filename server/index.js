@@ -68,10 +68,10 @@ massive({
 		app.delete("/api/kickstud/:userId/:classId", cohorts.deleteStud);
 		app.get("/api/viewJoinedStudents/:id", cohorts.viewCohort);
 		app.delete("/api/deleteClass/:id", cohorts.deleteClass)
-    // app.post("/api/assignMentor", cohorts.assignMentor)
-    app.post("/api/enroll", cohorts.enroll);
-    app.patch("/api/updateTitleDesc/:id", cohorts.updateTitleDesc);
-    app.get("/api/getMentors/:id", cohorts.getMentors);
+		// app.post("/api/assignMentor", cohorts.assignMentor)
+		app.post("/api/enroll", cohorts.enroll);
+		app.patch("/api/updateTitleDesc/:id", cohorts.updateTitleDesc);
+		app.get("/api/getMentors/:id", cohorts.getMentors);
 
 
 		//WEBSOCKETS

@@ -14,60 +14,63 @@ import AssignCohort from "./AssignCohort";
 
 // icons
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import SchoolIcon from "@material-ui/icons/School";
-
-export default function AttendingModal({ open, data, handleClose }) {
-  const [removeObj, setRemoveObj] = useState({
-    open: false,
-    data: ""
-  });
-  const [assignCohortObj, setAssignCohortObj] = useState({
-    open: false,
-    data: ""
-  });
-  const [table, setTable] = React.useState({
-    columns: [
-      { title: "Title", field: "class_title" },
-      { title: "Description", field: "class_description" },
-      { title: "Date Joined", field: "date_joined" },
-      {
-        title: "Status",
-        field: "class_status",
-        lookup: {
-          true: (
-            <span
-              style={{
-                background: `green`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              active
-            </span>
-          ),
-          false: (
-            <span
-              style={{
-                background: `red`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              close
-            </span>
-          )
-        },
-        export: false
-      },
-      { title: "Date Cohort Created", field: "class_created" }
-    ],
-    data: []
-  });
+import SchoolIcon from '@material-ui/icons/School';
+import CloseIcon from '@material-ui/icons/Close';
 
 
-  const renderDataTable = useCallback((data) => {
+export default function AttendingModal({open, data, handleClose}) {
+    const [removeObj, setRemoveObj] = useState({
+        open: false,
+        data: ''
+    })
+    const [assignCohortObj, setAssignCohortObj] = useState({
+      open: false,
+      data: ''
+    })
+    const [table, setTable] = React.useState({
+        columns: [
+          { title: 'Title', field: 'class_title' },
+          { title: 'Description', field: 'class_description' },
+          { title: 'Date Joined', field: 'date_joined' },
+          {
+            title: "Status",
+            field: "class_status",
+            lookup: {
+              true: (
+                <span
+                  style={{
+                    background: `green`,
+                    color: `white`,
+                    padding: `2px 4px`,
+                    borderRadius: `3px`
+                  }}
+                >
+                  active
+                </span>
+              ),
+              false: (
+                <span
+                  style={{
+                    background: `red`,
+                    color: `white`,
+                    padding: `2px 4px`,
+                    borderRadius: `3px`
+                  }}
+                >
+                  close
+                </span>
+              )
+            },
+            export: false
+          },
+          { title: 'Date Cohort Created', field: 'class_created' },  
+          
+         
+        ],
+        data: [],
+      });
+
+   const renderDataTable = useCallback((data) => {
     axios({
       method: "get",
       url: `/api/getAttendingCohorts/'${data.user_id}'`,
@@ -78,7 +81,7 @@ export default function AttendingModal({ open, data, handleClose }) {
       .then(data => {
         setTable(prevState => {
           return {
-          prevState,
+          ...prevState,
           data: data.data
         }});
       })
@@ -147,71 +150,52 @@ export default function AttendingModal({ open, data, handleClose }) {
         fullwidth={true}
         maxWidth="lg"
       >
-        <DialogTitle id="alert-dialog-title">
-          <div style={{ display: "flex" }}>
-            <img
-              alt=""
-              src={data.avatar}
-              width="50"
-              height="50"
-              style={{
-                borderRadius: `50%`,
-                margin: `0 10px 0 0`,
-                border: `5px solid #673ab7`
-              }}
-            />
-
-            <div>
-              <h5 style={{ margin: `0` }}>
-                {" "}
-                {data.firstname} {data.lastname}
-              </h5>
-              <div style={{ display: "flex", alignItems: "baseline" }}>
-                {data.user_status ? (
-                  <status-indicator active pulse positive />
-                ) : (
-                  <status-indicator active pulse negative />
-                )}
-                {data.user_role_id === 3 ? (
-                  <h6 style={{ margin: `0 0 0 10px` }}>Student</h6>
-                ) : (
-                  <h6 style={{ margin: `0 0 0 10px` }}>Mentor</h6>
-                )}
+        <DialogTitle id="alert-dialog-title" onClose={handleClose}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <div style={{display: 'flex'}}>
+                  <img src={data.avatar} width="50" height="50" alt="avatar" style={{ borderRadius: `50%`, margin: `0 10px 0 0`, border: `5px solid #673ab7` }} />
+                  
+                  <div>
+                      <h5 style={{margin:`0`}}> {data.firstname} {data.lastname}</h5>
+                      <div style={{display: 'flex', alignItems: 'baseline'}}>
+                      { (data.user_status)? <status-indicator active pulse positive /> : <status-indicator active pulse negative />}
+                      {(data.user_role_id === 3 ) ? <h6 style={{margin:`0 0 0 10px`}}>Student</h6> : <h6 style={{margin: `0 0 0 10px`}}>Mentor</h6>}
+                      </div>
+                      
+                  </div>
               </div>
+              <CloseIcon onClick={handleClose}/>
             </div>
-          </div>
         </DialogTitle>
 
         <DialogContent>
-          <MaterialTable
-            title={
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                onClick={e => getCohorts(data)}
-                startIcon={<SchoolIcon />}
-              >
-                Assign in a Cohort
-              </Button>
-            }
-            columns={table.columns}
-            data={table.data}
-            options={{
-              selection: true,
-              exportButton: true,
-              exportFileName: `${data.firstname} ${data.lastname}'s Enrolled Cohorts `,
-              pageSize: 10,
-              headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
-            }}
-            actions={[
-              {
-                tooltip: "Assign as a Mentor",
-                icon: () => <HighlightOffIcon />,
-                onClick: (e, data) => setRemoveObj({ open: true, data: data })
-              }
-            ]}
-          />
+            <MaterialTable
+                title={<Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  onClick={(e) => getCohorts(data)}
+                  startIcon={<SchoolIcon />}
+                >
+                  Assign in a Cohort
+                </Button>}
+                columns={table.columns}
+                data={table.data}
+                options={{
+                    selection: true,
+                    exportButton: true,
+                    exportFileName: `${data.firstname} ${data.lastname}'s Enrolled Cohorts `,
+                    pageSize: 10,
+                    headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
+                }}
+                actions={[
+                    {
+                    tooltip: 'Remove Cohort',
+                    icon: () => <HighlightOffIcon/>,
+                    onClick: (e, data) => setRemoveObj({open: true, data: data})
+                    }
+                ]}     
+                />
         </DialogContent>
 
         <DialogActions></DialogActions>

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Redirect, useHistory } from "react-router-dom";
 import io from "socket.io-client";
+import { useSnackbar } from "notistack";
 
 // COMPONENTS
 import { newUserContext } from "../../routes";
@@ -15,17 +16,28 @@ import UsersModal from "../tools/UsersModal";
 import { makeStyles, AppBar, Tabs, Tab } from "@material-ui/core";
 
 let socket;
-export default function StudentPage({ value }) {
+export default function StudentPage({ value, tabIndex }) {
+  const { enqueueSnackbar } = useSnackbar();
   const [request, setRequest] = useState();
-  const [open, setOpen] = useState(true);
-  const { isNew } = useContext(newUserContext);
+  const [open, setOpen] = useState(false);
+  const { isNew, setisNew } = useContext(newUserContext);
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
   const history = useHistory();
 
-
   sessionStorage.setItem("newUser", isNew);
+
+  useEffect(() => {
+    if(isNew)
+      setOpen(true)
+  }, [isNew])
+
+  useEffect(() => {
+    return () => {
+      setisNew(false)
+    }
+  }, [setisNew])
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -74,10 +86,9 @@ export default function StudentPage({ value }) {
         sessionStorage.setItem("newUser", "pending");
 
         socket.emit("mentorRequest", { data: userObj });
+        setOpen(false)
+        enqueueSnackbar(`Request Successfully Sent. Please Wait for the confirmation!`, {variant:`success`})
 
-        setTimeout(() => {
-          alert(`Request Successfully Sent. Please Wait for the confirmation!`);
-        }, 500);
 
         console.log(res);
       })
@@ -90,13 +101,14 @@ export default function StudentPage({ value }) {
   } else return <Redirect to="/" />;
 
   return (
-    <MainpageTemplate>
-      {sessionStorage.getItem("newUser") === "pending" ||
-      request === "pending" ||
-      userObj.user_approval_status_id === 2 ? (
-        <h3>Request Sent. Waiting for Confirmation!</h3>
-      ) : (
-        sessionStorage.getItem("newUser") === "true" && (
+    <MainpageTemplate tabIndex={tabIndex} request={request}>
+      {
+      // sessionStorage.getItem("newUser") === "pending" ||
+      // request === "pending" ||
+      // userObj.user_approval_status_id === 2 ? (
+      //   <h3>Request Sent. Waiting for Confirmation!</h3>
+      // ) : (
+        sessionStorage.getItem("newUser") === "true" && 
         <UsersModal 
           open={open}
           title="Welcome to Handraiser App!"
@@ -106,8 +118,7 @@ export default function StudentPage({ value }) {
           type="New User"
           buttonText = "I'am a Mentor"
         />
-        )
-      )}
+      }
 
       <div className={classes.parentDiv}>
         <div className={classes.tabRoot}>

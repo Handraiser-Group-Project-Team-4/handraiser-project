@@ -41,7 +41,7 @@ export default function LoginBtn() {
 						}
 					})
 						.then(res => {
-							console.log(res);
+							// console.log(res);
 							sessionStorage.setItem('accessToken', res.data.token);
 							setUser({ ...user, loginSuccess: true});
 							setisNew(true)

@@ -1,18 +1,15 @@
 import React, { useState, useEffect, Fragment, useContext } from 'react';
-import { Redirect, Link, useHistory } from 'react-router-dom';
-import { GoogleLogout } from 'react-google-login';
+import { Redirect, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import io from "socket.io-client";
 
 // COMPONENTS
-import jwtToken from '../tools/assets/jwtToken';
-// import handraise from '../../images/handraise.png';
-import { DarkModeContext } from '../../App';
-// import Team from './Team';
+import jwtToken from "../tools/assets/jwtToken";
+import { DarkModeContext } from "../../App";
+
 import UsersModal from '../tools/UsersModal'
-// import Unnamed from "./unnamed.jpg";
-// import Handraiser from "./Handraiser";
-// import ListOfCohorts from "./ListOfCohorts";
+import TabsTemplate from "./TabsTemplate";
+
 // MATERIAL-UI
 import {
   AppBar,
@@ -26,9 +23,8 @@ import {
   Toolbar,
   Typography,
   Tab,
-  // Box,
-  Tabs,
-  Switch,
+  Card,
+  CardContent,
   makeStyles,
   useTheme,
   Chip,
@@ -37,20 +33,16 @@ import {
 // import Skeleton from "@material-ui/lab/Skeleton";
 
 // ICONS
-import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
+// import PeopleOutlineIcon from "@material-ui/icons/PeopleOutline";
 // import PersonOutlineIcon from "@material-ui/icons/PersonOutline";
 import DnsIcon from "@material-ui/icons/Dns";
 import MenuIcon from "@material-ui/icons/Menu";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-import Brightness4Icon from "@material-ui/icons/Brightness4";
-import Brightness7Icon from "@material-ui/icons/Brightness7";
+import GroupIcon from "@material-ui/icons/Group";
+import ThumbUpIcon from "@material-ui/icons/ThumbUp";
+import WarningIcon from "@material-ui/icons/Warning";
 
 let socket;
-export default function MainpageTemplate({
-  children,
-  container,
-  tabIndex = 0
-}) {
+export default function MainpageTemplate({ children, container, tabIndex, request }) {
   const ENDPOINT = "localhost:3001";
   const userObj = jwtToken();
   const classes = useStyles();
@@ -81,6 +73,7 @@ export default function MainpageTemplate({
       });
     sessionStorage.clear();
   };
+  
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
@@ -169,17 +162,18 @@ export default function MainpageTemplate({
     };
   });
 
-  const handleDarkMode = async () => {
-    await axios({
-      method: "patch",
-      url: `/api/darkmode/${userObj.user_id}`,
-      data: { dark_mode: !darkMode },
-      headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-      }
-    });
-    setDarkMode(!darkMode);
-  };
+  // const handleDarkMode = async () => {
+  //   await axios({
+  //     method: "patch",
+  //     url: `/api/darkmode/${userObj.user_id}`,
+  //     data: { dark_mode: !darkMode },
+  //     headers: {
+  //       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+  //     }
+  //   });
+  //   setDarkMode(!darkMode);
+  // };
+
   if (!userObj) return <Redirect to="/" />;
   const drawer = (
     <div>
@@ -195,110 +189,163 @@ export default function MainpageTemplate({
           color="primary"
           style={{
             backgroundColor: "white",
-            color: darkMode ? "#000" : null
+            color: "#000"
           }}
         />
       </div>
-      <Tabs orientation="vertical" value={tabIndex} className={classes.tabs}>
-        <Tab
-          label={
-            <ListItem
-              onClick={() => history.push("/student-page")}
-              button
-              className={classes.listItemButton}
+      {userObj.user_role_id === 1 && (
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={userObj}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
             >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <DnsIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary="Cohorts"
-                className={classes.listItemText}
-              />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
-            <ListItem
-              onClick={() => history.push("/team")}
-              button
-              className={classes.listItemButton}
-            >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <PeopleOutlineIcon />
-              </ListItemIcon>
-              <ListItemText primary="Team" className={classes.listItemText} />
-            </ListItem>
-          }
-        />
-        <Tab
-          label={
-            <ListItem className={classes.listItemButton}>
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                {darkMode ? <Brightness4Icon /> : <Brightness7Icon />}
-              </ListItemIcon>
-              <ListItemText
-                className={classes.listItemText}
-                primary={darkMode ? "Dark" : "Light"}
-              />
-              <Switch
-                checked={darkMode}
-                onChange={handleDarkMode}
-                value="checkedB"
-                color="default"
-              />
-            </ListItem>
-          }
-        />
-
-        {/* <Divider className={classes.divider} /> */}
-
-        <Tab
-          label={
-            <ListItem
-              to="/"
-              renderas={Link}
-              onClick={handleLogout}
-              button
-              className={classes.listItemButton}
-            >
-              <ListItemIcon
-                style={{
-                  color: "white"
-                }}
-              >
-                <ExitToAppIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <GoogleLogout
-                    render={renderProps => (
-                      <p style={{ margin: `0` }}>Logout</p>
-                    )}
-                    clientId={process.env.REACT_APP_CLIENT_ID}
-                    buttonText="Logout"
-                    onLogoutSuccess={handleLogout}
-                  ></GoogleLogout>
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-cohorts"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
                 }
-                className={classes.listItemText}
+                {...a11yProps("admin-cohorts")}
               />
-            </ListItem>
-          }
-        />
-      </Tabs>
-
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-users"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/users")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <GroupIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Users"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-users")}
+              />
+              <Tab
+                style={{ padding: 0 }}
+                value="admin-approval"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/admin-page/approval")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <ThumbUpIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Approval"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("admin-approval")}
+              />
+            </TabsTemplate>
+          )
+        }
+      {userObj.user_role_id !== 1 && (
+            <TabsTemplate
+              tabIndex={tabIndex}
+              user={userObj}
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              classes={classes}
+            >
+              <Tab
+                style={{ padding: 0 }}
+                value="student-page"
+                label={
+                  <ListItem
+                    onClick={() => history.push("/student-page")}
+                    button
+                    className={classes.listItemButton}
+                  >
+                    <ListItemIcon
+                      style={{
+                        color: "white"
+                      }}
+                    >
+                      <DnsIcon />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary="Cohorts"
+                      className={classes.listItemText}
+                    />
+                  </ListItem>
+                }
+                {...a11yProps("student-page")}
+              />
+            </TabsTemplate>
+          )
+        }
+      <div
+        style={{
+          position: "absolute",
+          bottom: 10,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: 240
+        }}
+      >
+        {(userObj.user_approval_status_id === 2 || 
+        sessionStorage.getItem("newUser") === "pending" || 
+        request === "pending")&& 
+          <Card style={{ width: 220 }}>
+            <CardContent
+              style={{
+                paddingBottom: 16,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <WarningIcon />
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ whiteSpace: "normal", paddingLeft: 10 }}
+              >
+                Your request to be a mentor is still being processed.
+              </Typography>
+            </CardContent>
+          </Card>
+        }
+      </div>
     </div>
   );
   return (
@@ -387,7 +434,7 @@ export default function MainpageTemplate({
   );
 }
 
-const drawerWidth = 240;
+const drawerWidth = 245;
 const useStyles = makeStyles(theme => ({
   tabPanel: {
     "&>div": {
@@ -499,13 +546,13 @@ const useStyles = makeStyles(theme => ({
     color: "#9ea0b8"
   },
   divider: {
-    backgroundColor: "#ffe4c4",
-    margin: `10px 0 20px 0`
-  },
-  tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
-    "& button": {
-      padding: 0
-    }
+    backgroundColor: "#ffe4c4"
   }
 }));
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`
+  };
+}

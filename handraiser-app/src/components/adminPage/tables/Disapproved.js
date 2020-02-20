@@ -1,16 +1,35 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-import MaterialTable from "material-table";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
+import MaterialTable from 'material-table';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import Popper from '@material-ui/core/Popper';
+import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+
 
 // components
-import Badger from "../../tools/Badger";
+import Badger from '../../tools/Badger';
+
+import VisibilityIcon from "@material-ui/icons/Visibility";
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: 500,
+  },
+  typography: {
+    padding: theme.spacing(2),
+  },
+}));
 
 export default function Disapproved() {
+  const classes = useStyles();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("sm"));
+  const matches = useMediaQuery(theme.breakpoints.up('sm'));
+
   const [disapproved, setDisapproved] = useState({
     columns: [
       {
@@ -56,8 +75,30 @@ export default function Disapproved() {
               </div>
             </div>
           </div>
-        )
-      }
+          )
+      },
+      { title: 'Reason', field: "View", width: 50, cellStyle: {textAlign: "right"}, headerStyle: {textAlign: "right"},
+          render: (rowData) => (
+            <PopupState variant="popper" popupId="demo-popup-popper">
+            {popupState => (
+              <div>
+               
+                  <VisibilityIcon {...bindToggle(popupState)}/>
+              
+                <Popper {...bindPopper(popupState)} transition>
+                  {({ TransitionProps }) => (
+                    <Fade {...TransitionProps} timeout={350}>
+                      <Paper>
+                        <Typography className={classes.typography}>{rowData.reason_disapproved}</Typography>
+                      </Paper>
+                    </Fade>
+                  )}
+                </Popper>
+              </div>
+            )}
+          </PopupState>
+          )
+      } 
     ],
     data: []
   });
@@ -88,6 +129,9 @@ export default function Disapproved() {
   }, [renderDisapproved]);
 
   return (
+    <>
+ 
+
     <MaterialTable
       title=""
       columns={matches ? disapproved.columns : disapproved.mobileColumns}
@@ -99,5 +143,6 @@ export default function Disapproved() {
         headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
       }}
     />
+    </>
   );
 }
