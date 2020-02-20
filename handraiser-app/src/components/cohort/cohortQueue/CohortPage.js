@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import io from "socket.io-client";
-import Axios from "axios";
+import axios from "axios";
 import SwipeableViews from "react-swipeable-views";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -84,7 +84,7 @@ export default function CohortPage({ value = 0, match }) {
     setAnchorEl(null);
   };
   useEffect(() => {
-    Axios({
+    axios({
       method: "get",
       url: `/api/users/${userObj.user_id}`,
       headers: {
@@ -101,11 +101,7 @@ export default function CohortPage({ value = 0, match }) {
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {
-      socket.on("fetchOldLogs", ({ data }) => {
-        setLogs(data);
-      });
-    });
+    socket.emit("joinConcern", { id }, () => {});
   }, [ENDPOINT]);
 
   useEffect(() => {
@@ -748,6 +744,8 @@ export default function CohortPage({ value = 0, match }) {
                   changeHandler={changeHandler}
                   logs={logs}
                   search={search}
+                  id={id}
+                  setLogs={setLogs}
                 />
               </TabPanel>
             </SwipeableViews>

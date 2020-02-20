@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
+import io from "socket.io-client";
 import {
   Paper,
   Grid,
@@ -13,9 +14,28 @@ import SearchIcon from "@material-ui/icons/Search";
 
 import { DarkModeContext } from "../../../App";
 
-const Logs = ({ classes, Timeline, changeHandler, logs, search }) => {
+let socket;
+const Logs = ({
+  classes,
+  Timeline,
+  changeHandler,
+  logs,
+  search,
+  id,
+  setLogs
+}) => {
+  const ENDPOINT = "localhost:3001";
   const { darkMode } = useContext(DarkModeContext);
   const [searchResult, setSearchResult] = useState([]);
+
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+    socket.emit("joinConcern", { id }, () => {
+      socket.on("fetchOldLogs", ({ data }) => {
+        setLogs(data);
+      });
+    });
+  }, [ENDPOINT]);
 
   useEffect(() => {
     let filter = [];

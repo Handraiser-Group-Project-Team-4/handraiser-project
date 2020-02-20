@@ -2,7 +2,7 @@ module.exports = {
   chatSockets: (socket, io, db) => {
     const users = [];
     socket.on("join", ({ chatroom }, callback) => {
-      console.log("a user connected to chat");
+      // console.log("a user connected to chat");
       const user = {
         id: socket.id,
         name: chatroom.name,
@@ -82,7 +82,7 @@ module.exports = {
     });
 
     socket.on("disconnect", () => {
-      console.log("user disconnected to chat");
+      // console.log("user disconnected to chat");
     });
   }
 };
