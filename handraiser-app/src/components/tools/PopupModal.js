@@ -34,9 +34,9 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
     })
     const [counter, setCounter] = useState({
         title: '30',
-        description: '50',
+        description: '100',
         updatingTitle: 30 - titleLen,
-        updatingDescription: 50 - descLen,
+        updatingDescription: 100 - descLen,
     })
     const [body, setBody] = useState({
         data:
@@ -137,7 +137,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         else if(e.target.name === 'class_description'){
             setCounter({
                 ...counter,
-                description: 50-newBawas
+                description: 100-newBawas
             })
         }
     };
@@ -161,7 +161,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         else if(e.target.name === 'class_description'){
             setCounter({
                 ...counter,
-                updatingDescription: 50-newBawas
+                updatingDescription: 100-newBawas
             })
         }
     }
@@ -315,7 +315,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                                             label="Class Description"
                                             multiline
                                             name="class_description"
-                                            rows="3"
+                                            rows="5"
                                             defaultValue={body.data.class_description}
                                             onChange={updateCohort}
                                             variant="outlined"
@@ -325,10 +325,10 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                                                         color: (counter.updatingDescription < 10) ? "red" : null,
                                                         opacity: '0.5'
                                                     }}
-                                                    position="end">{counter.updatingDescription}/50</InputAdornment>
+                                                    position="end">{counter.updatingDescription}/100</InputAdornment>
                                             }}
                                             inputProps={{
-                                                maxLength: 50,
+                                                maxLength: 100,
                                             }}
                                         />
                                     </div>
@@ -370,7 +370,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                                                     id="standard-basic2"
                                                     variant="outlined"
                                                     multiline
-                                                    rows="3"
+                                                    rows="5"
                                                     name="class_description"
                                                     label="class_description"
                                                     onChange={handleInputs}
@@ -380,10 +380,10 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                                                                 color: (counter.description < 10) ? "red" : null,
                                                                 opacity: '0.5'
                                                             }}
-                                                            position="end">{counter.description}/50</InputAdornment>
+                                                            position="end">{counter.description}/100</InputAdornment>
                                                     }}
                                                     inputProps={{
-                                                        maxLength: 50,
+                                                        maxLength: 100,
                                                     }}
                                                 />
                                            </div>

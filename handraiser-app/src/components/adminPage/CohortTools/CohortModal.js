@@ -148,7 +148,7 @@ export default function CohortModal({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullwidth='true'
-        maxWidth="lg"
+        maxWidth="xl"
       >
         <DialogTitle id="alert-dialog-title">
           <div style={{ display: "flex", justifyContent: "space-between" }}>

@@ -3,7 +3,7 @@
     "user": "postgres",
     "password": "handraiser",
     "host": "localhost",
-    "port": 5435,
+    "port": 5432,
     "database": "handraiser"
   }
 }
