@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const emailSender = require('../email');
 
 module.exports = {
 	login: (req, res) => {
@@ -118,11 +119,17 @@ module.exports = {
 
 	request: (req, res) => {
 		const db = req.app.get('db');
-
+		const { name } = req.query;
 		db.query(
 			`UPDATE users set user_approval_status_id=2 WHERE user_id = '${req.params.id}'`
 		)
-			.then(get => res.status(200).json(get))
+			.then(get => {
+				res.status(200).json(get);
+				const body = `	<h2>${name} is Requesting to be a Mentor</h2>
+								<br /><br />
+								<a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>`
+				emailSender.emailTemplate(process.env.EMAIL_ADMIN, 'Request to be a Mentor in Handraiser App', body)
+			})
 			.catch(err => {
 				console.error(err);
 				res.status(500).end();
@@ -188,55 +195,59 @@ module.exports = {
 			});
 	},
 
-  movingToDisapprove: (req, res) => {
-    const db = req.app.get("db");
-    const { user_approval_status_id, reason_disapproved } = req.body;
-    db.users
-      .update(
-        {
-          user_id: req.params.id
-        },
-        {
-          user_approval_status_id: user_approval_status_id,
-          reason_disapproved: reason_disapproved
-        }
-      )
-      .then(post => res.status(201).send(post))
-      .catch(err => {
-        console.err(err);
-        res.status(500).end();
-      });
-  },
+	movingToDisapprove: (req, res) => {
+		const db = req.app.get('db');
+		const { user_approval_status_id, reason_disapproved } = req.body;
+		db.users
+			.update(
+				{
+					user_id: req.params.id
+				},
+				{
+					user_approval_status_id: user_approval_status_id,
+					reason_disapproved: reason_disapproved
+				}
+			)
+			.then(post => res.status(201).send(post))
+			.catch(err => {
+				console.err(err);
+				res.status(500).end();
+			});
+	},
 
-  getMentors: (req, res) => {
-    const db = req.app.get("db");
+	getMentors: (req, res) => {
+		const db = req.app.get('db');
 
-     db.query(`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
-     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
+		db.query(
+			`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
+     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`
+		)
+			.then(get => res.status(200).json(get))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
 
-  getAttendingCohorts: (req, res) => {
-    const db = req.app.get("db");
+	getAttendingCohorts: (req, res) => {
+		const db = req.app.get('db');
 
-     db.query(`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
+		db.query(
+			`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
      from users u
      inner join classroom_students cs
      on u.user_id = cs.user_id
      inner join classroom_details cd
      on cs.class_id = cd.class_id
-     where u.user_id = ${req.params.id}`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-	
+     where u.user_id = ${req.params.id}`
+		)
+			.then(get => res.status(200).json(get))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
+
 	darkmode: (req, res) => {
 		const db = req.app.get('db');
 		const { dark_mode } = req.body;
@@ -248,6 +259,33 @@ module.exports = {
 				{ dark_mode }
 			)
 			.then(user => res.status(200).json(user))
+			.catch(err => {
+				console.log(err);
+				res.status(500).end();
+			});
+	},
+
+	shareKey: (req, res) => {
+		const db = req.app.get('db');
+
+		db.query(`select cd.class_title, cs.user_id, u.email, c.class_key
+		from classroom_students cs
+		inner join classroom_details cd
+		on cs.class_id = cd.class_id
+		inner join users u
+		on cs.user_id = u.user_id
+		inner join classroom c
+		on cd.class_id = c.class_id
+		where cs.class_id = ${req.params.id} and u.user_role_id = 2`)
+			.then(mentors => {
+				res.status(200).json(mentors);
+				mentors.map(mentor => {
+					const body = `	<p>Please use the following credentials on joining the cohort: </p>
+					 				<h2>Cohort Name: ${mentor.class_title}</h2>
+					 				<h3>Cohort Key: ${mentor.class_key}</h3> ` 
+					emailSender.emailTemplate(mentor.email, 'Shared a Key on Cohort', body)
+				})
+			})
 			.catch(err => {
 				console.log(err);
 				res.status(500).end();

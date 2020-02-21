@@ -8,6 +8,7 @@ import CopyToClipBoard from '../../tools/CopyToClipBoard'
 import jwtToken from "../../tools/assets/jwtToken";
 import { DarkModeContext } from "../../../App";
 import cohort from "../../../images/cohort.png";
+import cohortDark from "../../../images/cohortdark.jpg";
 import UsersModal from '../../tools/UsersModal'
 
 // MATERIAL-UI
@@ -111,11 +112,14 @@ export default function CohortDetails({ classes, class_id, Lest, changeHandler }
                         md={8}
                         lg={8}
                         className={classes.loginBoxGridOne}
+                        style={{
+                            backgroundColor: darkMode ? "#303030" : null
+                        }}
                     >
                         <Grid item xs={12} sm={12} md={12} lg={6}>
                             <CardMedia
                                 className={classes.loginBoxGridOneCardMedia}
-                                image={cohort}
+                                image={darkMode ? cohortDark: cohort}
                             />
                         </Grid>
                         <Grid
@@ -206,13 +210,14 @@ export default function CohortDetails({ classes, class_id, Lest, changeHandler }
                                 />
                             </form>
                             {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
-                            <Lest>
+                            <Lest >
                                 <ul className={classes.lestUl}>
                                     <li
                                         className="list"
                                         style={{
                                             padding: 10,
-                                            textTransform: "uppercase"
+                                            textTransform: "uppercase",
+                                            backgroundColor: darkMode ? "#333" : null
                                         }}
                                     >
                                         <div
@@ -274,8 +279,8 @@ export default function CohortDetails({ classes, class_id, Lest, changeHandler }
                                     </span> */}
                                         </div>
                                     </li>
-                                    {classDetails.map(user => (
-                                        <li className="list" key={user}>
+                                    {classDetails.map((user,index) => (
+                                        <li className="list" key={index} style={{backgroundColor: darkMode ? "#333" : null}}>
                                             <div className="list__profile">
                                                 <div>
                                                     <img src={user.avatar} alt="avatar" />

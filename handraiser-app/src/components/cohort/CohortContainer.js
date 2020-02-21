@@ -117,7 +117,6 @@ export default function CohortContainer({
       setSearchResult([]);
     }
   }, [search, classroom]);
-
   return (
     <Container className={classes.paperr} maxWidth="xl">
       <Grid container spacing={0} className={classes.gridContainerrr}>
@@ -178,15 +177,8 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] &&
-                              x.mentor[0].firstname +
-                                " " +
-                                x.mentor[0].lastname}
-                            {x.mentor.length > 1 && (
-                              <b className={classes.num_text_mentor}>
-                                +{i > 0 && x.mentor.length - 1}
-                              </b>
-                            )}
+                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
+                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
                           </h5>
                         </span>
                         <span>
@@ -293,15 +285,8 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] &&
-                              x.mentor[0].firstname +
-                                " " +
-                                x.mentor[0].lastname}
-                            {x.mentor.length > 1 && (
-                              <b className={classes.num_text_mentor}>
-                                +{i > 0 && x.mentor.length - 1}
-                              </b>
-                            )}
+                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
+                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
                           </h5>
                         </span>
                         <span>

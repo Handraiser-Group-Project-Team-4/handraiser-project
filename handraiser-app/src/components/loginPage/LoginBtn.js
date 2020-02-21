@@ -1,15 +1,15 @@
-import React, { useState, useContext } from "react";
-import { Redirect } from "react-router-dom";
-import GoogleLogin from "react-google-login";
-import googleIcon from "../../images/google-icon.svg";
-import axios from "axios";
-import jwtToken from "../tools/assets/jwtToken";
-import { DarkModeContext } from "../../App";
-import { newUserContext } from "../../routes";
+import React, { useState, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
+import GoogleLogin from 'react-google-login';
+import googleIcon from '../../images/google-icon.svg';
+import axios from 'axios';
+import jwtToken from '../tools/assets/jwtToken';
+import { DarkModeContext } from '../../App';
+import { newUserContext } from '../../routes';
 
 export default function LoginBtn() {
 	const userObj = jwtToken();
-	const {setisNew} = useContext(newUserContext);
+	const { setisNew } = useContext(newUserContext);
 	const { setDarkMode } = useContext(DarkModeContext);
 	const [user, setUser] = useState({
 		loginSuccess: false,
@@ -22,7 +22,8 @@ export default function LoginBtn() {
 			url: `/api/users?user_id=${response.profileObj.googleId}`
 		})
 			.then(res => {
-				// console.log(res.data)
+				// console.log(res.data);
+
 				if (res.data[0] !== undefined)
 					sessionStorage.setItem('accessToken', res.data.token);
 				if (res.data[0] === undefined) {
@@ -41,13 +42,21 @@ export default function LoginBtn() {
 						}
 					})
 						.then(res => {
+							sessionStorage.setItem(
+								'notification',
+								`Hi ${response.profileObj.givenName}! Welcome to Handraiser!`
+							);
 							// console.log(res);
 							sessionStorage.setItem('accessToken', res.data.token);
-							setUser({ ...user, loginSuccess: true});
-							setisNew(true)
+							setUser({ ...user, loginSuccess: true });
+							setisNew(true);
 						})
 						.catch(err => console.log(err));
 				} else {
+					sessionStorage.setItem(
+						'notification',
+						`Hi ${res.data[0].firstname}! Welcome to Handraiser!`
+					);
 					setUser({
 						...user,
 						loginSuccess: true,
@@ -64,12 +73,11 @@ export default function LoginBtn() {
 		return <Redirect to="/admin-page" />;
 	else if ((userObj || user.loginSuccess) && user.role === 2)
 		return <Redirect to="/mentor-page" />;
-	else if (userObj || user.loginSuccess)
-		return (<Redirect to= "/student-page" />);
-		
+	else if (userObj || user.loginSuccess) return <Redirect to="/student-page" />;
+
 	return (
 		<GoogleLogin
-			clientId={process.env.REACT_APP_CLIENT_ID}
+			clientId="583886288270-pclb0onu831kl9a3n1onuqbnhs5sk8k1.apps.googleusercontent.com"
 			buttonText="Login with Google"
 			onSuccess={responseGoogle}
 			onFailure={response => console.log(response)}

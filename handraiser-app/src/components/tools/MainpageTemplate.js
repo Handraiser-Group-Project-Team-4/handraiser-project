@@ -29,7 +29,6 @@ import {
   useTheme,
   Chip,
 } from "@material-ui/core";
-import Skeleton from "@material-ui/lab/Skeleton";
 import { useSnackbar } from "notistack";
 
 // ICONS
@@ -99,10 +98,29 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
       });
       sessionStorage.removeItem("notification");
     }
-  }, []);
+  }, [enqueueSnackbar]);
+  
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
+
+  useEffect(() => {
+    socket.on("notifyAssignedMentor", ({ user_id, class_title }) => {
+      if (userObj.user_id === user_id)
+        setNotifyNotLogout({
+          open: true,
+          title: `You just have been enrolled  ${userObj.user_role_id===2?`as Mentor`:''} on ${class_title}!`,
+          modalTextContent: userObj.user_role_id === 2?"Please Check your Email for the cohort credentials.":'',
+          buttonText: "Agree",
+          type: "studentAsignedMentor"
+        });
+    });
+
+    return () => {
+      socket.emit("disconnect");
+      socket.off();
+    };
+  });
 
   useEffect(() => {
     socket.on("notifyKicked", ({ user_id, classroom }) => {
@@ -139,6 +157,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
       socket.off();
     };
   });
+
   useEffect(() => {
     socket.on("studentToMentor", user_id => {
       if (userObj.user_id === user_id)
@@ -250,6 +269,12 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
               darkMode={darkMode}
               setDarkMode={setDarkMode}
               classes={classes}
+                        
+            open={open}
+            modal={modal}
+            setModal={setModal}
+            setOpen={setOpen}
+            handleLogout= {handleLogout}
             >
               <Tab
                 style={{ padding: 0 }}
@@ -333,6 +358,11 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
               darkMode={darkMode}
               setDarkMode={setDarkMode}
               classes={classes}
+              open={open}
+              modal={modal}
+              setModal={setModal}
+              setOpen={setOpen}
+              handleLogout= {handleLogout}
             >
               <Tab
                 style={{ padding: 0 }}
