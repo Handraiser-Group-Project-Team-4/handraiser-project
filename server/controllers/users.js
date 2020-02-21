@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const nodeMailer = require('nodemailer');
 
 module.exports = {
 	login: (req, res) => {
@@ -118,11 +119,36 @@ module.exports = {
 
 	request: (req, res) => {
 		const db = req.app.get('db');
-
+		const { name } = req.query;
 		db.query(
 			`UPDATE users set user_approval_status_id=2 WHERE user_id = '${req.params.id}'`
 		)
-			.then(get => res.status(200).json(get))
+			.then(get => {
+				res.status(200).json(get);
+				let transporter = nodeMailer.createTransport({
+					host: process.env.EMAIL_HOST,
+					port: process.env.EMAIL_PORT,
+					secure: true,
+					auth: {
+						user: process.env.EMAIL_USER,
+						pass: process.env.EMAIL_PASS
+					}
+				});
+				let mailOptions = {
+					// from: email,
+					to: process.env.EMAIL_ADMIN,
+					subject: 'Request to be a Mentor in Handraiser App',
+					// text: "I'am Requesting to be a Mentor",
+					html: `<h3>${name} is Requesting to be a Mentor</h3><br /><br /><a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>` // html body
+				};
+				transporter.sendMail(mailOptions, (error, info) => {
+					if (error) {
+						return console.log(error);
+					}
+					console.log('Message %s sent: %s', info.messageId, info.response);
+					// res.render('index');
+				});
+			})
 			.catch(err => {
 				console.error(err);
 				res.status(500).end();
@@ -188,55 +214,59 @@ module.exports = {
 			});
 	},
 
-  movingToDisapprove: (req, res) => {
-    const db = req.app.get("db");
-    const { user_approval_status_id, reason_disapproved } = req.body;
-    db.users
-      .update(
-        {
-          user_id: req.params.id
-        },
-        {
-          user_approval_status_id: user_approval_status_id,
-          reason_disapproved: reason_disapproved
-        }
-      )
-      .then(post => res.status(201).send(post))
-      .catch(err => {
-        console.err(err);
-        res.status(500).end();
-      });
-  },
+	movingToDisapprove: (req, res) => {
+		const db = req.app.get('db');
+		const { user_approval_status_id, reason_disapproved } = req.body;
+		db.users
+			.update(
+				{
+					user_id: req.params.id
+				},
+				{
+					user_approval_status_id: user_approval_status_id,
+					reason_disapproved: reason_disapproved
+				}
+			)
+			.then(post => res.status(201).send(post))
+			.catch(err => {
+				console.err(err);
+				res.status(500).end();
+			});
+	},
 
-  getMentors: (req, res) => {
-    const db = req.app.get("db");
+	getMentors: (req, res) => {
+		const db = req.app.get('db');
 
-     db.query(`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
-     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
+		db.query(
+			`SELECT * FROM users WHERE user_role_id = 2 AND user_id NOT IN 
+     (SELECT user_id FROM classroom_students WHERE class_id = ${req.params.id} )`
+		)
+			.then(get => res.status(200).json(get))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
 
-  getAttendingCohorts: (req, res) => {
-    const db = req.app.get("db");
+	getAttendingCohorts: (req, res) => {
+		const db = req.app.get('db');
 
-     db.query(`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
+		db.query(
+			`select  cs.date_joined, cd.class_title, cd.class_description, cd.class_created, cd.class_status, cs.class_id
      from users u
      inner join classroom_students cs
      on u.user_id = cs.user_id
      inner join classroom_details cd
      on cs.class_id = cd.class_id
-     where u.user_id = ${req.params.id}`)
-      .then(get => res.status(200).json(get))
-      .catch(err => {
-        console.error(err);
-        res.status(500).end();
-      });
-  },
-	
+     where u.user_id = ${req.params.id}`
+		)
+			.then(get => res.status(200).json(get))
+			.catch(err => {
+				console.error(err);
+				res.status(500).end();
+			});
+	},
+
 	darkmode: (req, res) => {
 		const db = req.app.get('db');
 		const { dark_mode } = req.body;

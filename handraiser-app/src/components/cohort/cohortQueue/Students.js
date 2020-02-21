@@ -73,7 +73,7 @@ export default function Students({
 				setStudent(res.data);
 			})
 			.catch(err => console.log(err));
-	}, [student_id]);
+	}, [student_id, text]);
 
 	const handleUpdate = (e, value) => {
 		e.preventDefault();

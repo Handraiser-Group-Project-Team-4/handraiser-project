@@ -20,6 +20,6 @@ export default function DarkMode() {
 					console.log(err);
 				});
 		}
-	}, []);
+	}, [userObj]);
 	return { darkMode, setDarkMode };
 }

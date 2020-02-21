@@ -35,7 +35,7 @@ const Logs = ({
 				setLogs(data);
 			});
 		});
-	}, [ENDPOINT]);
+	}, [ENDPOINT, id, setLogs]);
 
 	useEffect(() => {
 		let filter = [];
@@ -50,7 +50,7 @@ const Logs = ({
 		} else {
 			setSearchResult([]);
 		}
-	}, [search]);
+	}, [search, logs]);
 
 	return (
 		<Paper className={classes.paperr} elevation={2}>

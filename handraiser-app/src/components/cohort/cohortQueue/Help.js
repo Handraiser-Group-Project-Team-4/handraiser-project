@@ -2,21 +2,22 @@ import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
 import styled, { keyframes } from 'styled-components';
 // COMPONENTS
-import { UserContext } from '../cohortQueue/CohortPage';
+import { UserContext } from './CohortPage';
 import jwtToken from '../../tools/assets/jwtToken';
 import Handraise from '../../../images/handraise.png';
 import UsersModal from '../../tools/UsersModal';
 // Material-UI
-import { useMediaQuery, useTheme, Fab } from '@material-ui/core';
+import { Fab } from '@material-ui/core';
 let socket;
 export default function Helps({ fab, classes }) {
 	const [value, setValue] = useState('');
-	const [isEmpty, setIsEmpty] = useState(false);
-	const { id, data, user, isTrue, setIsTrue } = useContext(UserContext);
+	const [isTrue, setIsTrue] = useState(false);
+	// const [isEmpty, setIsEmpty] = useState(false);
+	const { id, data, user } = useContext(UserContext);
 	const userObj = jwtToken();
 	const ENDPOINT = 'localhost:3001';
-	const theme = useTheme();
-	const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+	// const theme = useTheme();
+	// const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 	const [open, setOpen] = React.useState(false);
 	const HelpingHand = styled.div`
 		background: #fff;
@@ -94,13 +95,14 @@ export default function Helps({ fab, classes }) {
 		setOpen(false);
 		setValue('');
 	};
+
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
 	}, [ENDPOINT]);
 	const sendConcern = e => {
 		e.preventDefault();
 		if (value) {
-			setIsEmpty(false);
+			// setIsEmpty(false);
 			const concern = {
 				class_id: id,
 				mentor_id: null,
@@ -111,7 +113,7 @@ export default function Helps({ fab, classes }) {
 			socket.emit('sendConcern', { concern, userObj }, () => {});
 			handleClose();
 		} else {
-			setIsEmpty(true);
+			// setIsEmpty(true);
 		}
 	};
 	useEffect(() => {

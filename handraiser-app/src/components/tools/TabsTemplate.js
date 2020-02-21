@@ -2,9 +2,11 @@ import React, { useContext } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 
-import jwtToken from '../tools/assets/jwtToken';
+// import { newUserContext } from "../../routes";
 import { DarkModeContext } from '../../App';
 
+import { GoogleLogout } from 'react-google-login';
+import jwtToken from '../tools/assets/jwtToken';
 import {
 	Tabs,
 	Switch,
@@ -27,24 +29,25 @@ import Brightness4Icon from '@material-ui/icons/Brightness4';
 import Brightness7Icon from '@material-ui/icons/Brightness7';
 import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
 
+// let socket;
 export default function TabsTemplate({
 	children,
 	tabIndex,
 	classes,
-	user,
-	darkMode,
-	setDarkMode
+	open,
+	modal,
+	setModal,
+	setOpen,
+	handleLogout
 }) {
 	const userObj = jwtToken();
 	const history = useHistory();
-
-	const [open, setOpen] = React.useState(false);
-	const [modal, setModal] = React.useState(false);
+	const { darkMode, setDarkMode } = useContext(DarkModeContext);
 
 	const handleDarkMode = async () => {
-		let res = await axios({
+		await axios({
 			method: 'patch',
-			url: `/api/darkmode/${user.user_id}`,
+			url: `/api/darkmode/${userObj.user_id}`,
 			data: { dark_mode: !darkMode },
 			headers: {
 				Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
@@ -53,29 +56,29 @@ export default function TabsTemplate({
 		setDarkMode(!darkMode);
 	};
 
-	const handleLogout = () => {
-		setModal(false);
-		setOpen(true);
-		setTimeout(() => {
-			setOpen(false);
-			axios({
-				method: `patch`,
-				url: `/api/logout/${userObj.user_id}`,
-				headers: {
-					Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-				}
-			})
-				.then(res => {
-					console.log(res);
-				})
-				.catch(err => {
-					console.log(err);
-				});
-			sessionStorage.clear();
-			sessionStorage.setItem('notification', `Successfully logged out`);
-			history.push('/');
-		}, 2000);
-	};
+	// const handleLogout = () => {
+	//   axios({
+	//     method: `patch`,
+	//     url: `/api/logout/${userObj.user_id}`,
+	//     headers: {
+	//       Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+	//     }
+	//   })
+	//     .then(res => {
+	//       console.log(res);
+	//     })
+	//     .catch(err => {
+	//       console.log(err);
+	//     });
+	//     socket.emit('activeUser', () => {
+	//       socket.on('displayActiveUser', ({userIsActive}) => {
+	//         console.log(userIsActive)
+	//         setActiveUsers(userIsActive)
+	//       })
+	//     })
+	//   history.push('/')
+	//   sessionStorage.clear();
+	// };
 
 	return (
 		<>
@@ -131,7 +134,6 @@ export default function TabsTemplate({
 					}
 					{...a11yProps('team')}
 				/>
-				{/* <Divider className={classes.divider} /> */}
 				<Tab
 					style={{ padding: 0 }}
 					label={
@@ -149,7 +151,19 @@ export default function TabsTemplate({
 							>
 								<ExitToAppIcon />
 							</ListItemIcon>
-							<ListItemText primary="Logout" className={classes.listItemText} />
+							<ListItemText
+								primary={
+									<GoogleLogout
+										render={renderProps => (
+											<p style={{ margin: `0` }}>Logout</p>
+										)}
+										clientId={process.env.REACT_APP_CLIENT_ID}
+										buttonText="Logout"
+										onLogoutSuccess={handleLogout}
+									></GoogleLogout>
+								}
+								className={classes.listItemText}
+							/>
 						</ListItem>
 					}
 				/>

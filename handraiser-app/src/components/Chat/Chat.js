@@ -28,13 +28,12 @@ const Chat = ({ chatResponsive }) => {
 	// const [mentors, setMentors] = useState([]);
 	// const [currentConcern, setCurrentConcern] = useState();
 	const [message, setMessage] = useState('');
-	const [open, setOpen] = useState(false);
 	const [expanded, setExpanded] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [typing, setTyping] = useState({
-		isTyping: false,
-		name: ''
-	});
+	// const [typing, setTyping] = useState({
+	// 	isTyping: false,
+	// 	name: ''
+	// });
 
 	const ENDPOINT = 'localhost:3001';
 
@@ -66,19 +65,18 @@ const Chat = ({ chatResponsive }) => {
 			setCurrentChat([...currentChat, message]);
 		});
 		socket.on('displayTyping', ({ name }) => {
-			setTyping({ isTyping: true, name });
+			// setTyping({ isTyping: true, name });
 		});
 		socket.on('displayNotTyping', ({ name }) => {
-			setTyping({ isTyping: false, name: '' });
+			// setTyping({ isTyping: false, name: '' });
 		});
 		return () => {
 			socket.emit('disconnect');
 			socket.off();
 		};
-	}, [currentChat, chatroom]);
+	}, [currentChat, chatroom, message.length, userObj.name]);
 
 	const sendMessage = event => {
-		setOpen(true);
 		setMessage('');
 		event.preventDefault();
 		const temp = message.replace(/\n/g, '<br />');
@@ -128,6 +126,7 @@ const Chat = ({ chatResponsive }) => {
 					classes={classes}
 					handleExpandClick={handleExpandClick}
 					sendMessage={sendMessage}
+					darkMode={darkMode}
 				/>
 			) : (
 				''

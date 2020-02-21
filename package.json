@@ -34,6 +34,7 @@
 		"jsonwebtoken": "^8.5.1",
 		"massive": "^6.1.4",
 		"node-pg-migrate": "^4.2.2",
+		"nodemailer": "^6.4.2",
 		"pg": "^7.17.1",
 		"socket.io": "^2.3.0"
 	},

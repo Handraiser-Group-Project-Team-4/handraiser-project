@@ -15,6 +15,7 @@ import Chat from "../../Chat/Chat";
 import jwtToken from "../../tools/assets/jwtToken";
 import { DarkModeContext } from "../../../App";
 import Search from "./CohortFilter";
+import CohortDetails from "../cohortDetails/CohortDetails";
 import Logs from "../cohortLogs/Logs";
 
 // MATERIAL-UI
@@ -24,9 +25,7 @@ import {
   fade,
   Hidden,
   Typography,
-  IconButton,
   Paper,
-  Avatar,
   Grid,
   MenuItem,
   InputLabel,
@@ -34,26 +33,15 @@ import {
   Select,
   TextField,
   InputAdornment,
-  Chip,
   AppBar,
   Tabs,
   Tab,
   Box,
-  CardMedia,
-  Button,
-  Fab
+  Button
 } from "@material-ui/core";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import VisibilityIcon from "@material-ui/icons/Visibility";
-import Menu from "@material-ui/core/Menu";
-import FaceIcon from "@material-ui/icons/Face";
 
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
-import cohort from "../../../images/cohort.png";
-import cohortDark from "../../../images/cohortdark.jpg";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import ChatResponsive from "../../Chat/ChatResponsive";
 
@@ -78,14 +66,14 @@ export default function CohortPage({ value = 0, match }) {
 
   const theme = useTheme();
   const inputLabel = React.useRef(null);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const handleClick = event => {
-    setAnchorEl(event.currentTarget);
-  };
+  // const [anchorEl, setAnchorEl] = React.useState(null);
+  // const handleClick = event => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
   useEffect(() => {
     axios({
       method: "get",
@@ -116,12 +104,12 @@ export default function CohortPage({ value = 0, match }) {
       	.catch(err => {
       		console.log(err);
       	});
-  }, []);
+  }, [history,id,userObj.user_id]);
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
     socket.emit("joinConcern", { id }, () => {});
-  }, [ENDPOINT]);
+  }, [ENDPOINT,id]);
 
   useEffect(() => {
     socket.emit("getChatroom", { id }, () => {
@@ -138,7 +126,7 @@ export default function CohortPage({ value = 0, match }) {
                 name: userObj.name
               })
             : data.map(concern => {
-                concern.concern_status !== "pending" &&
+                return concern.concern_status !== "pending" &&
                 (concern.student_id === userObj.user_id ||
                   concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
@@ -174,7 +162,7 @@ export default function CohortPage({ value = 0, match }) {
       socket.emit("disconnectConcern", () => {});
       socket.off();
     };
-  }, [data, enqueueSnackbar, id, logs, userObj.user_id]);
+  }, [data, enqueueSnackbar, id, logs, userObj.user_id,userObj.avatar,userObj.name]);
 
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);
@@ -202,7 +190,7 @@ export default function CohortPage({ value = 0, match }) {
   };
 
   return (
-    <MainpageTemplate tabIndex={'student-page'}>
+    <MainpageTemplate tabIndex={"student-page"}>
       <div className={classes.parentDiv}>
         <UserContext.Provider
           value={{
@@ -405,377 +393,12 @@ export default function CohortPage({ value = 0, match }) {
                 dir={theme.direction}
                 className={classes.TabPanelpaperr}
               >
-                <Paper className={classes.paperr} elevation={2} style={{
-                      backgroundColor: darkMode ? "#333" : null
-                    }}>
-                  <Grid
-                    container
-                    spacing={0}
-                    className={classes.gridContainerr + " " + classes.banner}
-                    style={{
-                      backgroundColor: darkMode ? "#333" : null
-                    }}
-                  >
-                    <Grid
-                      container
-                      item
-                      xs={12}
-                      sm={12}
-                      md={8}
-                      lg={8}
-                      className={classes.loginBoxGridOne}
-                    >
-                      <Grid item xs={12} sm={12} md={12} lg={6}>
-                        <CardMedia
-                          className={classes.loginBoxGridOneCardMedia}
-                          image={darkMode ? cohortDark : cohort}
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={6}
-                        className={classes.gridDetails}style={{
-                          backgroundColor: darkMode ? "#333" : null
-                        }}
-                      >
-                        <h1>Computer Programming I</h1>
-                        <h6
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-around",
-                            alignItems: "center",
-                            paddingBottom: 10
-                          }}
-                        >
-                          <span>
-                            Cohort Code: <Chip label="******" />
-                            <IconButton
-                              color="primary"
-                              aria-label="upload picture"
-                              component="span"
-                            >
-                              <VisibilityIcon />
-                            </IconButton>
-                          </span>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            color="secondary"
-                            style={{ height: 30 }}
-                          >
-                            Leave Group
-                          </Button>
-                        </h6>
-                      </Grid>
-                    </Grid>
-                    <Grid
-                      container
-                      spacing={0}
-                      className={classes.gridContainerr + " " + classes.banner}
-                      style={{
-                        backgroundColor: darkMode ? "#333" : null
-                      }}
-                    >
-                      <Grid
-                        container
-                        item
-                        xs={12}
-                        sm={12}
-                        md={8}
-                        lg={8}
-                        className={classes.lest}
-                      >
-                        <form
-                          noValidate
-                          autoComplete="off"
-                          className={classes.searchform}
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            alignItems: "center"
-                          }}
-                        >
-                          <TextField
-                            id="outlined-search"
-                            label="Search field"
-                            type="search"
-                            name="search"
-                            variant="outlined"
-                            onChange={changeHandler}
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <SearchIcon />
-                                </InputAdornment>
-                              )
-                            }}
-                          />
-                        </form>
-                        {/* <h1 style={{ margin: 0 }}>Mentor</h1> */}
-                        <Lest>
-                          <ul className={classes.lestUl}>
-                            <li
-                              className="list"
-                              style={{
-                                padding: 10,
-                                textTransform: "uppercase",
-                                backgroundColor: darkMode ? "#333" : null
-                              }}
-                            >
-                              <div
-                                className="list__profile"
-                                style={{ width: "71%" }}
-                              >
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    width: "17%",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  Avatar
-                                </div>
-                                <div>
-                                  <img style={{ width: 50 }} src=""></img>
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "40%"
-                                  }}
-                                >
-                                  Role
-                                </div>
-                                <div>
-                                  <img style={{ width: 50 }} />
-                                </div>
-                                <div className="list__label">
-                                  <div className="list__label--value">Name</div>
-                                </div>
-                              </div>
-                              <div className="list__photos">
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "53%"
-                                  }}
-                                >
-                                  Date Joined
-                                </span>
-                                <span></span>
-                                <span></span>
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "45%"
-                                  }}
-                                >
-                                  Actions
-                                </span>
-                              </div>
-                            </li>
-                            <li className="list" style={{
-                                backgroundColor: darkMode ? "#333" : null
-                              }}>
-                              <div className="list__profile">
-                                <div>
-                                  <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
-                                </div>
-                                <div>
-                                  <img
-                                    style={{
-                                      width: 50
-                                    }}
-                                  />
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  <Chip
-                                    icon={<FaceIcon />}
-                                    label="Mentor"
-                                    color="secondary"
-                                  />
-                                </div>
-                                <div>
-                                  <img
-                                    style={{
-                                      width: 50
-                                    }}
-                                  />
-                                </div>
-                                <div className="list__label">
-                                  <div className="list__label--value">
-                                    <Chip
-                                      variant="outlined"
-                                      label="Jhon Michael Bolima"
-                                      className={classes.listChip}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="list__photos">
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  April 19, 2003 3:30 AM
-                                </span>
-                                <span></span>
-                                <span></span>
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "45%"
-                                  }}
-                                >
-                                  <IconButton
-                                    color="primary"
-                                    aria-controls="simple-menu"
-                                    aria-haspopup="true"
-                                    onClick={handleClick}
-                                    component="span"
-                                  >
-                                    <ExpandMoreIcon />
-                                  </IconButton>
-                                  <Menu
-                                    id="simple-menu"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleClose}
-                                  >
-                                    <MenuItem onClick={handleClose}>
-                                      Profile
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                      My account
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                      Logout
-                                    </MenuItem>
-                                  </Menu>
-                                </span>
-                              </div>
-                            </li>
-                            <li className="list" style={{
-                                backgroundColor: darkMode ? "#333" : null
-                              }}>
-                              <div className="list__profile">
-                                <div>
-                                  <img src="https://lh4.googleusercontent.com/-t4YjQXwPsnY/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rend54-qWova61cblPQt8mE23er0A/s96-c/photo.jpg" />
-                                </div>
-                                <div>
-                                  <img
-                                    style={{
-                                      width: 50
-                                    }}
-                                  />
-                                </div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  <Chip
-                                    icon={<FaceIcon />}
-                                    label="Student"
-                                    color="primary"
-                                  />
-                                </div>
-                                <div>
-                                  <img
-                                    style={{
-                                      width: 50
-                                    }}
-                                  />
-                                </div>
-                                <div className="list__label">
-                                  <div className="list__label--value">
-                                    <Chip
-                                      variant="outlined"
-                                      label="Diana Geromo"
-                                      className={classes.listChip}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="list__photos">
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-                                  }}
-                                >
-                                  April 19, 2003 3:30 AM
-                                </span>
-                                <span></span>
-                                <span></span>
-                                <span
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    width: "45%"
-                                  }}
-                                >
-                                  <IconButton
-                                    color="primary"
-                                    aria-controls="simple-menu"
-                                    aria-haspopup="true"
-                                    onClick={handleClick}
-                                    component="span"
-                                  >
-                                    <ExpandMoreIcon />
-                                  </IconButton>
-                                  <Menu
-                                    id="simple-menu"
-                                    anchorEl={anchorEl}
-                                    keepMounted
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleClose}
-                                  >
-                                    <MenuItem onClick={handleClose}>
-                                      Profile
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                      My account
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                      Logout
-                                    </MenuItem>
-                                  </Menu>
-                                </span>
-                              </div>
-                            </li>
-                          </ul>
-                        </Lest>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Paper>
+                <CohortDetails
+                  classes={classes}
+                  class_id={id}
+                  Lest={Lest}
+                  changeHandler={changeHandler}
+                />
               </TabPanel>
               <TabPanel
                 value={value}
@@ -829,7 +452,7 @@ const useStyles = makeStyles(theme => ({
   gridContainerr: {
     paddingBottom: 20,
     backgroundColor: "#F5F5F5",
-    height: "100%",
+    // height: "100%",
     [theme.breakpoints.up("md")]: {
       height: "100vh"
     },
@@ -1012,9 +635,6 @@ const useStyles = makeStyles(theme => ({
       padding: 0,
       paddingTop: 1
     }
-  },
-  chatTitle: {
-    margin: "0 auto"
   },
   loginBoxGridOne: {
     borderTopLeftRadius: 16,

@@ -33,7 +33,7 @@ export default function LoginPage() {
 			});
 			sessionStorage.removeItem('notification');
 		}
-	}, []);
+	}, [enqueueSnackbar]);
 
 	return (
 		<div className={classes.gradient}>

@@ -1,5 +1,7 @@
 module.exports = {
   adminSockets: (socket, io, db) => {
+    let userIsActive=[];
+
     socket.on(`mentorRequest`, ({ data }) => {
       io.emit("fetchMentorRequest");
     });
@@ -11,8 +13,8 @@ module.exports = {
       // })
     });
 
-    socket.on(`renderCohort`, ({ data }) => {
-      io.emit("fetchCohort", data);
+    socket.on(`renderCohort`, () => {
+      io.emit("fetchCohort");
     });
 
     socket.on(`changeUserRole`, ({ user_id, user_role_id }) => {
@@ -23,5 +25,39 @@ module.exports = {
       else if (user_role_id === 3) io.emit("mentorToStudent", user_id);
       // })
     });
+
+    socket.on(`studentKicked`, ({user_id, class_id}) => {
+      db.classroom_details.find(class_id)
+      .then(classroom => {
+        io.emit("notifyKicked", {
+          user_id, 
+          classroom:{
+            class_id: classroom.class_id,
+            class_title: classroom.class_title
+          }
+        })
+      })
+      
+    });
+
+    // socket.on('activeUser', (callback) => {
+    //   let temp=[];
+    //   db.users.find({user_status: "t"}, {"fields":[`user_id`]})
+    //   .then(active => {
+    //     active.map(x => {
+    //       temp.push(x.user_id)
+    //     })
+    //     io.emit('displayActiveUser', {userIsActive: temp})
+    //   })
+    //   .catch(err => console.log(err))
+
+    //   callback();
+    // });
+
+    // socket.on('logOutUser', ({user_id}) => {
+    //   // userIsActive.splice(userIsActive.indexOf(user_id), 1)
+    //   // io.emit('renderActiveUser', {userIsActive})
+    //   // console.log(userIsActive)
+    // })
   }
 };

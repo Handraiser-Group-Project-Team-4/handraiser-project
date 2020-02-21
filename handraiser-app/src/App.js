@@ -24,7 +24,12 @@ export default function App() {
 	return (
 		<ThemeProvider theme={theme}>
 			<DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-				<SnackbarProvider maxSnack={5} hideIconVariant={false}>
+				<SnackbarProvider
+					maxSnack={5}
+					hideIconVariant={false}
+					anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+					autoHideDuration={3000}
+				>
 					<HashRouter>
 						<Routes />
 					</HashRouter>

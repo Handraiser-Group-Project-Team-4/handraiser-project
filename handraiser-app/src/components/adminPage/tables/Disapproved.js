@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 import MaterialTable from 'material-table';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import Popper from '@material-ui/core/Popper';
 import PopupState, { bindToggle, bindPopper } from 'material-ui-popup-state';
 import Fade from '@material-ui/core/Fade';
@@ -38,6 +37,7 @@ export default function Disapproved() {
 				render: rowData => (
 					<div style={{ display: `flex` }}>
 						<img
+							alt={rowData.firstname}
 							src={rowData.avatar}
 							width="50"
 							height="50"
@@ -108,17 +108,7 @@ export default function Disapproved() {
 		data: []
 	});
 
-	useEffect(() => {
-		let isCancelled = false;
-
-		if (!isCancelled) renderDisapproved();
-
-		return () => {
-			isCancelled = true;
-		};
-	}, []);
-
-	const renderDisapproved = () => {
+	const renderDisapproved = useCallback(() => {
 		axios({
 			method: 'get',
 			url: `/api/user_approval_fetch?user_approval_status_id=3`,
@@ -128,10 +118,22 @@ export default function Disapproved() {
 		})
 			.then(data => {
 				console.log(data.data);
-				setDisapproved({ ...disapproved, data: data.data });
+				setDisapproved(prevState => {
+					return { ...prevState, data: data.data };
+				});
 			})
 			.catch(err => console.log('object'));
-	};
+	}, []);
+
+	useEffect(() => {
+		let isCancelled = false;
+
+		if (!isCancelled) renderDisapproved();
+
+		return () => {
+			isCancelled = true;
+		};
+	}, [renderDisapproved]);
 
 	return (
 		<>

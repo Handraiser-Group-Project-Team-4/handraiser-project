@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // material ui
@@ -62,17 +62,7 @@ export default function Approved() {
     data: []
   });
 
-  useEffect(() => {
-    let isCancelled = false;
-
-    if (!isCancelled) renderApproved();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
-
-  const renderApproved = () => {
+  const renderApproved = useCallback(() => {
     axios({
       method: "get",
       url: `/api/user_approval_fetch?user_approval_status_id=1`,
@@ -82,10 +72,20 @@ export default function Approved() {
     })
       .then(data => {
         console.log(data.data);
-        setApproved({ ...approved, data: data.data });
+        setApproved(prevState => {return { ...prevState, data: data.data }});
       })
       .catch(err => console.log("object"));
-  };
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    if (!isCancelled) renderApproved();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [renderApproved]);
 
   return (
     <MaterialTable
