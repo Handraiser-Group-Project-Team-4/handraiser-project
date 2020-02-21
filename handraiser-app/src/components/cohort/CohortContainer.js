@@ -177,8 +177,15 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>
@@ -229,7 +236,7 @@ export default function CohortContainer({
               </Card>
             </Grid>
           ))
-        ) : classroom.length ? (
+        ) : classroom.length && !search ? (
           classroom.map((x, i) => (
             <Grid
               key={i}
@@ -285,8 +292,15 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>
