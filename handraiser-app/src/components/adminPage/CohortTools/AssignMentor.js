@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useEffect} from "react";
 import axios from "axios";
+import io from 'socket.io-client';
 
 // Material UI
 import MaterialTable from "material-table";
@@ -10,7 +11,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 
 // Material UI Icons
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+
+let socket;
 export default function PopupModal({ handleClose, open, data, title, id}) {
+  const ENDPOINT = 'localhost:3001';
     const columns = [
         
         { title: 'Avatar', field: 'firstname',
@@ -23,6 +27,11 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         },
         { title: "Email", field: "email" },
       ]
+      
+    	useEffect(() => {
+        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+      }, [ENDPOINT]);
+    
     const assign = (data, id) => {
         let date = new Date();
         let newDate = date.toLocaleString();
@@ -40,6 +49,8 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
                 }
             })
             .then(() => {
+                socket.emit('userAssignedMentor', {user_id: x.user_id, class_id: id})
+                socket.emit('renderCohort')
                 handleClose(id)
             })
             .catch(err => console.log("err"))

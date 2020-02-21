@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import io from "socket.io-client";
-import Axios from "axios";
+import axios from "axios";
 import SwipeableViews from "react-swipeable-views";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
@@ -11,7 +11,7 @@ import MainpageTemplate from "../../tools/MainpageTemplate";
 import Helps from "./Help";
 import NeedHelps from "./NeedHelp";
 import BeingHelps from "./BeingHelp";
-import Chat from "../Chat/Chat";
+import Chat from "../../Chat/Chat";
 import jwtToken from "../../tools/assets/jwtToken";
 import { DarkModeContext } from "../../../App";
 import Search from "./CohortFilter";
@@ -33,7 +33,6 @@ import {
   Select,
   TextField,
   InputAdornment,
-  Chip,
   AppBar,
   Tabs,
   Tab,
@@ -44,6 +43,7 @@ import {
 // ICONS
 import SearchIcon from "@material-ui/icons/Search";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
+import ChatResponsive from "../../Chat/ChatResponsive";
 
 export const UserContext = createContext(null);
 let socket;
@@ -59,15 +59,23 @@ export default function CohortPage({ value = 0, match }) {
   const [user, setUser] = useState();
   const [search, setSearch] = useState();
   const [filter, setFilter] = useState();
+  const [isTrue, setIsTrue] = useState(false);
   const [chatroom, setChatRoom] = useState();
   const { enqueueSnackbar } = useSnackbar();
   const { darkMode } = useContext(DarkModeContext);
 
   const theme = useTheme();
   const inputLabel = React.useRef(null);
+  // const [anchorEl, setAnchorEl] = React.useState(null);
+  // const handleClick = event => {
+  //   setAnchorEl(event.currentTarget);
+  // };
 
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
   useEffect(() => {
-    Axios({
+    axios({
       method: "get",
       url: `/api/users/${userObj.user_id}`,
       headers: {
@@ -80,16 +88,28 @@ export default function CohortPage({ value = 0, match }) {
       .catch(err => {
         console.log(err);
       });
-  }, [userObj.user_id]);
+       // ACCESS KEY
+       axios({
+      	method: `get`,
+      	url: `/api/cohort-check/${id}?user_id=${userObj.user_id}`,
+      	headers: {
+      		Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
+      	}
+      })
+      	.then(res => {
+      		if (res.data.length === 0) {
+      			history.push(`/student-page`);
+      		}
+      	})
+      	.catch(err => {
+      		console.log(err);
+      	});
+  }, [history,id,userObj.user_id]);
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-    socket.emit("joinConcern", { id }, () => {
-      socket.on("fetchOldLogs", ({ data }) => {
-        setLogs(data);
-      });
-    });
-  }, [ENDPOINT, id]);
+    socket.emit("joinConcern", { id }, () => {});
+  }, [ENDPOINT,id]);
 
   useEffect(() => {
     socket.emit("getChatroom", { id }, () => {
@@ -107,8 +127,8 @@ export default function CohortPage({ value = 0, match }) {
               })
             : data.map(concern => {
                 return concern.concern_status !== "pending" &&
-                  (concern.student_id === userObj.user_id ||
-                    concern.mentor_id === userObj.user_id)
+                (concern.student_id === userObj.user_id ||
+                  concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
                       room: concern.concern_id,
                       concern: concern.concern_title,
@@ -142,7 +162,7 @@ export default function CohortPage({ value = 0, match }) {
       socket.emit("disconnectConcern", () => {});
       socket.off();
     };
-  }, [data, enqueueSnackbar, id, logs, userObj]);
+  }, [data, enqueueSnackbar, id, logs, userObj.user_id,userObj.avatar,userObj.name]);
 
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);
@@ -185,6 +205,8 @@ export default function CohortPage({ value = 0, match }) {
             search,
             filter,
             setFilter,
+            isTrue,
+            setIsTrue,
             handleConcernCount
           }}
         >
@@ -194,19 +216,22 @@ export default function CohortPage({ value = 0, match }) {
             </IconButton> */}
 
             <AppBar position="static" color="default">
-              <Button
-                style={{
-                  position: "absolute",
-                  zIndex: 1,
-                  top: 5,
-                  marginLeft: 5
-                }}
-                color="default"
-                className={classes.button}
-                startIcon={<ArrowBackIosIcon />}
-              >
-                Back
-              </Button>
+              <Hidden mdDown>
+                <Button
+                  style={{
+                    position: "absolute",
+                    zIndex: 1,
+                    top: 5,
+                    marginLeft: 5
+                  }}
+                  color="default"
+                  className={classes.button}
+                  startIcon={<ArrowBackIosIcon />}
+                  onClick={() => history.push(`/student-page`)}
+                >
+                  Back
+                </Button>
+              </Hidden>
               <Tabs
                 value={value}
                 // onChange={handleChange}
@@ -215,7 +240,7 @@ export default function CohortPage({ value = 0, match }) {
                 centered
               >
                 <Tab
-                  label="Handraiser"
+                  label="Handraiser Queue"
                   onClick={() => history.push(`/cohort/${id}`)}
                 />
                 <Tab
@@ -260,17 +285,6 @@ export default function CohortPage({ value = 0, match }) {
                       className={classes.gridItemm}
                     >
                       <Grid container spacing={0} className={classes.topNavi}>
-                        <Typography
-                          variant="h4"
-                          noWrap
-                          className={classes.typoTitle}
-                        >
-                          Handraiser Queue
-                          <Chip
-                            className={classes.largeChip}
-                            label={handleConcernCount("allConcern")}
-                          />
-                        </Typography>
                         <FormControl
                           variant="outlined"
                           className={classes.formControl}
@@ -327,28 +341,50 @@ export default function CohortPage({ value = 0, match }) {
                         )}
                       </div>
                     </Grid>
-                    <Hidden mdDown>
-                      <Grid
-                        item
-                        sm={12}
-                        xs={12}
-                        md={12}
-                        lg={6}
-                        className={classes.gridItemm}
-                      >
-                        <section className={classes.rootq}>
-                          {chatroom ? (
-                            <Chat />
+                      {chatroom ? (
+                       <>
+                        <Hidden mdDown>
+                            <Grid
+                              item
+                              sm={12}
+                              xs={12}
+                              md={12}
+                              lg={6}
+                              className={classes.gridItemm}
+                            >
+                              <section className={classes.rootq}>
+                                  <Chat chatResponsive={false}/>
+                              </section>
+                            </Grid>
+                          </Hidden>
+                          <Hidden lgUp>
+                            <ChatResponsive/>
+                          </Hidden>
+                       </>
                           ) : (
-                            userObj.user_role_id === 3 && <Helps />
+                            userObj.user_role_id === 3 && (
+                              <>
+                                <Hidden mdDown>
+                                  <Grid
+                                    item
+                                    sm={12}
+                                    xs={12}
+                                    md={12}
+                                    lg={6}
+                                    className={classes.gridItemm}
+                                  >
+                                    <section className={classes.rootq}>
+                                        <Helps />
+                                    </section>
+                                  </Grid>
+                                </Hidden>
+                                <Hidden lgUp>
+                                  <Helps fab={true} classes={classes} />
+                                </Hidden>
+                              </>
+                            )
                           )}
-                        </section>
-                      </Grid>
-                    </Hidden>
                   </Grid>
-                  <Hidden lgUp>
-                    <Helps fab={true} classes={classes} />
-                  </Hidden>
                 </Paper>
               </TabPanel>
               <TabPanel
@@ -376,6 +412,8 @@ export default function CohortPage({ value = 0, match }) {
                   changeHandler={changeHandler}
                   logs={logs}
                   search={search}
+                  id={id}
+                  setLogs={setLogs}
                 />
               </TabPanel>
             </SwipeableViews>
@@ -438,7 +476,7 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     marginRight: 10,
-    minWidth: 120,
+    minWidth: '20%',
     [theme.breakpoints.down("md")]: {
       marginBottom: 10
     }
@@ -533,7 +571,7 @@ const useStyles = makeStyles(theme => ({
   },
   topNavi: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     marginBottom: 10,
     alignItems: "center"
   },

@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useEffect} from "react";
 import axios from "axios";
+import io from 'socket.io-client';
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -12,7 +13,14 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import SchoolIcon from "@material-ui/icons/School";
 
+let socket;
 export default function PopupModal({ handleClose, open, data, userObj }) {
+  const ENDPOINT = 'localhost:3001';
+
+  useEffect(() => {
+    socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+}, [ENDPOINT]);
+
   const kick = (e, userObj, row) => {
     e.preventDefault();
 
@@ -26,6 +34,8 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
       })
         .then(res => {
           handleClose(userObj);
+          socket.emit("studentKicked", { user_id: userObj.user_id, class_id: x.class_id });
+          socket.emit('renderCohort')
         })
         .catch(err => console.log(err));
     });
