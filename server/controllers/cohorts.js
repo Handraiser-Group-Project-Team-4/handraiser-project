@@ -1,4 +1,5 @@
 const keyGenerator = require('../keyGenerator');
+const emailSender = require('../email');
 
 module.exports = {
 	list: (req, res) => {
@@ -270,7 +271,24 @@ module.exports = {
 				user_id,
 				date_joined
 			})
-			.then(post => res.status(201).json(post))
+			.then(post => {
+				db.query(`SELECT * from classroom, classroom_details, users
+						 WHERE user_id='${user_id}' 
+						 AND classroom_details.class_id=${class_id} 
+						 AND classroom_details.class_id = classroom.class_id`)
+				.then(classroom => {
+					classroom.map(x => {
+						if (x.user_role_id === 2){
+							const body = `	<h1>The Admin Added you as a Mentor on the cohort.</h1>
+											<p>Please use the following credentials on joining the cohort: </p>
+											<h2>Cohort Name: ${x.class_title}</h2>
+											<h3>Cohort Key: ${x.class_key}</h3> ` 
+							emailSender.emailTemplate(x.email, 'Shared a Key on Cohort', body)
+						}
+					})
+				})
+				res.status(201).json(post)
+			})
 			.catch(err => {
 				console.error(err);
 				res.status(500).end();
