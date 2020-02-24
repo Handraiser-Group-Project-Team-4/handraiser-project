@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import io from "socket.io-client";
-
 // COMPONENTS
 import keyGenerator from './assets/keyGenerator'
 import Attending from '../adminPage/CohortTools/Attending'
-
 // MATERIAL-UI
 import {
     Button,
@@ -20,11 +18,9 @@ import {
     ListItemIcon,
     ListItemText
 } from "@material-ui/core/";
-
 //  ICONS
 import EditIcon from "@material-ui/icons/Edit";
 import SchoolIcon from '@material-ui/icons/School';
-
 let socket;
 export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen }) {
     const ENDPOINT = "172.60.63.82:3001";
@@ -48,7 +44,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             {
                 class_status: true,
             }: 
-
         (type === 'updating')?
             {
                 class_title: data.class_title,
@@ -69,7 +64,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 class_title: "",
                 class_description: "",
             }:
-
         (type === 'Change Key')?
             {
                 class_id: data.class_id,
@@ -82,18 +76,14 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 reason_disapproved: null
             } : null   
     });
-
   
-
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-
         return () => {
             socket.emit("disconnect");
             socket.off();
         };
     }, [ENDPOINT]);
-
     const closeAttending = () => {
         setAttending({
           ...attending,
@@ -112,7 +102,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         });
         console.log(body)
     };
-
     const handleInputs = e => {
         let date = new Date();
         let newDate = date.toLocaleString();
@@ -141,7 +130,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             })
         }
     };
-
     const updateCohort = e => {
         setBody({
             data:{
@@ -151,7 +139,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         })
         const bawas = e.target.value
         const newBawas = bawas.length
-
         if(e.target.name === 'class_title'){
             setCounter({
                 ...counter,
@@ -165,10 +152,8 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             })
         }
     }
-
     const generateKey = () => {
         var result = keyGenerator();
-
         setBody({
             data: {
                 class_id: data.class_id,
@@ -177,7 +162,6 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
         })
        
     }
-
     const submitUserData = e => {
         e.preventDefault();
         const METHOD =  (type === "Share Key Cohort")?'get':
@@ -273,11 +257,9 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                                     Manage Enrolled Cohorts
                                 </Button>
                             : null}   
-
                             <Button onClick={(type === 'Kick Student') ? ()=>handleClose(data.class_id) : handleClose} color="secondary">
                                 Disagree
                             </Button>
-
                             <Button onClick={e => { submitUserData(e) }} color="secondary" autoFocus>
                                 Confirm
                         </Button>

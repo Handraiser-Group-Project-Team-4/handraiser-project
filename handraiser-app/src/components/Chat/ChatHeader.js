@@ -31,7 +31,7 @@ const ChatHeader = ({
 		<CardHeader
 			avatar={
 				<Avatar aria-label="recipe" className={classes.avatar}>
-					R
+					{chatroom.concern.charAt(0)}
 				</Avatar>
 			}
 			// action={

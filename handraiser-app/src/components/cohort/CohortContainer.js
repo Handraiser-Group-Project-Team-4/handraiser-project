@@ -249,7 +249,7 @@ export default function CohortContainer({
               </Card>
             </Grid>
           ))
-        ) : classroom.length ? (
+        ) : classroom.length && !search ? (
           classroom.map((x, i) => (
             <Grid
               key={i}

@@ -25,15 +25,9 @@ const Chat = ({ chatResponsive }) => {
 	const [showEmoji, setShowEmoji] = useState(false);
 	const [modal, setModal] = useState(false);
 	const [currentChat, setCurrentChat] = useState([]);
-	// const [mentors, setMentors] = useState([]);
-	// const [currentConcern, setCurrentConcern] = useState();
 	const [message, setMessage] = useState('');
 	const [expanded, setExpanded] = useState(false);
 	const [anchorEl, setAnchorEl] = useState(null);
-	// const [typing, setTyping] = useState({
-	// 	isTyping: false,
-	// 	name: ''
-	// });
 
 	const ENDPOINT = '172.60.63.82:3001';
 
@@ -45,19 +39,6 @@ const Chat = ({ chatResponsive }) => {
 			});
 		});
 	}, [ENDPOINT, chatroom]);
-
-	// useEffect(() => {
-	//   socket.emit("fetchMentors", { id: chatroom.room }, () => {
-	//     socket.on("assignMentors", ({ user, concern }) => {
-	//       let filter = [];
-	//       user.filter(e => {
-	//         return e.user_id !== userObj.user_id ? filter.push(e) : null;
-	//       });
-	//       setMentors(filter);
-	//       setCurrentConcern(...concern);
-	//     });
-	//   });
-	// }, [chatroom]);
 
 	useEffect(() => {
 		if (message.length <= 0) socket.emit('NotTyping', { name: userObj.name });
@@ -131,14 +112,6 @@ const Chat = ({ chatResponsive }) => {
 			) : (
 				''
 			)}
-			{/* <ChatModal
-        modal={modal}
-        handleModal={handleModal}
-        mentors={mentors}
-        currentConcern={currentConcern}
-        userObj={userObj}
-        id={id}
-      /> */}
 		</Card>
 	);
 };

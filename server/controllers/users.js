@@ -16,6 +16,7 @@ module.exports = {
 					const token = jwt.sign(
 						{
 							user_id,
+							email: user[0].email,
 							name: user[0].firstname + ' ' + user[0].lastname,
 							avatar: user[0].avatar,
 							user_role_id,
@@ -46,6 +47,7 @@ module.exports = {
 				const token = jwt.sign(
 					{
 						user_id,
+						email,
 						name: firstname + ' ' + lastname,
 						avatar,
 						user_role_id: 3,
@@ -127,8 +129,12 @@ module.exports = {
 				res.status(200).json(get);
 				const body = `	<h2>${name} is Requesting to be a Mentor</h2>
 								<br /><br />
-								<a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>`
-				emailSender.emailTemplate(process.env.EMAIL_ADMIN, 'Request to be a Mentor in Handraiser App', body)
+								<a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>`;
+				emailSender.emailTemplate(
+					process.env.EMAIL_ADMIN,
+					'Request to be a Mentor in Handraiser App',
+					body
+				);
 			})
 			.catch(err => {
 				console.error(err);
@@ -268,7 +274,8 @@ module.exports = {
 	shareKey: (req, res) => {
 		const db = req.app.get('db');
 
-		db.query(`select cd.class_title, cs.user_id, u.email, c.class_key
+		db.query(
+			`select cd.class_title, cs.user_id, u.email, c.class_key
 		from classroom_students cs
 		inner join classroom_details cd
 		on cs.class_id = cd.class_id
@@ -276,15 +283,20 @@ module.exports = {
 		on cs.user_id = u.user_id
 		inner join classroom c
 		on cd.class_id = c.class_id
-		where cs.class_id = ${req.params.id} and u.user_role_id = 2`)
+		where cs.class_id = ${req.params.id} and u.user_role_id = 2`
+		)
 			.then(mentors => {
 				res.status(200).json(mentors);
 				mentors.map(mentor => {
 					const body = `	<p>Please use the following credentials on joining the cohort: </p>
 					 				<h2>Cohort Name: ${mentor.class_title}</h2>
-					 				<h3>Cohort Key: ${mentor.class_key}</h3> ` 
-					emailSender.emailTemplate(mentor.email, 'Shared a Key on Cohort', body)
-				})
+					 				<h3>Cohort Key: ${mentor.class_key}</h3> `;
+					emailSender.emailTemplate(
+						mentor.email,
+						'Shared a Key on Cohort',
+						body
+					);
+				});
 			})
 			.catch(err => {
 				console.log(err);

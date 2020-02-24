@@ -272,22 +272,27 @@ module.exports = {
 				date_joined
 			})
 			.then(post => {
-				db.query(`SELECT * from classroom, classroom_details, users
+				db.query(
+					`SELECT * from classroom, classroom_details, users
 						 WHERE user_id='${user_id}' 
 						 AND classroom_details.class_id=${class_id} 
-						 AND classroom_details.class_id = classroom.class_id`)
-				.then(classroom => {
+						 AND classroom_details.class_id = classroom.class_id`
+				).then(classroom => {
 					classroom.map(x => {
-						if (x.user_role_id === 2){
+						if (x.user_role_id === 2) {
 							const body = `	<h1>The Admin Added you as a Mentor on the cohort.</h1>
 											<p>Please use the following credentials on joining the cohort: </p>
 											<h2>Cohort Name: ${x.class_title}</h2>
-											<h3>Cohort Key: ${x.class_key}</h3> ` 
-							emailSender.emailTemplate(x.email, 'Shared a Key on Cohort', body)
+											<h3>Cohort Key: ${x.class_key}</h3> `;
+							emailSender.emailTemplate(
+								x.email,
+								'Shared a Key on Cohort',
+								body
+							);
 						}
-					})
-				})
-				res.status(201).json(post)
+					});
+				});
+				res.status(201).json(post);
 			})
 			.catch(err => {
 				console.error(err);
@@ -303,7 +308,7 @@ module.exports = {
               AND users.user_id = classroom_students.user_id
               AND classroom_students.class_id = classroom.class_id 
               AND classroom_students.class_id = classroom_details.class_id 
-              AND classroom.class_id = classroom_details.class_id`
+              AND classroom.class_id = classroom_details.class_id ORDER BY users.user_role_id ASC`
 		)
 			.then(classDetail => res.status(200).json(classDetail))
 			.catch(err => {
