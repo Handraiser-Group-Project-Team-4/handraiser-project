@@ -21,6 +21,7 @@ import CohortModal from "../CohortTools/CohortModal";
 import CopyToClipBoard from "../../tools/CopyToClipBoard";
 
 // ICONS
+import ShareIcon from '@material-ui/icons/Share';
 import VpnKeyIcon from "@material-ui/icons/VpnKey";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import SchoolIcon from '@material-ui/icons/School';
@@ -39,6 +40,11 @@ export default function Cohort() {
     open: false,
     data: "",
     type: "updating"
+  })
+  const [shareKey, setShareKey] = useState({
+    open: false,
+    class_id: "",
+    class_key: ""
   })
 
   const [toggleCohort, setToggleCohort] = useState({
@@ -70,6 +76,9 @@ export default function Cohort() {
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `110px` }}>{rowData.class_key}</p>
             <CopyToClipBoard data={rowData.class_key} />
+            <Tooltip title="Share Key to Mentors">
+              <ShareIcon style={{cursor:`pointer`}} onClick={() => setShareKey({open: true, class_id: rowData.class_id, class_key: rowData.class_key})} />
+            </Tooltip>
           </div>
         )
       },
@@ -89,17 +98,17 @@ export default function Cohort() {
               active
             </span>
           ) : (
-            <span
-              style={{
-                background: `red`,
-                color: `white`,
-                padding: `2px 4px`,
-                borderRadius: `3px`
-              }}
-            >
-              close
+              <span
+                style={{
+                  background: `red`,
+                  color: `white`,
+                  padding: `2px 4px`,
+                  borderRadius: `3px`
+                }}
+              >
+                close
             </span>
-          )
+            )
       },
       {
         title: "Actions",
@@ -150,7 +159,7 @@ export default function Cohort() {
                 }
               />
             </Tooltip>
-            
+
           </div>
         )
       }
@@ -166,11 +175,11 @@ export default function Cohort() {
               <span> {rowData.class_title}</span>
             </>
           ) : (
-            <>
-              <status-indicator active pulse negative />
-              <span> {rowData.class_title}</span>
-            </>
-          )
+              <>
+                <status-indicator active pulse negative />
+                <span> {rowData.class_title}</span>
+              </>
+            )
       },
       {
         title: "Key",
@@ -214,11 +223,11 @@ export default function Cohort() {
                     View Joined Users
                   </MenuItem>
 
-                  <MenuItem  onClick={e => setUpdateTitleDesc({...updateTitleDesc, open: true, data: rowData})} >
+                  <MenuItem onClick={e => setUpdateTitleDesc({ ...updateTitleDesc, open: true, data: rowData })} >
                     Update Cohort
                   </MenuItem>
-              
-              </Menu>
+
+                </Menu>
 
               </React.Fragment>
             )}
@@ -286,13 +295,13 @@ export default function Cohort() {
             data: row,
             hasUsers: true
           });
-         
+
         }
       })
       .catch(err => console.log("object"));
   }
-  
-  
+
+
   const openViewStudentsModal = row => {
     setSubject({
       title: row.class_title,
@@ -301,7 +310,7 @@ export default function Cohort() {
       key: row.class_key,
       status: row.class_status
     });
-   
+
     // setCohortObj(row)
     renderViewStudentsTable(row.class_id);
   };
@@ -326,6 +335,17 @@ export default function Cohort() {
 
   return (
     <>
+      {shareKey.open && (
+        <PopupModal
+          title={"Are you Sure you want to share the Cohort key to Mentors? Cohort Key will be Send on Mentor/s Email."}
+          open={shareKey.open}
+          data={shareKey}
+          handleClose={() => setShareKey({open:false, class_id:"", class_key:""})}
+          render={() => setShareKey({open:false, class_id:"", class_key:""})}
+          type={"Share Key Cohort"}
+        />
+      )}
+
       {updateTitleDesc.open && (
         <PopupModal
           open={updateTitleDesc.open}
@@ -344,9 +364,9 @@ export default function Cohort() {
       {toggleCohort.open && (
         <PopupModal
           title={
-            (toggleCohort.data.class_status === 'true'  && toggleCohort.hasUsers === true) ? `${toggleCohort.data.class_title} still have users on it. Are you sure you want to close this Cohort ?` : 
-            (toggleCohort.data.class_status === 'false') ? `Are you sure you want to open ${toggleCohort.data.class_title} Cohort ?` : 
-            (toggleCohort.data.class_status === 'true' && toggleCohort.hasUsers === false ) ? `Are you sure you want to close ${toggleCohort.data.class_title} Cohort ?` : null
+            (toggleCohort.data.class_status === 'true' && toggleCohort.hasUsers === true) ? `${toggleCohort.data.class_title} still have users on it. Are you sure you want to close this Cohort ?` :
+              (toggleCohort.data.class_status === 'false') ? `Are you sure you want to open ${toggleCohort.data.class_title} Cohort ?` :
+                (toggleCohort.data.class_status === 'true' && toggleCohort.hasUsers === false) ? `Are you sure you want to close ${toggleCohort.data.class_title} Cohort ?` : null
           }
           open={toggleCohort.open}
           handleClose={e =>

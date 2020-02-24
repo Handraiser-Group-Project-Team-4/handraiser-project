@@ -60,6 +60,7 @@ massive({
 		app.patch("/api/toapprove/:id", users.movingToApprove);
 		app.patch("/api/todisapprove/:id", users.movingToDisapprove);
 		app.get("/api/getAttendingCohorts/:id", users.getAttendingCohorts);
+		app.get("/api/shareKey/:id", users.shareKey)
 
 		// ADMIN - COHORTS
 		app.post("/api/class", cohorts.make);
