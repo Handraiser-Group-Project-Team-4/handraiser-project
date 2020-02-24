@@ -32,8 +32,8 @@ export default function CohortContainer({
   search
 }) {
   const userObj = jwtToken();
-  const { enqueueSnackbar } = useSnackbar()
-  const ENDPOINT = "172.60.63.82:3001";;
+  const { enqueueSnackbar } = useSnackbar();
+  const ENDPOINT = "172.60.63.82:3001";
   const [classroom, setClassroom] = useState([]);
   const { darkMode } = useContext(DarkModeContext);
   const [searchResult, setSearchResult] = useState([]);
@@ -239,7 +239,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : handleClickVariant() 
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}
@@ -354,7 +354,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : handleClickVariant() 
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}
