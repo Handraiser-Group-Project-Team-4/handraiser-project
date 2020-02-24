@@ -63,7 +63,9 @@ export default function CohortModal({
         ),
       
       },
-      {title: "Last Name", field: "lastname", export: false},
+      {title: "Last Name", field: "lastname", 
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` }},
       {
         title: "Role",
         field: "user_role_id",

@@ -21,7 +21,7 @@ const userDetails = {
 };
 
 export default function CohortPage(props) {
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 	const classes = useStyles();
 	const userObj = jwtToken();
 	const { id } = props.match.params;

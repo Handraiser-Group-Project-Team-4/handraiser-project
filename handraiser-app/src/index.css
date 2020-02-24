@@ -15,3 +15,14 @@ code {
 :root {
   font-size: 16px;
 }
+
+.needHelpList {
+  counter-reset: list -1;
+}
+.needHelpChild {
+  counter-increment: list;
+}
+
+.needHelpChip > span:before {
+  content: counter(list);
+}

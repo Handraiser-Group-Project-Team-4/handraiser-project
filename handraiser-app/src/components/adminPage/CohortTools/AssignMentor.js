@@ -64,7 +64,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
      
   };
 
-    console.log(data)
+
   const toastNotify = (message, variant) => {
     // variant could be success, error, warning, info, or default
     enqueueSnackbar(message, { variant });
@@ -81,7 +81,7 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}
-        maxWidth="md"
+        maxWidth="sm"
       >
         <DialogTitle id="alert-dialog-title">
          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>

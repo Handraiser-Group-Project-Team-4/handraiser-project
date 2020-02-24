@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import axios from "axios";
 import io from "socket.io-client";
+import { useSnackbar } from "notistack";
 import NoResult from "../../images/no-search-result.png";
 import NoResultDark from "../../images/no-search-result-dark.png";
 
@@ -31,7 +32,8 @@ export default function CohortContainer({
   search
 }) {
   const userObj = jwtToken();
-  const ENDPOINT = "localhost:3001";
+  const { enqueueSnackbar } = useSnackbar();
+  const ENDPOINT = "172.60.63.82:3001";
   const [classroom, setClassroom] = useState([]);
   const { darkMode } = useContext(DarkModeContext);
   const [searchResult, setSearchResult] = useState([]);
@@ -117,6 +119,17 @@ export default function CohortContainer({
       setSearchResult([]);
     }
   }, [search, classroom]);
+
+  const handleClickVariant = () => {
+    // variant could be success, error, warning, info, or default
+    enqueueSnackbar("Sorry this cohort is closed!", {
+      variant: "error",
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right"
+      }
+    });
+  };
   return (
     <Container className={classes.paperr} maxWidth="xl">
       <Grid container spacing={0} className={classes.gridContainerrr}>
@@ -125,8 +138,8 @@ export default function CohortContainer({
             <Grid
               key={i}
               item
-              xl={6}
-              lg={6}
+              xl={4}
+              lg={4}
               md={12}
               sm={12}
               xs={12}
@@ -177,8 +190,15 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>
@@ -219,7 +239,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : alert("Sorry This class is closed")
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}
@@ -234,8 +254,8 @@ export default function CohortContainer({
             <Grid
               key={i}
               item
-              xl={6}
-              lg={6}
+              xl={4}
+              lg={4}
               md={12}
               sm={12}
               xs={12}
@@ -277,16 +297,23 @@ export default function CohortContainer({
                       </Badge>
                     </Grid>
                     <Grid item xs={8} className={classes.cardDesc}>
-                      <div>
-                        <h3>{x.class_details.class_title}</h3>
-                        <p>{x.class_details.class_description}</p>
-                      </div>
+                      <h3>{x.class_details.class_title}</h3>
+                      <p>{x.class_details.class_description}</p>
+                    </Grid>
+                    <Grid item xs={12} className={classes.cardDesc}>
                       <div>
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>
@@ -327,7 +354,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : alert("Sorry This class is closed")
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}

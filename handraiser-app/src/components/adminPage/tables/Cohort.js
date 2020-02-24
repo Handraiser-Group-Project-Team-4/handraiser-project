@@ -32,7 +32,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 let socket;
 export default function Cohort() {
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [createCohort, setCreateCohort] = useState(false);
@@ -198,6 +198,7 @@ export default function Cohort() {
           <div style={{ display: `flex`, alignItems: `center` }}>
             <p style={{ width: `90px` }}>{rowData.class_key}</p>
             <CopyToClipBoard data={rowData.class_key} />
+            <ShareIcon style={{cursor:`pointer`}} onClick={() => setShareKey({open: true, class_id: rowData.class_id, class_key: rowData.class_key})} />
           </div>
         )
       },
