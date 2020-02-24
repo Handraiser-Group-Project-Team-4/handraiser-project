@@ -146,14 +146,13 @@ export default function CohortContainer({
               className={classes.rootq}
             >
               <Card className={classes.cardRoot} elevation={3}>
-                <CardContent>
+              <CardContent>
                   <Grid
                     container
                     spacing={0}
                     className={classes.gridCardContainer}
                   >
                     <Grid item xs={4} className={classes.profile__image}>
-                      {/* <img src={Unnamed} alt="Pic" /> */}
                       <Badge
                         overlap="circle"
                         anchorOrigin={{
@@ -182,18 +181,18 @@ export default function CohortContainer({
                       </Badge>
                     </Grid>
                     <Grid item xs={8} className={classes.cardDesc}>
-                      <div>
-                        <h3>{x.class_details.class_title}</h3>
-                        <p>{x.class_details.class_description}</p>
-                      </div>
+                      <h3>{x.class_details.class_title}</h3>
+                      <p>{x.class_details.class_description}</p>
+                    </Grid>
+                    <Grid item xs={12} className={classes.cardDesc}>
                       <div>
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] &&
+                            {x.mentor[0]?
                               x.mentor[0].firstname +
                                 " " +
-                                x.mentor[0].lastname}
+                                x.mentor[0].lastname:"-"}
                             {x.mentor.length > 1 && (
                               <b className={classes.num_text_mentor}>
                                 +{x.mentor.length - 1}
@@ -305,10 +304,10 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] &&
+                            {x.mentor[0]?
                               x.mentor[0].firstname +
                                 " " +
-                                x.mentor[0].lastname}
+                                x.mentor[0].lastname:'-'}
                             {x.mentor.length > 1 && (
                               <b className={classes.num_text_mentor}>
                                 +{x.mentor.length - 1}

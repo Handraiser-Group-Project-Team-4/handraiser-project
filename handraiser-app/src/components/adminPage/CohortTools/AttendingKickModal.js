@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import axios from "axios";
 import io from 'socket.io-client';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -16,6 +17,7 @@ import SchoolIcon from "@material-ui/icons/School";
 let socket;
 export default function PopupModal({ handleClose, open, data, userObj }) {
   const ENDPOINT = 'localhost:3001';
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -39,10 +41,20 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
         })
         .catch(err => console.log(err));
     });
+
+    toastNotify(`Successfully removed a cohort to ${userObj.firstname} ${userObj.lastname}`, 'success')
+    
   };
+ 
+
+  const toastNotify = (message, variant) => {
+    // variant could be success, error, warning, info, or default
+    enqueueSnackbar(message, { variant });
+  };
+
   console.log(data);
   return (
-    <>
+    <SnackbarProvider maxSnack={3}>
       <Dialog
         open={open}
         onClose={() => handleClose(userObj)}
@@ -81,6 +93,6 @@ export default function PopupModal({ handleClose, open, data, userObj }) {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+      </SnackbarProvider>
   );
 }

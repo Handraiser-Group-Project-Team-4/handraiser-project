@@ -241,7 +241,7 @@ export default function Students({
 								<Chip
 									variant="outlined"
 									color="secondary"
-									label={` to go before your turn`}
+									// label={` to go before your turn`}
 									className="needHelpChip"
 								/>
 							) : userObj.user_role_id === 2 && needHelp && counter === 0 ? (

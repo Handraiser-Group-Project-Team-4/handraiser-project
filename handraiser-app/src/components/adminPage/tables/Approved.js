@@ -33,6 +33,7 @@ export default function Approved() {
         )
       },
       {
+        title: "Last Name",
         field: "lastname",
         headerStyle: { display: `none` },
         cellStyle: { display: `none` }
@@ -95,6 +96,7 @@ export default function Approved() {
       options={{
         pageSize: 10,
         actionsColumnIndex: -1,
+        exportFileName: 'Approved Mentor Request',
         exportButton: true,
         headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
       }}

@@ -23,6 +23,7 @@ import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import CloseIcon from '@material-ui/icons/Close';
 
+
 export default function CohortModal({
   handleClose,
   open,
@@ -45,7 +46,7 @@ export default function CohortModal({
     columns: [
       {
         title: "Avatar",
-        field: "avatar",
+        field: "firstname",
         render: rowData => (
           <div style={{ display: `flex` }}>
             <img
@@ -60,13 +61,18 @@ export default function CohortModal({
             </p>
           </div>
         ),
-        export: false
+      
       },
+      {title: "Last Name", field: "lastname", 
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` }},
       {
         title: "Role",
         field: "user_role_id",
-
-        lookup: { 3: "Student", 2: "Mentor" }
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` },
+        lookup: { 3: "Student", 2: "Mentor" },
+       
       },
       { title: "Email", field: "email" },
       { title: "Status", field: "user_status",
@@ -121,6 +127,8 @@ export default function CohortModal({
 
   return (
     <>
+       
+
       {kickbool && (
         // <KickStud open={kickbool} handleClose={closeKickModal} row={kickobj} />
         <PopupModal 
@@ -148,7 +156,7 @@ export default function CohortModal({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullwidth='true'
-        maxWidth="lg"
+        maxWidth="xl"
       >
         <DialogTitle id="alert-dialog-title">
           <div style={{ display: "flex", justifyContent: "space-between" }}>
