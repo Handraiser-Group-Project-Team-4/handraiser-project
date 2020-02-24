@@ -50,6 +50,7 @@ export default function Disapproved() {
 				)
 			},
 			{
+				title: "Last Name",
 				field: 'lastname',
 				headerStyle: { display: `none` },
 				cellStyle: { display: `none` }
@@ -143,6 +144,7 @@ export default function Disapproved() {
 				data={disapproved.data}
 				options={{
 					pageSize: 10,
+					exportFileName: 'Disapproved Mentor Request',
 					actionsColumnIndex: -1,
 					exportButton: true,
 					headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }

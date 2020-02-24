@@ -19,6 +19,8 @@ import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
+
+
 let socket;
 export default function Pending() {
   const ENDPOINT = "localhost:3001";
@@ -53,7 +55,9 @@ export default function Pending() {
         )
       },
       {
+        title: 'Last Name',
         field: "lastname",
+        
         headerStyle: { display: `none` },
         cellStyle: { display: `none` }
       },
@@ -184,6 +188,7 @@ export default function Pending() {
 
   return (
     <React.Fragment>
+
       {approving.open && (
         <PopupModal
           title={`Are you sure you want to assign ${approving.data.firstname} ${approving.data.lastname} as a mentor?`}
@@ -213,7 +218,6 @@ export default function Pending() {
         options={{
           pageSize: 10,
           actionsColumnIndex: -1,
-          exportButton: true,
           headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}
       />

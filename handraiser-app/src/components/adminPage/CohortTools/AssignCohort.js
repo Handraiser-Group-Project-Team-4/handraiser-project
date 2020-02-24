@@ -1,6 +1,7 @@
 import React, {useEffect} from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 // Material UI
 import MaterialTable from 'material-table';
@@ -13,8 +14,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 let socket;
-export default function PopupModal({ handleClose, open, data, title, userId }) {
+export default function PopupModal({ handleClose, open, data, title, userId, name }) {
 	const ENDPOINT = 'localhost:3001';
+	const { enqueueSnackbar } = useSnackbar();
 	const columns = [
 		{ title: 'Title', field: 'class_title' },
 		{ title: 'Email', field: 'class_description' },
@@ -50,6 +52,11 @@ export default function PopupModal({ handleClose, open, data, title, userId }) {
 		},
 		{ title: 'Status', field: 'class_created' }
 	];
+	
+	const toastNotify = (message, variant) => {
+		// variant could be success, error, warning, info, or default
+		enqueueSnackbar(message, { variant });
+	};
 
 	useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -79,10 +86,12 @@ export default function PopupModal({ handleClose, open, data, title, userId }) {
 				})
 				.catch(err => console.log('err'));
 		});
+
+		toastNotify(`Successfully added a cohort to ${title}`, 'success')
 	};
 
 	return (
-		<>
+		<SnackbarProvider maxSnack={3}>
 			<Dialog
 				open={open}
 				onClose={handleClose}
@@ -126,6 +135,6 @@ export default function PopupModal({ handleClose, open, data, title, userId }) {
 
 				<DialogActions></DialogActions>
 			</Dialog>
-		</>
+		</SnackbarProvider>
 	);
 }

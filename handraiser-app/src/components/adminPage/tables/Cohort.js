@@ -29,6 +29,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 // import PopupModal from "../CohortTools/AssignCohort";
 
+
 let socket;
 export default function Cohort() {
   const ENDPOINT = "localhost:3001";
@@ -85,6 +86,15 @@ export default function Cohort() {
       {
         title: "Status",
         field: "class_status",
+        headerStyle: { display: `none` },
+        cellStyle: { display: `none` },
+        lookup: { true: "Active", false: "Closed" },
+       
+      },
+      {
+        title: "Status",
+        field: "class_status",
+        export: false,
         render: rowData =>
           rowData.class_status === "true" ? (
             <span
@@ -310,8 +320,7 @@ export default function Cohort() {
       key: row.class_key,
       status: row.class_status
     });
-
-    // setCohortObj(row)
+    
     renderViewStudentsTable(row.class_id);
   };
 
@@ -333,8 +342,11 @@ export default function Cohort() {
       .catch(err => console.log("object"));
   };
 
+
   return (
     <>
+       
+
       {shareKey.open && (
         <PopupModal
           title={"Are you Sure you want to share the Cohort key to Mentors? Cohort Key will be Send on Mentor/s Email."}
@@ -438,6 +450,8 @@ export default function Cohort() {
         columns={matches ? table.columns : table.mobileColumns}
         data={table.data}
         options={{
+          exportButton: true,
+          exportFileName: 'Cohorts',
           pageSize: 10,
           headerStyle: { textTransform: `uppercase`, fontWeight: `bold` }
         }}

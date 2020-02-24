@@ -22,6 +22,7 @@ import WorkIcon from "@material-ui/icons/Work";
 import WorkOutlineIcon from "@material-ui/icons/WorkOutline";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 
+
 export default function Users() {
   const [users, setUsers] = useState({
     columns: [
@@ -257,6 +258,7 @@ export default function Users() {
   
   return (
     <>
+      
       {assignModal && (
         <PopupModal
           title={(cohorts.length === 0)

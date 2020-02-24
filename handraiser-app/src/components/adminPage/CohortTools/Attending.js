@@ -37,7 +37,7 @@ export default function AttendingModal({open, data, handleClose}) {
           { title: 'Title', field: 'class_title' },
           { title: 'Description', field: 'class_description' },
           { title: 'Date Joined', field: 'date_joined' },
-          {title: "Status",
+          {title: "Status", export: false,
             field: "class_status",
             render: (rowData) => ((rowData.class_status === 'true')
             ?  <span style={{background: `green`, color: `white`, padding: `2px 4px`, borderRadius: `3px`}}>

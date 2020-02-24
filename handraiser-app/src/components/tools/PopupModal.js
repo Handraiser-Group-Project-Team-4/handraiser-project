@@ -20,14 +20,17 @@ import {
     ListItemIcon,
     ListItemText
 } from "@material-ui/core/";
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 //  ICONS
 import EditIcon from "@material-ui/icons/Edit";
 import SchoolIcon from '@material-ui/icons/School';
 
+
 let socket;
 export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen }) {
     const ENDPOINT = "localhost:3001";
+    const { enqueueSnackbar } = useSnackbar();
     const [attending, setAttending] = useState({
         open: false,
         data: ''
@@ -83,7 +86,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             } : null   
     });
 
-  
+    
 
     useEffect(() => {
         socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
@@ -178,6 +181,9 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
        
     }
 
+    
+
+
     const submitUserData = e => {
         e.preventDefault();
         const METHOD =  (type === "Share Key Cohort")?'get':
@@ -208,27 +214,63 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
             data: body.data
         })
             .then(() => {
-                if (type === 'Change User Role')
+                if (type === 'Change User Role'){
                     socket.emit("changeUserRole", { user_id: data.user_id, user_role_id: data.role });
-                if (type === 'Create Cohort' || type === 'Toggle Cohort' || type === 'updating')
-                    socket.emit("renderCohort", { data: body.data });
-                if (type === 'approving' || type === 'disapproving')
-                    socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
+                    if(data.role === 2) toastNotify(`${data.firstname} ${data.lastname} is now Mentor`,'success' )
+                    if(data.role === 3) toastNotify(`${data.firstname} ${data.lastname} is now Student`,'success' )
+                    
+                }
+                if (type === 'Create Cohort' || type === 'Toggle Cohort' || type === 'updating'){
+                    socket.emit("renderCohort", { data: body.data })
+                    if(type === 'Create Cohort') toastNotify(`Succefully created ${body.data.class_title}`,'success')
+                    if(type === 'Toggle Cohort' && data.class_status === 'true') toastNotify(`Succefully Closed ${data.class_title}`,'success')
+                    if(type === 'Toggle Cohort' && data.class_status === 'false') toastNotify(`Succefully Opened ${data.class_title}`,'success')
+                    if(type === 'updating') toastNotify(`Succefully updated ${body.data.class_title}`,'success')
+                }
+                if (type === 'approving' || type === 'disapproving'){
+                    socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data })
+                    if(type=== 'approving') toastNotify(`${data.firstname} ${data.lastname} is now a Mentor`,'success')
+                    if(type=== 'disapproving') toastNotify(`You've dissaproved ${data.firstname} ${data.lastname}'s request to be a mentor`,'success')
+                }
                 if (type === 'Kick Student') {
                     socket.emit('renderCohort')
                     socket.emit("studentKicked", { user_id: data.user_id, class_id: data.class_id });
                     handleClose(data.class_id);
+                    toastNotify(`${data.firstname} ${data.lastname} has been kick to ${data.class_title}`,'success' )
+                
                 }
-                else {
+                if (type === 'Change Key'){
+                    render()
+                    handleClose()
+                    toastNotify(`Succefully Changed Key for the Cohort ${data.class_title}`,'success')
+                }
+                if (type === 'Share Key Cohort'){
+                    toastNotify(`Succefully shared the Key to the Mentors`, 'success')
                     render()
                     handleClose()
                 }
+                else{
+                    render()
+                    handleClose()
+                }   
+                
             })
+            
             .catch(err => console.log(err))
     };
-    
+
+    const toastNotify = (message, variant) => {
+        // variant could be success, error, warning, info, or default
+        enqueueSnackbar(message, { variant });
+    };
+
     return (
-        <>
+      
+            <SnackbarProvider maxSnack={3}>
+       
+        
+    
+
             {attending.open && (
                 <Attending
                     open={attending.open}
@@ -237,6 +279,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                     type={'assigning'}
                 />
             )}
+
             <Dialog
                 open={open}
                 onClose={(type === 'Kick Student') ? ()=>handleClose(data.class_id) : handleClose}
@@ -435,6 +478,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                         : null
                 }
             </Dialog>
-        </>
+            </SnackbarProvider>
+       
     )
 }
