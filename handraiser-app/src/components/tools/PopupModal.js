@@ -180,7 +180,8 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
 
     const submitUserData = e => {
         e.preventDefault();
-        const METHOD =  (type === "Toggle Cohort") ? 'patch' :
+        const METHOD =  (type === "Share Key Cohort")?'get':
+                        (type === "Toggle Cohort") ? 'patch' :
                         (type === "updating") ? 'patch' :
                         (type === "approving") ? 'patch' :
                         (type === "disapproving") ? 'patch' :
@@ -189,7 +190,8 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                         (type === "Change User Role") ? 'patch' :
                         (type === 'Toggle Cohort') ? 'patch' :
                         (type === 'Kick Student') ? 'delete' : null
-        const URL = (type === 'Toggle Cohort') ? `/api/toggleCohort/${data.class_id}` :
+        const URL = (type === "Share Key Cohort")?`/api/shareKey/${data.class_id}`:
+                    (type === 'Toggle Cohort') ? `/api/toggleCohort/${data.class_id}` :
                     (type === 'updating') ? `/api/updateTitleDesc/${data.class_id}` :
                     (type === 'approving') ? `/api/toapprove/${data.user_id}` :
                     (type === 'disapproving') ? `/api/todisapprove/${data.user_id}` :
@@ -213,6 +215,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                 if (type === 'approving' || type === 'disapproving')
                     socket.emit("handleRoleRequest", { user_id: data.user_id, approval_status: body.data });
                 if (type === 'Kick Student') {
+                    socket.emit('renderCohort')
                     socket.emit("studentKicked", { user_id: data.user_id, class_id: data.class_id });
                     handleClose(data.class_id);
                 }
@@ -285,6 +288,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
                             <DialogTitle id="alert-dialog-title">
                                 {title}
                             </DialogTitle>
+                            
                             <DialogContent>
                                 {(type === 'updating') ?
                                     <div style={{ display: `flex`, flexDirection: `column` }}>

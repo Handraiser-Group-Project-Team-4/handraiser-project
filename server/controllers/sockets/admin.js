@@ -40,6 +40,14 @@ module.exports = {
       
     });
 
+    socket.on('userAssignedMentor', ({user_id, class_id}) => {
+      db.classroom_details.find({class_id})
+      .then(classroom => {
+        console.log(classroom[0].class_title)
+        io.emit('notifyAssignedMentor', {user_id, class_title: classroom[0].class_title})
+      })
+    })
+
     // socket.on('activeUser', (callback) => {
     //   let temp=[];
     //   db.users.find({user_status: "t"}, {"fields":[`user_id`]})

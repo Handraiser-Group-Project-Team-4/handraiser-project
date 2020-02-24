@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const nodeMailer = require('nodemailer');
+const emailSender = require('../email');
 
 module.exports = {
 	login: (req, res) => {
@@ -125,29 +125,10 @@ module.exports = {
 		)
 			.then(get => {
 				res.status(200).json(get);
-				let transporter = nodeMailer.createTransport({
-					host: process.env.EMAIL_HOST,
-					port: process.env.EMAIL_PORT,
-					secure: true,
-					auth: {
-						user: process.env.EMAIL_USER,
-						pass: process.env.EMAIL_PASS
-					}
-				});
-				let mailOptions = {
-					// from: email,
-					to: process.env.EMAIL_ADMIN,
-					subject: 'Request to be a Mentor in Handraiser App',
-					// text: "I'am Requesting to be a Mentor",
-					html: `<h3>${name} is Requesting to be a Mentor</h3><br /><br /><a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>` // html body
-				};
-				transporter.sendMail(mailOptions, (error, info) => {
-					if (error) {
-						return console.log(error);
-					}
-					console.log('Message %s sent: %s', info.messageId, info.response);
-					// res.render('index');
-				});
+				const body = `	<h2>${name} is Requesting to be a Mentor</h2>
+								<br /><br />
+								<a href="http://localhost:3000/admin-page/approval">Click here to Respond on Request</a>`
+				emailSender.emailTemplate(process.env.EMAIL_ADMIN, 'Request to be a Mentor in Handraiser App', body)
 			})
 			.catch(err => {
 				console.error(err);
@@ -278,6 +259,33 @@ module.exports = {
 				{ dark_mode }
 			)
 			.then(user => res.status(200).json(user))
+			.catch(err => {
+				console.log(err);
+				res.status(500).end();
+			});
+	},
+
+	shareKey: (req, res) => {
+		const db = req.app.get('db');
+
+		db.query(`select cd.class_title, cs.user_id, u.email, c.class_key
+		from classroom_students cs
+		inner join classroom_details cd
+		on cs.class_id = cd.class_id
+		inner join users u
+		on cs.user_id = u.user_id
+		inner join classroom c
+		on cd.class_id = c.class_id
+		where cs.class_id = ${req.params.id} and u.user_role_id = 2`)
+			.then(mentors => {
+				res.status(200).json(mentors);
+				mentors.map(mentor => {
+					const body = `	<p>Please use the following credentials on joining the cohort: </p>
+					 				<h2>Cohort Name: ${mentor.class_title}</h2>
+					 				<h3>Cohort Key: ${mentor.class_key}</h3> ` 
+					emailSender.emailTemplate(mentor.email, 'Shared a Key on Cohort', body)
+				})
+			})
 			.catch(err => {
 				console.log(err);
 				res.status(500).end();
