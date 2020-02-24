@@ -89,6 +89,7 @@ export default function TabsTemplate({
 				style={{ position: 'relative', height: 'calc(100vh - 250px)' }}
 			>
 				<Tab
+					onClick={handleDarkMode}
 					style={{ padding: 0 }}
 					label={
 						<ListItem className={classes.listItemButton}>

@@ -261,6 +261,9 @@ export default function MainpageTemplate({
         <Typography className={classes.studentImgButton}>
           {userObj.name}
         </Typography>
+        <p style={{ margin: `0 0 10px 0`, fontSize: `12px`, color: `white` }}>
+          {userObj.email}
+        </p>
         <Chip
           // icon={<FaceIcon />}
           label={
