@@ -49,7 +49,7 @@ export const UserContext = createContext(null);
 let socket;
 
 export default function CohortPage({ value = 0, match }) {
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const classes = useStyles();
   const history = useHistory();
   const userObj = jwtToken();
@@ -88,28 +88,28 @@ export default function CohortPage({ value = 0, match }) {
       .catch(err => {
         console.log(err);
       });
-       // ACCESS KEY
-       axios({
-      	method: `get`,
-      	url: `/api/cohort-check/${id}?user_id=${userObj.user_id}`,
-      	headers: {
-      		Authorization: 'Bearer ' + sessionStorage.getItem('accessToken')
-      	}
+    // ACCESS KEY
+    axios({
+      method: `get`,
+      url: `/api/cohort-check/${id}?user_id=${userObj.user_id}`,
+      headers: {
+        Authorization: "Bearer " + sessionStorage.getItem("accessToken")
+      }
+    })
+      .then(res => {
+        if (res.data.length === 0) {
+          history.push(`/student-page`);
+        }
       })
-      	.then(res => {
-      		if (res.data.length === 0) {
-      			history.push(`/student-page`);
-      		}
-      	})
-      	.catch(err => {
-      		console.log(err);
-      	});
-  }, [history,id,userObj.user_id]);
+      .catch(err => {
+        console.log(err);
+      });
+  }, [history, id, userObj.user_id]);
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
     socket.emit("joinConcern", { id }, () => {});
-  }, [ENDPOINT,id]);
+  }, [ENDPOINT, id]);
 
   useEffect(() => {
     socket.emit("getChatroom", { id }, () => {
@@ -127,8 +127,8 @@ export default function CohortPage({ value = 0, match }) {
               })
             : data.map(concern => {
                 return concern.concern_status !== "pending" &&
-                (concern.student_id === userObj.user_id ||
-                  concern.mentor_id === userObj.user_id)
+                  (concern.student_id === userObj.user_id ||
+                    concern.mentor_id === userObj.user_id)
                   ? setChatRoom({
                       room: concern.concern_id,
                       concern: concern.concern_title,
@@ -162,7 +162,15 @@ export default function CohortPage({ value = 0, match }) {
       socket.emit("disconnectConcern", () => {});
       socket.off();
     };
-  }, [data, enqueueSnackbar, id, logs, userObj.user_id,userObj.avatar,userObj.name]);
+  }, [
+    data,
+    enqueueSnackbar,
+    id,
+    logs,
+    userObj.user_id,
+    userObj.avatar,
+    userObj.name
+  ]);
 
   const changeHandler = event => {
     event.target.name === "search" && setSearch(event.target.value);
@@ -341,9 +349,30 @@ export default function CohortPage({ value = 0, match }) {
                         )}
                       </div>
                     </Grid>
-                      {chatroom ? (
-                       <>
+                    {chatroom ? (
+                      <>
                         <Hidden mdDown>
+                          <Grid
+                            item
+                            sm={12}
+                            xs={12}
+                            md={12}
+                            lg={6}
+                            className={classes.gridItemm}
+                          >
+                            <section className={classes.rootq}>
+                              <Chat chatResponsive={false} />
+                            </section>
+                          </Grid>
+                        </Hidden>
+                        <Hidden lgUp>
+                          <ChatResponsive />
+                        </Hidden>
+                      </>
+                    ) : (
+                      userObj.user_role_id === 3 && (
+                        <>
+                          <Hidden mdDown>
                             <Grid
                               item
                               sm={12}
@@ -353,37 +382,16 @@ export default function CohortPage({ value = 0, match }) {
                               className={classes.gridItemm}
                             >
                               <section className={classes.rootq}>
-                                  <Chat chatResponsive={false}/>
+                                <Helps />
                               </section>
                             </Grid>
                           </Hidden>
                           <Hidden lgUp>
-                            <ChatResponsive/>
+                            <Helps fab={true} classes={classes} />
                           </Hidden>
-                       </>
-                          ) : (
-                            userObj.user_role_id === 3 && (
-                              <>
-                                <Hidden mdDown>
-                                  <Grid
-                                    item
-                                    sm={12}
-                                    xs={12}
-                                    md={12}
-                                    lg={6}
-                                    className={classes.gridItemm}
-                                  >
-                                    <section className={classes.rootq}>
-                                        <Helps />
-                                    </section>
-                                  </Grid>
-                                </Hidden>
-                                <Hidden lgUp>
-                                  <Helps fab={true} classes={classes} />
-                                </Hidden>
-                              </>
-                            )
-                          )}
+                        </>
+                      )
+                    )}
                   </Grid>
                 </Paper>
               </TabPanel>
@@ -447,14 +455,16 @@ const useStyles = makeStyles(theme => ({
     }
   },
   paperr: {
-    height: "100%"
+    height: "100%",
+    marginTop: -40
   },
   gridContainerr: {
     paddingBottom: 20,
+    paddingTop: 30,
     backgroundColor: "#F5F5F5",
     // height: "100%",
     [theme.breakpoints.up("md")]: {
-      height: "100vh"
+      height: "calc(100% - 48px)"
     },
     [theme.breakpoints.down("md")]: {
       height: "calc(110vh - 64px)",
@@ -476,7 +486,7 @@ const useStyles = makeStyles(theme => ({
   },
   formControl: {
     marginRight: 10,
-    minWidth: '20%',
+    minWidth: "20%",
     [theme.breakpoints.down("md")]: {
       marginBottom: 10
     }
@@ -489,6 +499,7 @@ const useStyles = makeStyles(theme => ({
   },
   gridItemm: {
     height: "100%",
+    marginTop: -30,
     "&:first-of-type": {
       padding: "3rem 3rem 0"
     },
@@ -649,7 +660,8 @@ const useStyles = makeStyles(theme => ({
       }
     },
     [theme.breakpoints.up("md")]: {
-      height: "auto"
+      // height: "auto"
+      minHeight: 210
     }
   },
   loginBoxGridTwo: {
@@ -672,6 +684,10 @@ const useStyles = makeStyles(theme => ({
     fontFamily: "'Rubik', sans-serif",
     textAlign: "center",
     paddingLeft: "3rem",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
     "&>h1": {
       fontSize: "2.5rem",
       color: "#673ab7",

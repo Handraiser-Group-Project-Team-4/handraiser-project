@@ -10,7 +10,7 @@ export default function Help() {
   const [isTrue, setIsTrue] = useState(false);
   const { id, data, setData, user } = useContext(UserContext);
   const userObj = jwtToken();
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
 
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);

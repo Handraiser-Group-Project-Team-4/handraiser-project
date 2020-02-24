@@ -31,7 +31,7 @@ export default function CohortContainer({
   search
 }) {
   const userObj = jwtToken();
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const [classroom, setClassroom] = useState([]);
   const { darkMode } = useContext(DarkModeContext);
   const [searchResult, setSearchResult] = useState([]);
@@ -125,8 +125,8 @@ export default function CohortContainer({
             <Grid
               key={i}
               item
-              xl={6}
-              lg={6}
+              xl={4}
+              lg={4}
               md={12}
               sm={12}
               xs={12}
@@ -177,8 +177,15 @@ export default function CohortContainer({
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>
@@ -234,8 +241,8 @@ export default function CohortContainer({
             <Grid
               key={i}
               item
-              xl={6}
-              lg={6}
+              xl={4}
+              lg={4}
               md={12}
               sm={12}
               xs={12}
@@ -277,16 +284,23 @@ export default function CohortContainer({
                       </Badge>
                     </Grid>
                     <Grid item xs={8} className={classes.cardDesc}>
-                      <div>
-                        <h3>{x.class_details.class_title}</h3>
-                        <p>{x.class_details.class_description}</p>
-                      </div>
+                      <h3>{x.class_details.class_title}</h3>
+                      <p>{x.class_details.class_description}</p>
+                    </Grid>
+                    <Grid item xs={12} className={classes.cardDesc}>
                       <div>
                         <span>
                           <p>Mentor/s</p>
                           <h5>
-                            {x.mentor[0] && x.mentor[0].firstname + ' ' + x.mentor[0].lastname}
-                            {x.mentor.length > 1 && <b className={classes.num_text_mentor}>+{x.mentor.length - 1}</b>}
+                            {x.mentor[0] &&
+                              x.mentor[0].firstname +
+                                " " +
+                                x.mentor[0].lastname}
+                            {x.mentor.length > 1 && (
+                              <b className={classes.num_text_mentor}>
+                                +{x.mentor.length - 1}
+                              </b>
+                            )}
                           </h5>
                         </span>
                         <span>

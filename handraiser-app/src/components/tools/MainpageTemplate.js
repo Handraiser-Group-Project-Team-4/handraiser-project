@@ -1,13 +1,13 @@
-import React, { useState, useEffect, Fragment, useContext } from 'react';
-import { Redirect, useHistory } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect, Fragment, useContext } from "react";
+import { Redirect, useHistory } from "react-router-dom";
+import axios from "axios";
 import io from "socket.io-client";
 
 // COMPONENTS
 import jwtToken from "../tools/assets/jwtToken";
 import { DarkModeContext } from "../../App";
 
-import UsersModal from '../tools/UsersModal'
+import UsersModal from "../tools/UsersModal";
 import TabsTemplate from "./TabsTemplate";
 
 // MATERIAL-UI
@@ -27,7 +27,7 @@ import {
   CardContent,
   makeStyles,
   useTheme,
-  Chip,
+  Chip
 } from "@material-ui/core";
 import { useSnackbar } from "notistack";
 
@@ -41,8 +41,13 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import WarningIcon from "@material-ui/icons/Warning";
 
 let socket;
-export default function MainpageTemplate({ children, container, tabIndex, request }) {
-  const ENDPOINT = "localhost:3001";
+export default function MainpageTemplate({
+  children,
+  container,
+  tabIndex,
+  request
+}) {
+  const ENDPOINT = "172.60.63.82:3001";
   const userObj = jwtToken();
   const classes = useStyles();
   const theme = useTheme();
@@ -85,7 +90,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
   //     });
   //   sessionStorage.clear();
   // };
-  
+
   useEffect(() => {
     let login = sessionStorage.getItem("notification") ? true : false;
     if (login) {
@@ -99,7 +104,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
       sessionStorage.removeItem("notification");
     }
   }, [enqueueSnackbar]);
-  
+
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
@@ -234,8 +239,13 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
         </Typography>
         <Chip
           // icon={<FaceIcon />}
-          label={(userObj.user_role_id === 3) ? `Student` :
-            (userObj.user_role_id === 2) ? `Mentor` : `Admin`}
+          label={
+            userObj.user_role_id === 3
+              ? `Student`
+              : userObj.user_role_id === 2
+              ? `Mentor`
+              : `Admin`
+          }
           color="primary"
           style={{
             backgroundColor: "white",
@@ -244,134 +254,131 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
         />
       </div>
       {userObj.user_role_id === 1 && (
-            <TabsTemplate
-              tabIndex={tabIndex}
-              user={userObj}
-              darkMode={darkMode}
-              setDarkMode={setDarkMode}
-              classes={classes}
-                        
-            open={open}
-            modal={modal}
-            setModal={setModal}
-            setOpen={setOpen}
-            handleLogout= {handleLogout}
-            >
-              <Tab
-                style={{ padding: 0 }}
-                value="admin-cohorts"
-                label={
-                  <ListItem
-                    onClick={() => history.push("/admin-page")}
-                    button
-                    className={classes.listItemButton}
-                  >
-                    <ListItemIcon
-                      style={{
-                        color: "white"
-                      }}
-                    >
-                      <DnsIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Cohorts"
-                      className={classes.listItemText}
-                    />
-                  </ListItem>
-                }
-                {...a11yProps("admin-cohorts")}
-              />
-              <Tab
-                style={{ padding: 0 }}
-                value="admin-users"
-                label={
-                  <ListItem
-                    onClick={() => history.push("/admin-page/users")}
-                    button
-                    className={classes.listItemButton}
-                  >
-                    <ListItemIcon
-                      style={{
-                        color: "white"
-                      }}
-                    >
-                      <GroupIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Users"
-                      className={classes.listItemText}
-                    />
-                  </ListItem>
-                }
-                {...a11yProps("admin-users")}
-              />
-              <Tab
-                style={{ padding: 0 }}
-                value="admin-approval"
-                label={
-                  <ListItem
-                    onClick={() => history.push("/admin-page/approval")}
-                    button
-                    className={classes.listItemButton}
-                  >
-                    <ListItemIcon
-                      style={{
-                        color: "white"
-                      }}
-                    >
-                      <ThumbUpIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Approval"
-                      className={classes.listItemText}
-                    />
-                  </ListItem>
-                }
-                {...a11yProps("admin-approval")}
-              />
-            </TabsTemplate>
-          )
-        }
+        <TabsTemplate
+          tabIndex={tabIndex}
+          user={userObj}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          classes={classes}
+          open={open}
+          modal={modal}
+          setModal={setModal}
+          setOpen={setOpen}
+          handleLogout={handleLogout}
+        >
+          <Tab
+            style={{ padding: 0 }}
+            value="admin-cohorts"
+            label={
+              <ListItem
+                onClick={() => history.push("/admin-page")}
+                button
+                className={classes.listItemButton}
+              >
+                <ListItemIcon
+                  style={{
+                    color: "white"
+                  }}
+                >
+                  <DnsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Cohorts"
+                  className={classes.listItemText}
+                />
+              </ListItem>
+            }
+            {...a11yProps("admin-cohorts")}
+          />
+          <Tab
+            style={{ padding: 0 }}
+            value="admin-users"
+            label={
+              <ListItem
+                onClick={() => history.push("/admin-page/users")}
+                button
+                className={classes.listItemButton}
+              >
+                <ListItemIcon
+                  style={{
+                    color: "white"
+                  }}
+                >
+                  <GroupIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Users"
+                  className={classes.listItemText}
+                />
+              </ListItem>
+            }
+            {...a11yProps("admin-users")}
+          />
+          <Tab
+            style={{ padding: 0 }}
+            value="admin-approval"
+            label={
+              <ListItem
+                onClick={() => history.push("/admin-page/approval")}
+                button
+                className={classes.listItemButton}
+              >
+                <ListItemIcon
+                  style={{
+                    color: "white"
+                  }}
+                >
+                  <ThumbUpIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Approval"
+                  className={classes.listItemText}
+                />
+              </ListItem>
+            }
+            {...a11yProps("admin-approval")}
+          />
+        </TabsTemplate>
+      )}
       {userObj.user_role_id !== 1 && (
-            <TabsTemplate
-              tabIndex={tabIndex}
-              user={userObj}
-              darkMode={darkMode}
-              setDarkMode={setDarkMode}
-              classes={classes}
-              open={open}
-              modal={modal}
-              setModal={setModal}
-              setOpen={setOpen}
-              handleLogout= {handleLogout}
-            >
-              <Tab
-                style={{ padding: 0 }}
-                value="student-page"
-                label={
-                  <ListItem
-                    onClick={() => history.push("/student-page")}
-                    button
-                    className={classes.listItemButton}
-                  >
-                    <ListItemIcon
-                      style={{
-                        color: "white"
-                      }}
-                    >
-                      <DnsIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary="Cohorts"
-                      className={classes.listItemText}
-                    />
-                  </ListItem>
-                }
-                {...a11yProps("student-page")}
-              />
-            </TabsTemplate>
-          )
-        }
+        <TabsTemplate
+          tabIndex={tabIndex}
+          user={userObj}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          classes={classes}
+          open={open}
+          modal={modal}
+          setModal={setModal}
+          setOpen={setOpen}
+          handleLogout={handleLogout}
+        >
+          <Tab
+            style={{ padding: 0 }}
+            value="student-page"
+            label={
+              <ListItem
+                onClick={() => history.push("/student-page")}
+                button
+                className={classes.listItemButton}
+              >
+                <ListItemIcon
+                  style={{
+                    color: "white"
+                  }}
+                >
+                  <DnsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Cohorts"
+                  className={classes.listItemText}
+                />
+              </ListItem>
+            }
+            {...a11yProps("student-page")}
+          />
+        </TabsTemplate>
+      )}
       <div
         style={{
           position: "absolute",
@@ -382,9 +389,9 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
           width: 240
         }}
       >
-        {(userObj.user_approval_status_id === 2 || 
-        sessionStorage.getItem("newUser") === "pending" || 
-        request === "pending")&& 
+        {(userObj.user_approval_status_id === 2 ||
+          sessionStorage.getItem("newUser") === "pending" ||
+          request === "pending") && (
           <Card style={{ width: 220 }}>
             <CardContent
               style={{
@@ -405,7 +412,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
               </Typography>
             </CardContent>
           </Card>
-        }
+        )}
       </div>
     </div>
   );
@@ -594,7 +601,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: "1.25rem",
     paddingTop: "5px",
     wordBreak: "break-word",
-    textAlign: "center"
+    textAlign: "center",
+    width: "90%"
   },
   navigList: {
     textTransform: "uppercase",

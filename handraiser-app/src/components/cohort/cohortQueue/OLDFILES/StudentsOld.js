@@ -20,7 +20,7 @@ let socket;
 export default function Students(props) {
   const classes = useStyles();
   const userObj = jwtToken();
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const { room_id, id, status, student_id, index, text } = props;
   const [student, setStudent] = useState([]);
 
