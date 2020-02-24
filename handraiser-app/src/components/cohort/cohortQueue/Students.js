@@ -43,7 +43,9 @@ export default function Students({
   index,
   text,
   classes,
-  darkMode
+  darkMode,
+  needHelp,
+  counter
 }) {
   const userObj = jwtToken();
   const ENDPOINT = "172.60.63.82:3001";
@@ -56,7 +58,7 @@ export default function Students({
   const [open, setOpen] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false);
   const [value, setValue] = useState("");
-
+  console.log(index);
   useEffect(() => {
     socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
   }, [ENDPOINT]);
@@ -121,7 +123,7 @@ export default function Students({
   };
 
   return (
-    <>
+    <li className="needHelpChild">
       <ListItem
         key={index}
         className={classes.beingHelped}
@@ -235,14 +237,22 @@ export default function Students({
           }
           title={
             <span>
-              {`${text} `}{" "}
-              {
+              {`${text} `}
+              {userObj.user_id === student_id && needHelp ? (
                 <Chip
                   variant="outlined"
                   color="secondary"
-                  label={`${index} to go before your turn`}
+                  label={` to go before your turn`}
+                  className="needHelpChip"
                 />
-              }
+              ) : userObj.user_role_id === 2 && needHelp && counter === 0 ? (
+                <Chip
+                  variant="outlined"
+                  color="secondary"
+                  label={`Next in Line`}
+                  // className="needHelpChip"
+                />
+              ) : null}
             </span>
           }
           subheader={student.firstname + " " + student.lastname}
@@ -281,6 +291,6 @@ export default function Students({
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </li>
   );
 }
