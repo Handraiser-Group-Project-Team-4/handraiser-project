@@ -17,7 +17,7 @@ code {
 }
 
 .needHelpList {
-	counter-reset: list -1;
+	counter-reset: list;
 }
 .needHelpChild {
 	counter-increment: list;
