@@ -370,27 +370,25 @@ export default function CohortPage({ value = 0, match }) {
                         </Hidden>
                       </>
                     ) : (
-                      userObj.user_role_id === 3 && (
-                        <>
-                          <Hidden mdDown>
-                            <Grid
-                              item
-                              sm={12}
-                              xs={12}
-                              md={12}
-                              lg={6}
-                              className={classes.gridItemm}
-                            >
-                              <section className={classes.rootq}>
-                                <Helps />
-                              </section>
-                            </Grid>
-                          </Hidden>
-                          <Hidden lgUp>
-                            <Helps fab={true} classes={classes} />
-                          </Hidden>
-                        </>
-                      )
+                      <>
+                        <Hidden mdDown>
+                          <Grid
+                            item
+                            sm={12}
+                            xs={12}
+                            md={12}
+                            lg={6}
+                            className={classes.gridItemm}
+                          >
+                            <section className={classes.rootq}>
+                              <Helps />
+                            </section>
+                          </Grid>
+                        </Hidden>
+                        <Hidden lgUp>
+                          <Helps fab={true} classes={classes} />
+                        </Hidden>
+                      </>
                     )}
                   </Grid>
                 </Paper>
@@ -455,16 +453,14 @@ const useStyles = makeStyles(theme => ({
     }
   },
   paperr: {
-    height: "100%",
-    marginTop: -40
+    height: "100%"
   },
   gridContainerr: {
     paddingBottom: 20,
-    paddingTop: 30,
     backgroundColor: "#F5F5F5",
     // height: "100%",
     [theme.breakpoints.up("md")]: {
-      height: "calc(100% - 48px)"
+      height: "100vh"
     },
     [theme.breakpoints.down("md")]: {
       height: "calc(110vh - 64px)",
@@ -499,7 +495,6 @@ const useStyles = makeStyles(theme => ({
   },
   gridItemm: {
     height: "100%",
-    marginTop: -30,
     "&:first-of-type": {
       padding: "3rem 3rem 0"
     },
@@ -660,8 +655,7 @@ const useStyles = makeStyles(theme => ({
       }
     },
     [theme.breakpoints.up("md")]: {
-      // height: "auto"
-      minHeight: 210
+      height: "auto"
     }
   },
   loginBoxGridTwo: {
@@ -684,10 +678,6 @@ const useStyles = makeStyles(theme => ({
     fontFamily: "'Rubik', sans-serif",
     textAlign: "center",
     paddingLeft: "3rem",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
     "&>h1": {
       fontSize: "2.5rem",
       color: "#673ab7",

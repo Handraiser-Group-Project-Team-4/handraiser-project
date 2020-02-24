@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
 import axios from "axios";
 import io from "socket.io-client";
+import { useSnackbar } from "notistack";
 import NoResult from "../../images/no-search-result.png";
 import NoResultDark from "../../images/no-search-result-dark.png";
 
@@ -31,6 +32,7 @@ export default function CohortContainer({
   search
 }) {
   const userObj = jwtToken();
+  const { enqueueSnackbar } = useSnackbar();
   const ENDPOINT = "172.60.63.82:3001";
   const [classroom, setClassroom] = useState([]);
   const { darkMode } = useContext(DarkModeContext);
@@ -117,6 +119,17 @@ export default function CohortContainer({
       setSearchResult([]);
     }
   }, [search, classroom]);
+
+  const handleClickVariant = () => {
+    // variant could be success, error, warning, info, or default
+    enqueueSnackbar("Sorry this cohort is closed!", {
+      variant: "error",
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right"
+      }
+    });
+  };
   return (
     <Container className={classes.paperr} maxWidth="xl">
       <Grid container spacing={0} className={classes.gridContainerrr}>
@@ -226,7 +239,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : alert("Sorry This class is closed")
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}
@@ -341,7 +354,7 @@ export default function CohortContainer({
                     onClick={() =>
                       x.class_details.class_status === "true"
                         ? handleCohort(x.class_details)
-                        : alert("Sorry This class is closed")
+                        : handleClickVariant()
                     }
                   >
                     {x.currentUser ? `Enter Cohort` : `Join Cohort`}

@@ -114,8 +114,13 @@ export default function MainpageTemplate({
       if (userObj.user_id === user_id)
         setNotifyNotLogout({
           open: true,
-          title: `You just have been enrolled  ${userObj.user_role_id===2?`as Mentor`:''} on ${class_title}!`,
-          modalTextContent: userObj.user_role_id === 2?"Please Check your Email for the cohort credentials.":'',
+          title: `You just have been enrolled  ${
+            userObj.user_role_id === 2 ? `as Mentor` : ""
+          } on ${class_title}!`,
+          modalTextContent:
+            userObj.user_role_id === 2
+              ? "Please Check your Email for the cohort credentials."
+              : "",
           buttonText: "Agree",
           type: "studentAsignedMentor"
         });
@@ -246,7 +251,7 @@ export default function MainpageTemplate({
       sessionStorage.clear();
       sessionStorage.setItem("notification", `Successfully logged out`);
       history.push("/");
-    }, 2000);
+    }, 1000);
   };
   if (!userObj) return <Redirect to="/" />;
   const drawer = (

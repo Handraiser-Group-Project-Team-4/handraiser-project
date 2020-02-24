@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
     height: "100%"
   }),
   media: chatResponsive => ({
-    height: chatResponsive ? "75%" : "100%",
+    // height: chatResponsive ? '75%' : '100%',
     minHeight: "500px",
     padding: "0px!important",
     "& > div > div::-webkit-scrollbar": {
