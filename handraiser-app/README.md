@@ -1,68 +1,67 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Handraiser (Team 4)
 
-## Available Scripts
+An application that allows Boom.Camp students to "digitally" raise their hand to request assistance from a mentor. This makes it easier for Mentors to efficiently provide assistance and reduces the burden on students to keep requesting assistance if Mentors forget who is next in the queue.
 
-In the project directory, you can run:
+# Getting Started
 
-### `npm start`
+1. Download the zip file at Github
+2. Extract and save the local file copy.
+3. Meet the requirement before getting started.
+4. Run `npm run db:start` and `nodemon server/index.js`in the root folder.
+5. Run `npm run start` in the `/handraiser-app` directory.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Project Functionalities
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+**Login/Registration Page**
 
-### `npm test`
+- Students and mentors able to login to the Handraiser application
+- Verified using Google as the 0Auth provider
+- Generates an alert, notifying the user if failure happens or it succeeded
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Class Selection Page**
 
-### `npm run build`
+- Sort contacts by its last name
+- Search contacts by its first name or last name
+- Provides a detailed view for contact
+- Creating, Editing or Deleting of contacts
+- Provides a detailed view of all groups and its contacts.
+- Creating, Editing or Deleting of groups
+- Adding of contacts to a group
+- Logout to the application
+- Shows validation and error messages if failure happens
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Queue Page**
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+- Student - List item - List item
+- Mentor - List item - List item
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Admin Page**
 
-### `npm run eject`
+## Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- Web Browser
+- Terminal
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Built w/
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- [React JS](https://reactjs.org/)
+- [ExpressJs](<[https://expressjs.com/](https://expressjs.com/)>)
+- [Docker](<[https://www.docker.com/](https://www.docker.com/)>)
+- [Visual Studio Code](<([https://code.visualstudio.com/](https://code.visualstudio.com/))>)
+- [Postgres](<([[https://www.postgresql.org/docs/](https://www.postgresql.org/docs/))>)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Creator
 
-## Learn More
+Vince Gerard F. Ludovice (Team Leader)
+Clark B. Amor
+Joven B. Bandagosa
+Zion J. Camba
+Jake M. Balbedina
+Noe Philip Gabriel M. Restum
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Acknowledgements
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+- [Stack Overflow](<[[https://stackoverflow.com/](https://stackoverflow.com/)](https://stackoverflow.com/](https://stackoverflow.com/))>)
+- [Windows Visual Studio](<[https://code.visualstudio.com](https://code.visualstudio.com/)>)
+- [Material UI](<[[https://material-ui.com/](https://material-ui.com/)](https://material-ui.com/](https://material-ui.com/))>)
+- [MassiveJS](<[[https://massivejs.org/](https://massivejs.org/)](https://massivejs.org/](https://massivejs.org/))>)

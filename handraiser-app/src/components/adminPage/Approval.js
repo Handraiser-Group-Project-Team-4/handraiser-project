@@ -1,15 +1,25 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import React from "react";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import FormControl from "@material-ui/core/FormControl";
+import Select from "@material-ui/core/Select";
 
-// Components
-import Pending from './Actions/Pending';
-import Approved from './Actions/Approved';
-import Disapproved from './Actions/Disapprove';
+import useMediaQuery from "@material-ui/core/useMediaQuery";
+
+// MATERIAL-UI
+import {
+  makeStyles,
+  Tabs,
+  Tab,
+  Typography,
+  Box,
+  useTheme
+} from "@material-ui/core/";
+
+// COMPONENTS
+import Pending from "./tables/Pending";
+import Approved from "./tables/Approved";
+import Disapproved from "./tables/Disapproved";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -27,35 +37,48 @@ function TabPanel(props) {
     </Typography>
   );
 }
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.any.isRequired,
-  value: PropTypes.any.isRequired,
-};
-
 function a11yProps(index) {
   return {
     id: `vertical-tab-${index}`,
-    'aria-controls': `vertical-tabpanel-${index}`,
+    "aria-controls": `vertical-tabpanel-${index}`
   };
 }
 
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-    display: 'flex',
-    height: 224,
+    backgroundColor: "transparent"
+    // display: "flex",
+    // height: 224
   },
   tabs: {
-    borderRight: `1px solid ${theme.palette.divider}`,
+    borderRight: `1px solid ${theme.palette.divider}`
   },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2)
+  }
 }));
 
 export default function VerticalTabs() {
-  const classes = useStyles();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [value, setValue] = React.useState(0);
+  const classes = useStyles();
+  const [page, setPage] = React.useState("");
+
+  const inputLabel = React.useRef(null);
+  const [labelWidth, setLabelWidth] = React.useState(0);
+  React.useEffect(() => {
+    setLabelWidth(inputLabel.current.offsetWidth);
+  }, []);
+
+  const handleChangeMobile = event => {
+    setPage(event.target.value);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -63,28 +86,61 @@ export default function VerticalTabs() {
 
   return (
     <div className={classes.root}>
-      <Tabs
-        orientation="vertical"
-        variant="scrollable"
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs example"
-        className={classes.tabs}
+      <div style={{ display: matches ? "none" : null }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel ref={inputLabel} id="demo-simple-select-outlined-label">
+              Select Table
+            </InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={page}
+              onChange={handleChangeMobile}
+              labelWidth={labelWidth}
+            >
+              <MenuItem value={1}>For Approval</MenuItem>
+              <MenuItem value={2}> Approved</MenuItem>
+              <MenuItem value={3}>Disapproved</MenuItem>
+            </Select>
+          </FormControl>
+          <br />
+
+          {page === "" && <Pending style={{ width: "100%" }} />}
+
+          {page === 1 && <Pending style={{ width: "100%" }} />}
+
+          {page === 2 && <Approved style={{ width: "100%" }} />}
+
+          {page === 3 && <Disapproved style={{ width: "100%" }} />}
+        </div>
+      </div>
+
+      <div
+        style={{ display: matches ? null : "none" }}
+        className={classes.root}
       >
-        <Tab label="For Approval" {...a11yProps(0)} />
-        <Tab label="Approved" {...a11yProps(1)} />
-        <Tab label="Disapproved" {...a11yProps(2)} />
-      </Tabs>
-      <TabPanel style={{width: '100%'}} value={value} index={0}>
-        <Pending/>
-      </TabPanel>
-      <TabPanel style={{width: '100%'}} value={value} index={1}>
-        <Approved/>
-      </TabPanel>
-      <TabPanel style={{width: '100%'}} value={value} index={2}>
-        <Disapproved/>
-      </TabPanel>
-      
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+        >
+          <Tab label="For Approval" {...a11yProps(0)} />
+          <Tab label="Approved" {...a11yProps(1)} />
+          <Tab label="Disapproved" {...a11yProps(2)} />
+        </Tabs>
+        <TabPanel style={{ width: "100%" }} value={value} index={0}>
+          <Pending />
+        </TabPanel>
+        <TabPanel style={{ width: "100%" }} value={value} index={1}>
+          <Approved />
+        </TabPanel>
+        <TabPanel style={{ width: "100%" }} value={value} index={2}>
+          <Disapproved />
+        </TabPanel>
+      </div>
     </div>
   );
 }

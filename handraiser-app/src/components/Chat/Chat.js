@@ -1,112 +1,118 @@
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
-import axios from "axios";
-import jwtToken from '../tools/jwtToken'
+import React, { useEffect, useState, useContext } from 'react';
+import io from 'socket.io-client';
+
+// MATERIAL-UI
+import { Card, Divider } from '@material-ui/core';
+
+// COMPONENTS
+import { UserContext } from '../cohort/cohortQueue/CohortPage';
+import jwtToken from '../tools/assets/jwtToken';
+import { DarkModeContext } from '../../App';
+import ChatHeader from './ChatHeader';
+import ChatBody from './ChatBody';
+import ChatAction from './ChatAction';
+// import ChatModal from "./ChatModal";
+
+//STYLES
+import useStyles from './Style';
 
 let socket;
-const Chat = () => {
-    const username=`noe`, room="1";
-    const userObj = jwtToken();
-    // const [chatDetails, setChatDetails] = useState({
-    //     name:"",
-    //     room:"",
-    //     avatar:"",
-    // });
-    // const [username, setUsername] = useState("");
-    // const [room, setRoom] = useState("");
-    const [oldChat, setOldChat] = useState([]);
-    const [currentChat, setCurrentChat] = useState([]);
-    const [message, setMessage] = useState("");
-    const ENDPOINT = "localhost:4000";
-  
-    useEffect(() => {
-        axios({
-            method: "get",
-            url: `/api/users/${userObj.user_id}?chat=true`,
-            headers: {
-                Authorization: "Bearer " + sessionStorage.getItem("accessToken")
-            }
-        })
-            .then(res => {
-                // console.log(res.data)
-                // setChatDetails({
-                //     name: res.data.firstname + " " + res.data.lastname,
-                //     room: `'${res.data.concern_id}'`,
-                //     avatar: res.data.avatar
-                // })
+const Chat = ({ chatResponsive }) => {
+	const classes = useStyles(chatResponsive);
+	const userObj = jwtToken();
+	const { chatroom } = useContext(UserContext);
+	const { darkMode } = useContext(DarkModeContext);
+	const [showEmoji, setShowEmoji] = useState(false);
+	const [modal, setModal] = useState(false);
+	const [currentChat, setCurrentChat] = useState([]);
+	const [message, setMessage] = useState('');
+	const [expanded, setExpanded] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
 
-                // setUsername(res.data.users_concern.firstname + " " + res.data.users_concern.lastname);
-                // setRoom(res.data.users_concern.concern_id);
+	const ENDPOINT = '172.60.63.82:3001';
 
-                setOldChat(res.data.messages);
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    }, []);
+	useEffect(() => {
+		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
+		socket.emit('join', { chatroom }, () => {
+			socket.on('oldChat', data => {
+				setCurrentChat(data.data.messages);
+			});
+		});
+	}, [ENDPOINT, chatroom]);
 
-    useEffect(() => {
-        socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);
-        socket.emit("join", { username, room, userObj}, error => { });
-    }, [ENDPOINT]);
+	useEffect(() => {
+		if (message.length <= 0) socket.emit('NotTyping', { name: userObj.name });
+		socket.on('message', message => {
+			setCurrentChat([...currentChat, message]);
+		});
+		socket.on('displayTyping', ({ name }) => {
+			// setTyping({ isTyping: true, name });
+		});
+		socket.on('displayNotTyping', ({ name }) => {
+			// setTyping({ isTyping: false, name: '' });
+		});
+		return () => {
+			socket.emit('disconnect');
+			socket.off();
+		};
+	}, [currentChat, chatroom, message.length, userObj.name]);
 
-    useEffect(() => {
-        socket.on("message", message => {
-            // console.log(message)
-            setCurrentChat([...currentChat, message]);
-        });
-        socket.emit("saveChat", currentChat);
+	const sendMessage = event => {
+		setMessage('');
+		event.preventDefault();
+		const temp = message.replace(/\n/g, '<br />');
+		if (message) {
+			socket.emit('sendMessage', { message: temp }, () => setMessage(''));
+			socket.emit('NotTyping', { name: userObj.name });
+		}
+	};
 
-        return () => {
-            socket.emit("disconnect");
-            socket.off();
-        };
-    }, [currentChat]);
+	const handleExpandClick = () => {
+		setExpanded(!expanded);
+	};
+	const toggleEmoji = () => {
+		setShowEmoji(!showEmoji);
+	};
+	const handleClick = e => setAnchorEl(e.currentTarget);
+	const handleClose = () => setAnchorEl(null);
+	const handleModal = () => setModal(!modal);
 
-    const sendMessage = event => {
-        event.preventDefault();
-        if (message) {
-            socket.emit("sendMessage", {message}, () => setMessage(""));
-        }
-    };
-
-    // console.log(message, currentChat);
-    return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignContent: "center",
-                padding: "100px",
-                flexWrap: "wrap"
-            }}
-        >
-            <h1>Chat</h1>
-            <p>{"Name: " + username}</p>
-            <p style={{ paddingBottom: "80px" }}>{"Room: " + room}</p>
-            {oldChat.map((message, i) => (
-                <div key={i}>
-                    <div>{message.user + " " + message.text}</div>
-                    <p style={{opacity:`0.5`, fontSize:`10px`, margin:`0`}}>{message.time_sent}</p>
-                </div>
-            ))}
-            {currentChat.map((message, i) => (
-                <div key={i}>
-                    <div>{message.user + " " + message.text}</div>
-                    <p style={{opacity:`0.5`, fontSize:`10px`, margin:`0`}}>{message.time_sent}</p>
-                </div>
-            ))}
-            <input
-                style={{ marginTop: "50px", padding: "30px" }}
-                value={message}
-                onChange={({ target: { value } }) => setMessage(value)}
-                onKeyPress={event =>
-                    event.key === "Enter" ? sendMessage(event) : null
-                }
-            />
-        </div>
-    );
+	return (
+		<Card className={classes.root}>
+			<ChatHeader
+				classes={classes}
+				handleClick={handleClick}
+				anchorEl={anchorEl}
+				handleClose={handleClose}
+				handleModal={handleModal}
+				chatroom={chatroom}
+			/>
+			<Divider />
+			<ChatBody
+				classes={classes}
+				currentChat={currentChat}
+				chatroom={chatroom}
+				userObj={userObj}
+				darkMode={darkMode}
+			/>
+			{chatroom.concern_status !== 'done' ? (
+				<ChatAction
+					showEmoji={showEmoji}
+					setMessage={setMessage}
+					message={message}
+					toggleEmoji={toggleEmoji}
+					userObj={userObj}
+					socket={socket}
+					expanded={expanded}
+					classes={classes}
+					handleExpandClick={handleExpandClick}
+					sendMessage={sendMessage}
+					darkMode={darkMode}
+				/>
+			) : (
+				''
+			)}
+		</Card>
+	);
 };
-
 export default Chat;
