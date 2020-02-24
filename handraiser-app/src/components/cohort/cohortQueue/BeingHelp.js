@@ -6,12 +6,7 @@ import { UserContext } from './CohortPage';
 import { DarkModeContext } from '../../../App';
 
 // MATERIAL-UI
-import { List, 
-	Typography, 
-	Card, 
-	CardContent, 
-	Chip 
-} from '@material-ui/core';
+import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
 
 export default function BeingHelp({ classes }) {
 	const { id, data, user, handleConcernCount } = useContext(UserContext);
