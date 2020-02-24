@@ -30,7 +30,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 let socket;
 export default function Cohort() {
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("sm"));
   const [createCohort, setCreateCohort] = useState(false);

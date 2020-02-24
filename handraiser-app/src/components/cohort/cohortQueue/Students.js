@@ -45,7 +45,7 @@ export default function Students({
 	darkMode
 }) {
 	const userObj = jwtToken();
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 	const { chatHandler } = useContext(UserContext);
 	const handleClose = () => setAnchorEl(null);
 	const [anchorEl, setAnchorEl] = React.useState(null);
@@ -69,11 +69,13 @@ export default function Students({
 			}
 		})
 			.then(res => {
-				setValue(text);
+				if (student_id === userObj.user_id) {
+					setValue(text);
+				}
 				setStudent(res.data);
 			})
 			.catch(err => console.log(err));
-	}, [student_id, text]);
+	}, [student_id, text, userObj.user_id]);
 
 	const handleUpdate = (e, value) => {
 		e.preventDefault();
@@ -263,7 +265,7 @@ export default function Students({
 						Cancel
 					</Button>
 					<Button onClick={handleUpdateConcern} color="primary">
-						Subscribe
+						Edit
 					</Button>
 				</DialogActions>
 			</Dialog>

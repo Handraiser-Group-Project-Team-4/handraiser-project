@@ -15,7 +15,7 @@ const ChatModal = ({
 	id
 }) => {
 	smsmodal;
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 
 	useEffect(() => {
 		socket = io(process.env.WEBSOCKET_HOST || ENDPOINT);

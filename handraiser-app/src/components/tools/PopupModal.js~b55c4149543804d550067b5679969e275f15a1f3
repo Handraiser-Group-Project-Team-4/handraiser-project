@@ -20,7 +20,7 @@ import Attending from "../adminPage/CohortTools/Attending"
 
 let socket;
 export default function PopupModal({ title, setTemp, temp, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts}) {
-    const ENDPOINT = "localhost:3001";
+    const ENDPOINT = "172.60.63.82:3001";
     const [attending, setAttending] = useState({
         open: false,
         data: ''
