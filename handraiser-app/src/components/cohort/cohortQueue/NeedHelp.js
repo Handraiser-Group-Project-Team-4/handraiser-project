@@ -11,6 +11,7 @@ import { List, Typography, Card, CardContent, Chip } from '@material-ui/core';
 export default function NeedHelps({ classes }) {
 	const { id, data, handleConcernCount } = useContext(UserContext);
 	const { darkMode } = useContext(DarkModeContext);
+	let counter = 0;
 	return (
 		<Card className={classes.cardRootContent}>
 			<CardContent className={classes.cardRootContentContent}>
@@ -28,7 +29,7 @@ export default function NeedHelps({ classes }) {
 					<Chip label={handleConcernCount('pending')} />
 				</Typography>
 				{data && data.some(concern => concern.concern_status === 'pending') ? (
-					<List className={classes.roots}>
+					<List className={classes.roots + ' needHelpList'}>
 						{data.map(
 							(concern, index) =>
 								concern.concern_status === 'pending' && (
@@ -42,6 +43,8 @@ export default function NeedHelps({ classes }) {
 										index={index}
 										classes={classes}
 										darkMode={darkMode}
+										needHelp={true}
+										counter={counter++}
 									/>
 								)
 						)}
