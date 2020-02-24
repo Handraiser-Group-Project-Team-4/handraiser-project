@@ -1,6 +1,7 @@
 import React, {useEffect} from "react";
 import axios from "axios";
 import io from 'socket.io-client';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 // Material UI
 import MaterialTable from "material-table";
@@ -12,9 +13,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 // Material UI Icons
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 
+
 let socket;
 export default function PopupModal({ handleClose, open, data, title, id}) {
   const ENDPOINT = 'localhost:3001';
+  const { enqueueSnackbar } = useSnackbar();
     const columns = [
         
         { title: 'Avatar', field: 'firstname',
@@ -52,19 +55,33 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
                 socket.emit('userAssignedMentor', {user_id: x.user_id, class_id: id})
                 socket.emit('renderCohort')
                 handleClose(id)
+               
             })
             .catch(err => console.log("err"))
         })
+
+        toastNotify(`Succefully added a mentor to ${title}`, 'success')
+     
   };
+
+
+  const toastNotify = (message, variant) => {
+    // variant could be success, error, warning, info, or default
+    enqueueSnackbar(message, { variant });
+};
+ 
+
+
+
   return (
-    <>
+    <SnackbarProvider maxSnack={3}>
       <Dialog
         open={open}
         onClose={() =>handleClose(id)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}
-        maxWidth="xs"
+        maxWidth="sm"
       >
         <DialogTitle id="alert-dialog-title">
          <div style={{display:`flex`, alignItems: `center`, flexDirection:`column`, fontWeight: `normal`}}>
@@ -94,6 +111,6 @@ export default function PopupModal({ handleClose, open, data, title, id}) {
         <DialogActions>
         </DialogActions>
       </Dialog>
-    </>
+      </SnackbarProvider>
   );
 }
