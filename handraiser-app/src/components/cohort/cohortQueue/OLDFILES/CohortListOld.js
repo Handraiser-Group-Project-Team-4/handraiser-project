@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 
 let socket;
 export default function CohortListOld({ mentor }) {
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 	const userObj = jwtToken();
 	const history = useHistory();
 	const [cohorts, setCohorts] = useState([]);

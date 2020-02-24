@@ -42,7 +42,7 @@ import WarningIcon from "@material-ui/icons/Warning";
 
 let socket;
 export default function MainpageTemplate({ children, container, tabIndex, request }) {
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const userObj = jwtToken();
   const classes = useStyles();
   const theme = useTheme();
@@ -241,7 +241,7 @@ export default function MainpageTemplate({ children, container, tabIndex, reques
       sessionStorage.clear();
       sessionStorage.setItem("notification", `Successfully logged out`);
       history.push("/");
-    }, 2000);
+    }, 1000);
   };
   if (!userObj) return <Redirect to="/" />;
   const drawer = (
@@ -613,7 +613,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: "1.25rem",
     paddingTop: "5px",
     wordBreak: "break-word",
-    textAlign: "center"
+    textAlign: "center",
+    width:'90%'
   },
   navigList: {
     textTransform: "uppercase",

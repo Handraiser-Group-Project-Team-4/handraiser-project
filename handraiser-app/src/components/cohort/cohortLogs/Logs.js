@@ -24,7 +24,7 @@ const Logs = ({
 	id,
 	setLogs
 }) => {
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 	const { darkMode } = useContext(DarkModeContext);
 	const [searchResult, setSearchResult] = useState([]);
 
@@ -60,8 +60,9 @@ const Logs = ({
 				className={classes.gridContainerr + ' ' + classes.banner}
 				style={{
 					backgroundColor: darkMode ? '#333' : null,
-					paddingTop: 0,
-					marginTop: -40
+					// paddingTop: 0,
+					marginTop: -50,
+					height: '100vh'
 				}}
 			>
 				<Grid container item xs={12} sm={12} md={5} lg={5}>

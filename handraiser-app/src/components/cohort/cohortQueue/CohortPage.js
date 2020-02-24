@@ -49,7 +49,7 @@ export const UserContext = createContext(null);
 let socket;
 
 export default function CohortPage({ value = 0, match }) {
-  const ENDPOINT = "localhost:3001";
+  const ENDPOINT = "172.60.63.82:3001";
   const classes = useStyles();
   const history = useHistory();
   const userObj = jwtToken();
@@ -362,7 +362,7 @@ export default function CohortPage({ value = 0, match }) {
                           </Hidden>
                        </>
                           ) : (
-                            userObj.user_role_id === 3 && (
+                           
                               <>
                                 <Hidden mdDown>
                                   <Grid
@@ -382,7 +382,7 @@ export default function CohortPage({ value = 0, match }) {
                                   <Helps fab={true} classes={classes} />
                                 </Hidden>
                               </>
-                            )
+                            
                           )}
                   </Grid>
                 </Paper>

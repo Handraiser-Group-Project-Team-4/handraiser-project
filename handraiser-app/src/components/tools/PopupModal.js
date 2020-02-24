@@ -27,7 +27,7 @@ import SchoolIcon from '@material-ui/icons/School';
 
 let socket;
 export default function PopupModal({ title, data, open, handleClose, render, type, id, canDelete, cohorts, getCohorts, descLen, titleLen }) {
-    const ENDPOINT = "localhost:3001";
+    const ENDPOINT = "172.60.63.82:3001";
     const [attending, setAttending] = useState({
         open: false,
         data: ''

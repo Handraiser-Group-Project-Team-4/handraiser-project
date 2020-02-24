@@ -5,9 +5,10 @@ import styled, { keyframes } from 'styled-components';
 import { UserContext } from './CohortPage';
 import jwtToken from '../../tools/assets/jwtToken';
 import Handraise from '../../../images/handraise.png';
+import Queue from '../../../images/queue.svg';
 import UsersModal from '../../tools/UsersModal';
 // Material-UI
-import { Fab } from '@material-ui/core';
+import { Fab, Hidden } from '@material-ui/core';
 let socket;
 export default function Helps({ fab, classes }) {
 	const [value, setValue] = useState('');
@@ -15,7 +16,7 @@ export default function Helps({ fab, classes }) {
 	// const [isEmpty, setIsEmpty] = useState(false);
 	const { id, data, user } = useContext(UserContext);
 	const userObj = jwtToken();
-	const ENDPOINT = 'localhost:3001';
+	const ENDPOINT = '172.60.63.82:3001';
 	// const theme = useTheme();
 	// const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 	const [open, setOpen] = React.useState(false);
@@ -147,22 +148,24 @@ export default function Helps({ fab, classes }) {
 							alignItems: 'center'
 						}}
 					>
-						<HelpingHand
-							button
-							onClick={e => setOpen(true)}
-							disabled={isTrue}
-						/>
-						<h1
-							style={{
-								marginTop: '10rem',
-								color: '#673ab7',
-								fontweight: 400,
-								fontSize: '2.5rem',
-								fontFamily: 'Fira Mono, monospace'
-							}}
-						>
-							Click to raise a concern.
-						</h1>
+						<>
+							<HelpingHand
+								button
+								onClick={e => setOpen(true)}
+								disabled={isTrue}
+							/>
+							<h1
+								style={{
+									marginTop: '10rem',
+									color: '#673ab7',
+									fontweight: 400,
+									fontSize: '2.5rem',
+									fontFamily: 'Fira Mono, monospace'
+								}}
+							>
+								Click to raise a concern.
+							</h1>
+						</>
 					</div>
 				)}
 				<UsersModal
@@ -179,7 +182,11 @@ export default function Helps({ fab, classes }) {
 					fab={fab}
 				/>
 			</>
-		) : null
+		) : (
+			<Hidden mdDown>
+				<img src={Queue} alt="Queue" style={{ width: '70%' }} />
+			</Hidden>
+		)
 	) : null;
 }
 const play = keyframes`
@@ -189,7 +196,7 @@ const play = keyframes`
 15% {
   box-shadow: 0 0 0 20px rgba(103, 58, 183, 0.2);
 }
-25% {
+25% {	
   box-shadow: 0 0 0 20px rgba(103, 58, 183, 0.2),
     0 0 0 40px rgba(103, 58, 183, 0.2);
 }
