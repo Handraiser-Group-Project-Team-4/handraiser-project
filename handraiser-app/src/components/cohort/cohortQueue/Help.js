@@ -13,12 +13,9 @@ let socket;
 export default function Helps({ fab, classes }) {
   const [value, setValue] = useState("");
   const [isTrue, setIsTrue] = useState(false);
-  // const [isEmpty, setIsEmpty] = useState(false);
   const { id, data, user } = useContext(UserContext);
   const userObj = jwtToken();
   const ENDPOINT = "172.60.63.82:3001";
-  // const theme = useTheme();
-  // const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const [open, setOpen] = React.useState(false);
   const HelpingHand = styled.div`
     background: #fff;
