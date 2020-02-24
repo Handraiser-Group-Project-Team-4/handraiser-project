@@ -172,8 +172,17 @@ export default function CohortPage({ value = 0, match }) {
 
   const chatHandler = (event, value) => {
     event.stopPropagation();
-    setChatRoom(value);
+    const obj = {
+      room: value.room,
+      concern: value.concern,
+      concern_status: value.concern_status,
+      user_id: userObj.user_id,
+      avatar: userObj.avatar,
+      name: userObj.name
+    };
+    setChatRoom(obj);
   };
+  
   const handleConcernCount = value => {
     if (value === "allConcern") {
       let concernCount = data.filter(
