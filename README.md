@@ -52,11 +52,11 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 
 ## Creator
 
-Vince Gerard F. Ludovice (Team Leader)
-Clark B. Amor
-Joven B. Bandagosa
-Zion J. Camba
-Jake M. Balbedina
+Vince Gerard F. Ludovice (Team Leader)  
+Clark B. Amor  
+Joven B. Bandagosa  
+Zion J. Camba  
+Jake M. Balbedina  
 Noe Philip Gabriel M. Restum
 
 ## Acknowledgements
