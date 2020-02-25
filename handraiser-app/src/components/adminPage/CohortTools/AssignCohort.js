@@ -64,7 +64,7 @@ export default function PopupModal({ handleClose, open, data, title, userId, nam
 	  
 	const assign = (data, id) => {
 		let date = new Date();
-		let newDate = date.toLocaleString();
+		let newDate = date.toDateString();
 
 		data.map(x => {
 			return axios({
