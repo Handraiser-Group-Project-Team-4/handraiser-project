@@ -111,7 +111,7 @@ export default function PopupModal({ title, data, open, handleClose, render, typ
     };
     const handleInputs = e => {
         let date = new Date();
-        let newDate = date.toLocaleString();
+        let newDate = date.toDateString();
         let key = keyGenerator();
         setBody({
         data: {

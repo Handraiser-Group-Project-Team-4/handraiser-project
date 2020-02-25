@@ -1,19 +1,7 @@
-{
-<<<<<<< HEAD
-  "db": {
-    "user": "postgres",
-    "password": "handraiser",
-    "host": "localhost",
-    "port": 5432,
-    "database": "handraiser"
-  }
-=======
-	"db": {
-		"user": "postgres",
-		"password": "handraiser",
-		"host": "172.60.63.82",
-		"port": 5435,
-		"database": "handraiser"
-	}
->>>>>>> 8dda28fa0fbd6256c391de77829f935513c732cb
+"db": {
+	"user": "postgres",
+	"password": "handraiser",
+	"host": "172.60.63.82",
+	"port": 5435,
+	"database": "handraiser"
 }
