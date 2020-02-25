@@ -36,6 +36,15 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 - Mentor - List item - List item
 
 **Admin Page**
+-Creating/Editing a Cohort
+-Changing key to a Cohort incase of leakage
+-Sending cohort key to mentor via gmail
+-Assigning/Kicking a mentor and a student to a cohort
+-Activate/Deactivate a cohort
+-Assign student to be a mentor
+-Assing mentor to be a student
+-Remove/add a cohort to a user before reassigning
+-Approve/Disapprove a request to be a Mentor
 
 ## Prerequisites
 
