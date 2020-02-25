@@ -69,8 +69,6 @@ export default function CohortModal({
       {
         title: "Role",
         field: "user_role_id",
-        headerStyle: { display: `none` },
-        cellStyle: { display: `none` },
         lookup: { 3: "Student", 2: "Mentor" },
        
       },
