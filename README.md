@@ -17,30 +17,38 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 - Students and mentors able to login to the Handraiser application
 - Verified using Google as the 0Auth provider
 - Generates an alert, notifying the user if failure happens or it succeeded
+- On the first login, there is an alert asking if the user wants to request to be a mentor
 
-**Class Selection Page**
+**Cohort Selection PAGE**
 
-- Sort contacts by its last name
-- Search contacts by its first name or last name
-- Provides a detailed view for contact
-- Creating, Editing or Deleting of contacts
-- Provides a detailed view of all groups and its contacts.
-- Creating, Editing or Deleting of groups
-- Adding of contacts to a group
-- Logout to the application
-- Shows validation and error messages if failure happens
+- User can select a cohort
+- Must enter cohort key to join the cohort
 
-**Queue Page**
+**Mentor Page**
 
-- Student - List item - List item
-- Mentor - List item - List item
+- Can view cohort list
+- Can help the student's concern
+- Can remove the student's concern
+- Can chat the student
+- Can close or mark as done the student's concern
 
 **Admin Page**
+
+- Creating/Editing a Cohort
+- Changing key to a Cohort incase of leakage
+- Sending cohort key to mentor via gmail
+- Assigning/Kicking a mentor and a student to a cohort
+- Activate/Deactivate a cohort
+- Reassign student to be a mentor
+- Reassing mentor to be a student
+- Remove/add/retain a cohort to a user before reassigning
+- Approve/Disapprove a request to be a Mentor
 
 ## Prerequisites
 
 - Web Browser
 - Terminal
+- Internet
 
 ## Built w/
 
@@ -49,15 +57,19 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 - [Docker](<[https://www.docker.com/](https://www.docker.com/)>)
 - [Visual Studio Code](<([https://code.visualstudio.com/](https://code.visualstudio.com/))>)
 - [Postgres](<([[https://www.postgresql.org/docs/](https://www.postgresql.org/docs/))>)
+- Node JS
+- Socket.IO
+- React
+- Material UI
 
 ## Creator
 
-Vince Gerard F. Ludovice (Team Leader)  
-Clark B. Amor  
-Joven B. Bandagosa  
-Zion J. Camba  
-Jake M. Balbedina  
-Noe Philip Gabriel M. Restum
+- Clark B. Amor
+- Joven B. Bandagosa
+- Zion J. Camba
+- Jake M. Balbedina
+- Vince Gerard F. Ludovice (Team Leader)
+- Noe Philip Gabriel M. Restum
 
 ## Acknowledgements
 
