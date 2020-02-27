@@ -4,11 +4,21 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 
 # Getting Started
 
-1. Download the zip file at Github
-2. Extract and save the local file copy.
-3. Meet the requirement before getting started.
-4. Run `npm run db:start` and `nodemon server/index.js`in the root folder.
-5. Run `npm run start` in the `/handraiser-app` directory.
+1. Clone this repository.
+2. Meet the requirement before getting started.
+3. Run `npm install` on both root directory and handraiser-app folder.
+4. On the root and handraiser app directory, create `.env` file with the template:
+> DB_HOST = localhost  
+> DB_USER = postgres   
+> DB_PORT = port  
+> DB_NAME = handraiser
+> DB_PASS = handraiser
+5. On the root directory, create a file `secret.js` with the template:
+>module.exports = ' sample token';
+6. Next, run `docker-compose up db` as initial setup for the back end.
+7. Create a database named `handraiser` within `postgres`
+8. Next, execute `npm run migrate up` to setup the database.
+9. Finally run `npm run dev` to start the react-app.
 
 ## Project Functionalities
 
