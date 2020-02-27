@@ -6,7 +6,7 @@ An application that allows Boom.Camp students to "digitally" raise their hand to
 
 1. Clone this repository.
 2. Meet the requirement before getting started.
-3. Run `npm install` on both root directory and handraiser-app folder.
+3. Run `npm install` on root directory and handraiser-app folder.
 4. On the root and handraiser app directory, create `.env` file with the template:
 > DB_HOST = localhost  
 > DB_USER = postgres   
